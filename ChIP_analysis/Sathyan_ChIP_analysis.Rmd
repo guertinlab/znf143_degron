@@ -32,25 +32,8 @@ the alternative of trying to salvage poorly controlled experiments.
 
 # ChIP-seq analysis
 
-
 First we name the experiments with the trailing name being `PE1` or
-`PE` for paired end data. 
-
-```{r engine='bash', eval=F, echo=TRUE}
-for i in *_S*R1_001.fastq.gz
-do
-    nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_S" '{print $1}')
-    echo $nm
-	two=$(echo $i | awk -F"/" '{print $NF}' | awk -F"R1_001.fastq.gz" '{print $1}')
-	mv $i ${nm}_PE1.fastq.gz
-	mv ${two}R2_001.fastq.gz ${nm}_PE2.fastq.gz
-done
-```
-
-
-
-First we name the experiments with the trailing name being `PE1` or
-`PE` for paired end data. 
+`PE2` for paired end data. 
 
 ```{r engine='bash', eval=F, echo=TRUE}
 for i in *_S*R1_001.fastq.gz
