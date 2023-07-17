@@ -767,17 +767,7 @@ the alternative of trying to salvage poorly controlled experiments.</p>
 <div id="chip-seq-analysis" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> ChIP-seq analysis</h1>
 <p>First we name the experiments with the trailing name being <code>PE1</code> or
-<code>PE</code> for paired end data.</p>
-<pre class="bash"><code>for i in *_S*R1_001.fastq.gz
-do
-    nm=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_S&quot; &#39;{print $1}&#39;)
-    echo $nm
-    two=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;R1_001.fastq.gz&quot; &#39;{print $1}&#39;)
-    mv $i ${nm}_PE1.fastq.gz
-    mv ${two}R2_001.fastq.gz ${nm}_PE2.fastq.gz
-done</code></pre>
-<p>First we name the experiments with the trailing name being <code>PE1</code> or
-<code>PE</code> for paired end data.</p>
+<code>PE2</code> for paired end data.</p>
 <pre class="bash"><code>for i in *_S*R1_001.fastq.gz
 do
     nm=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_S&quot; &#39;{print $1}&#39;)
