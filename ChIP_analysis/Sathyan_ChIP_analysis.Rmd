@@ -50,11 +50,13 @@ done
 ## Cut off the adapter with `cutadapt`
 
 In our daily workflow in the lab we use
-`cutadapt` to remove adapeter sequences. The options we use below are `-j` for the number of cores
-to use, `-m` specifies the minimal lenght of a read to keep after
-adapter sequence removal, and `-O` is the number of bases to trim off the
-end of the read if it overlaps with the adapter sequence. If the
-genome is 25% of each base, then you would expect one quarter of the
+`cutadapt` to remove adapter sequences. The options we use below are:
+
+- `-j` for the number of cores to use
+- `-m` specifies the minimal lenght of a read to keep after adapter sequence removal
+- `-O` is the number of bases to trim off the end of the read if it overlaps with the adapter sequence 
+
+If the genome contains 25% of each base, then you would expect one quarter of the
 reads that have no adapter to have the trailing base
 trimmed. Likewise, approximately 1/16 of the remaining
 reads without the adapter will have the final two bases
@@ -63,8 +65,8 @@ matches to longer trailing k-mers (in this case 19-mers) would be
 removed first, then 18-mer matches removed, etcetera... The `-a` and `-A`
 options are the adapter sequences of the PE1 and PE2 reads.  The
 output file is `-o` (PE1) and `-p` PE2. The last two positional
-areguments are the input `fastq` files. Of course we save the output
-to a log file
+arguments are the input `fastq` files. Save the output
+to a log file.
 
 
 ```{r engine='bash', eval=F, echo=TRUE}
