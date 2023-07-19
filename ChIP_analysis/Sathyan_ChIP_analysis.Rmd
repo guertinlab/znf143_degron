@@ -88,8 +88,7 @@ done
 
 ## Align to the human genome
 
-Now we are aligning to the `hg38.fa` genome just as we have previously
-for ChIP-seq, the difference is that the libraries are paired end. Note the `-1` and
+Now we are aligning to the `hg38.fa` genome, note that the libraries are paired end. The `-1` and
 `-2` options for the respective paired-end `fastq` files. There is no
 need to save the output `sam` file, so the output is piped to
 `samtools` to convert to `bam`, then sorted by name (`-n`) so paired

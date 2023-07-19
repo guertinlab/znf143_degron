@@ -812,8 +812,7 @@ done</code></pre>
 </div>
 <div id="align-to-the-human-genome" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Align to the human genome</h2>
-<p>Now we are aligning to the <code>hg38.fa</code> genome just as we have previously
-for ChIP-seq, the difference is that the libraries are paired end. Note the <code>-1</code> and
+<p>Now we are aligning to the <code>hg38.fa</code> genome, note that the libraries are paired end. The <code>-1</code> and
 <code>-2</code> options for the respective paired-end <code>fastq</code> files. There is no
 need to save the output <code>sam</code> file, so the output is piped to
 <code>samtools</code> to convert to <code>bam</code>, then sorted by name (<code>-n</code>) so paired
@@ -826,8 +825,7 @@ chance unless you sequence to very high read depth, so these reads are
 considered PCR amplicon duplicates. The <code>fixmate</code> step is necessary to
 pipe to <code>markdup</code>. We use the entire DNA fragment for making the
 browser tracks, which is accomplished by converted the paired-end
-<code>bam</code> file to a <code>bed12</code> and taking out discordant reads. We also
-normalize to read depth.</p>
+<code>bam</code> file to a <code>bed12</code> and taking out discordant reads. The final step is normalizing to read depth.</p>
 <pre class="bash"><code>#! /bin/sh
 
 #SBATCH --job-name=chip_alignment1_XXXXXXX.sh     # name for job
