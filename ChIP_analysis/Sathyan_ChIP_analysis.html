@@ -826,8 +826,7 @@ chance unless you sequence to very high read depth, so these reads are
 considered PCR amplicon duplicates. The <code>fixmate</code> step is necessary to
 pipe to <code>markdup</code>. We use the entire DNA fragment for making the
 browser tracks, which is accomplished by converted the paired-end
-<code>bam</code> file to a <code>bed12</code> and taking out discordant reads. We also
-normalize to read depth.</p>
+<code>bam</code> file to a <code>bed12</code> and taking out discordant reads. The final step is normalizing to read depth.</p>
 <pre class="bash"><code>#! /bin/sh
 
 #SBATCH --job-name=chip_alignment1_XXXXXXX.sh     # name for job
