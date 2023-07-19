@@ -784,18 +784,20 @@ done</code></pre>
 <li><code>-j</code> for the number of cores to use</li>
 <li><code>-m</code> specifies the minimal length of a read to keep after adapter sequence removal</li>
 <li><code>-O</code> is the number of bases to trim off the end of the read if it overlaps with the adapter sequence</li>
+<li><code>-a</code> adapter sequence of PE1 reads</li>
+<li><code>-A</code> adapter sequence of PE2 reads</li>
+<li><code>-o</code> PE1 output file</li>
+<li><code>-p</code> PE2 output file</li>
 </ul>
+<p>The last two positional arguments are the input <code>fastq</code> files. Save the output
+to a log file.</p>
 <p>If the genome contains 25% of each base, then you would expect one quarter of the
 reads that have no adapter to have the trailing base
 trimmed. Likewise, approximately 1/16 of the remaining
 reads without the adapter will have the final two bases
 trimmed. Technically these values are not exact, because the reads with
 matches to longer trailing k-mers (in this case 19-mers) would be
-removed first, then 18-mer matches removed, etcetera… The <code>-a</code> and <code>-A</code>
-options are the adapter sequences of the PE1 and PE2 reads. The
-output file is <code>-o</code> (PE1) and <code>-p</code> PE2. The last two positional
-arguments are the input <code>fastq</code> files. Save the output
-to a log file.</p>
+removed first, then 18-mer matches removed, etcetera…</p>
 <pre class="bash"><code>module load cutadapt
 for i in *PE1.fastq.gz
 do
