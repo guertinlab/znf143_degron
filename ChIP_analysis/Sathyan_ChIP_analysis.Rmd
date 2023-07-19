@@ -102,8 +102,7 @@ chance unless you sequence to very high read depth, so these reads are
 considered PCR amplicon duplicates. The `fixmate` step is necessary to
 pipe to `markdup`. We use the entire DNA fragment for making the
 browser tracks, which is accomplished by converted the paired-end
-`bam` file to a `bed12` and taking out discordant reads. We also
-normalize to read depth. 
+`bam` file to a `bed12` and taking out discordant reads. The final step is normalizing to read depth. 
 
 
 ```{r engine='bash', eval=F, echo=TRUE}
