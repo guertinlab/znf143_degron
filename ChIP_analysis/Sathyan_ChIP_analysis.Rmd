@@ -53,7 +53,7 @@ In our daily workflow in the lab we use
 `cutadapt` to remove adapter sequences. The options we use below are:
 
 - `-j` for the number of cores to use
-- `-m` specifies the minimal lenght of a read to keep after adapter sequence removal
+- `-m` specifies the minimal length of a read to keep after adapter sequence removal
 - `-O` is the number of bases to trim off the end of the read if it overlaps with the adapter sequence 
 
 If the genome contains 25% of each base, then you would expect one quarter of the
