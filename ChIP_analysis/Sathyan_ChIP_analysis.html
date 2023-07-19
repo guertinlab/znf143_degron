@@ -812,8 +812,7 @@ done</code></pre>
 </div>
 <div id="align-to-the-human-genome" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Align to the human genome</h2>
-<p>Now we are aligning to the <code>hg38.fa</code> genome just as we have previously
-for ChIP-seq, the difference is that the libraries are paired end. Note the <code>-1</code> and
+<p>Now we are aligning to the <code>hg38.fa</code> genome, note that the libraries are paired end. The <code>-1</code> and
 <code>-2</code> options for the respective paired-end <code>fastq</code> files. There is no
 need to save the output <code>sam</code> file, so the output is piped to
 <code>samtools</code> to convert to <code>bam</code>, then sorted by name (<code>-n</code>) so paired
