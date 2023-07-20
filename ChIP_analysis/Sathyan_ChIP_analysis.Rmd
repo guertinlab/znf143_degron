@@ -86,12 +86,12 @@ done
 ## Align to the human genome
 
 Now we are aligning to the `hg38.fa` genome, note that the libraries are paired end. The `-1` and
-`-2` options for the respective paired-end `fastq` files. There is no
+`-2` options are for the respective paired-end `fastq` files. There is no
 need to save the output `sam` file, so the output is piped to
 `samtools` to convert to `bam`, then sorted by name (`-n`) so paired
 end reads are adjacent in the file, then piped to `samtools fixmate`
 which adds information about the fragment length by comparing the PE1
-and PE2 coordinates, then the files are sorted by coordinate, then
+and PE2 coordinates. Then the files are sorted by coordinate and 
 piped to `samtools markdup` to remove duplicate reads. Duplicate reads
 have the same PE1 and PE2 ends. This is very unlikely to happen by
 chance unless you sequence to very high read depth, so these reads are
