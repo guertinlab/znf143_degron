@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-07-20" />
+<meta name="date" content="2023-07-21" />
 
 <title>ChIP-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">ChIP-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-07-20</h4>
+<h4 class="date">2023-07-21</h4>
 
 </div>
 
@@ -809,24 +809,27 @@ done</code></pre>
 </div>
 <div id="align-to-the-human-genome" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Align to the human genome</h2>
-<p>Now we are aligning to the <code>hg38.fa</code> genome, note that the libraries are paired end. The <code>-1</code> and
+<p>Now we are aligning to the <code>hg38.fa</code> genome, note that the libraries are paired end [COMMA SPLICE PLS FIX]. The <code>-1</code> and
 <code>-2</code> options are for the respective paired-end <code>fastq</code> files. There is no
 need to save the output <code>sam</code> file, so the output is piped to
-<code>samtools</code> to convert to <code>bam</code>, then sorted by name (<code>-n</code>) so paired
-end reads are adjacent in the file, then piped to <code>samtools fixmate</code>
+<code>samtools</code> to convert to <code>bam</code>, then piped to <code>samtools fixmate</code>
 which adds information about the fragment length by comparing the PE1
 and PE2 coordinates. Then the files are sorted by coordinate and
 piped to <code>samtools markdup</code> to remove duplicate reads. Duplicate reads
 have the same PE1 and PE2 ends. This is very unlikely to happen by
 chance unless you sequence to very high read depth, so these reads are
 considered PCR amplicon duplicates. The <code>fixmate</code> step is necessary to
-pipe to <code>markdup</code>. We use the entire DNA fragment for making the
-browser tracks, which is accomplished by converted the paired-end
-<code>bam</code> file to a <code>bed12</code> and taking out discordant reads. The final step is normalizing to read depth.</p>
+pipe to <code>markdup</code>. While reads are sorted by coordinate, we run also
+run <code>seqOutBias</code> to generate a <code>bigWig</code> file.</p>
+<p>After removing duplicates, the reads are sorted by name (<code>-n</code>) so paired
+end reads are adjacent in the file. We use the entire DNA fragment for making the
+browser tracks, which is accomplished by converting the paired-end
+<code>bam</code> file to a <code>bed12</code> and taking out discordant reads.
+The final step is normalizing to read depth.</p>
 <p>“chip_alignment.sh”:</p>
 <pre class="bash"><code>#! /bin/sh
 
-#SBATCH --job-name=chip_alignment1_XXXXXXX.sh     # name for job
+#SBATCH --job-name=chip_alignment_XXXXXXX.sh     # name for job
 #SBATCH -N 1                  
 #SBATCH -n 1                 
 #SBATCH -c 32                  
@@ -834,25 +837,26 @@ browser tracks, which is accomplished by converted the paired-end
 #SBATCH --qos=general       
 #SBATCH --mem=32G               
 #SBATCH --mail-type=ALL 
-#SBATCH --mail-user=guertin@uchc.edu
+#SBATCH --mail-user=jdong@uchc.edu
 #SBATCH -o chip_alignment_XXXXXXX.sh_%j.out
 #SBATCH -e chip_alignment_XXXXXXX.sh_%j.err
 
 hostname
 
 name=XXXXXXX
-seqOutBias=/home/FCAM/meds5420/software/seqOutBias_v1.4.0.bin.linux.x86_64/seqOutBias
-tallymerFiles=/path/to/tallymer/output 
+read_size=42
+seqOutBias=/home/FCAM/jdong/software/seqOutBias
+tallymerFile=/home/FCAM/jdong/ZNF143_ChIP_2023/hg38.tal_${read_size}.gtTxt.gz
 module load samtools/1.16.1
 module load genometools/1.5.10
 module load ucsc_genome/2012.05.22
 module load rust
 module load bowtie2
 module load bedtools
-sizes=/home/FCAM/meds5420/genomes/hg38.chrom.sizes
-genome=/home/FCAM/meds5420/genomes/hg38.fa
-genome_index=/home/FCAM/meds5420/genomes/hg38_bt2/hg38
-ncore=30
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+genome=/home/FCAM/jdong/human38/hg38.fa
+genome_index=/home/FCAM/jdong/human38/hg38
+ncore=32
 
 bowtie2 -p $ncore --maxins 800 -x $genome_index -1 ${name}_PE1_no_adapt.fastq -2 ${name}_PE2_no_adapt.fastq | samtools sort -@ $ncore -n -o ${name}.bw.bam
 gzip ${name}_PE1_no_adapt.fastq
@@ -860,7 +864,7 @@ gzip ${name}_PE2_no_adapt.fastq
 gzip ${name}_PE2.fastq
 gzip ${name}_PE1.fastq
 samtools fixmate -m ${name}.bw.bam - | samtools sort -@ $ncore - | samtools markdup -s -r - ${name}.hg38.bam
-seqOutBias ${genome} ${name}.hg38.bam --tallymer=$tallymerFiles --shift-counts --no-scale --bw=${name}.bigWig --read-size=42 2&gt;&amp;1 | tee ${name}_seqOutBias.log
+seqOutBias ${genome} ${name}.hg38.bam --tallymer=$tallymerFile --shift-counts --no-scale --bw=${name}.bigWig --read-size=${read_size} 2&gt;&amp;1 | tee ${name}_seqOutBias.log
 samtools sort -@ $ncore -n -o ${name}.sorted.bam ${name}.hg38.bam
 bedtools bamtobed -i ${name}.sorted.bam -bedpe &gt; ${name}_bed12.bed
 awk &#39;$1==$4 {print $0}&#39; ${name}_bed12.bed | awk &#39;{OFS=&quot;\t&quot;;} {print $1, $2, $6}&#39; | awk &#39;$1!=&quot;.&quot; &amp;&amp; $3&gt;$2 &amp;&amp; (($3 - $2)&lt;2000) {print $0}&#39; | sort -k1,1 -k2,2n &gt; ${name}_read_span.bed
@@ -874,8 +878,11 @@ wigToBigWig -clip ${name}_normalized.bedGraph $sizes ${name}_normalized.bigWig</
 <div id="run-the-previous-chunk-in-parallel" class="section level2" number="3.3">
 <h2><span class="header-section-number">3.3</span> Run the previous chunk in parallel</h2>
 <p>Important: prior to running any sort of parallel alignment, seqOutBias needs to run tallymer once. This only needs to be done once for each dataset (as long as they have the same read length), as future runs of seqOutBias can use the same output. This step may take a while, so do it before sending anything to the cluster.</p>
-<pre class="bash"><code># run seqoutbias tallymer outside the loop
-seqOutBias tallymer 
+<pre class="bash"><code>genome=/home/FCAM/jdong/human38/hg38.fa
+read_size=42
+
+# run seqoutbias tallymer outside the loop
+seqOutBias tallymer $genome $read_size
 
 file=chip_alignment.sh
 
