@@ -921,7 +921,7 @@ relevant track files are here:
 <a href="http://guertinlab.cam.uchc.edu/znf143_hub/">http://guertinlab.cam.uchc.edu/znf143_hub/</a></p>
 <pre class="bash"><code>#!/bin/bash
 module load ucsc_genome/2012.05.22
-sizes=/home/FCAM/meds5420/genomes/hg38.chrom.sizes
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
 
 for i in *ZNF*rep1_PE1.fastq.gz
 do
@@ -939,20 +939,22 @@ do
     awk -v scaleall=&quot;$scaleall&quot; &#39;{OFS=&quot;\t&quot;;} {print $1, $2, $3, $4*scaleall}&#39; tmp.bg &gt; ${name}_normalized.bedGraph
     rm tmp.bg
     wigToBigWig ${name}_normalized.bedGraph $sizes ${name}.bigWig
-    #awk -v var=&quot;$name&quot; &#39;BEGIN {  print &quot;browser position chr11:5,289,521-5,291,937&quot;; print &quot;track type=bedGraph name=\&quot;&quot; var &quot;\&quot; description=\&quot;&quot; var &quot;_bedGraph\&quot; visibility=full autoScale=on alwaysZero=on color=0,0,0&quot;}  { print $0}&#39; ${name}_normalized.bedGraph &gt; ${name}_header_normalized.bedGraph
-    #gzip ${name}_header_normalized.bedGraph
-done
-
-for i in *ZNF*PE1.fastq.gz
+    awk -v var=&quot;$name&quot; &#39;BEGIN {  print &quot;browser position chr11:5,289,521-5,291,937&quot;; print &quot;track type=bedGraph name=\&quot;&quot; var &quot;\&quot; description=\&quot;&quot; var &quot;_bedGraph\&quot; visibility=full autoScale=on alwaysZero=on color=0,0,0&quot;}  { print $0}&#39; ${name}_normalized.bedGraph &gt; ${name}_header_normalized.bedGraph
+    gzip ${name}_header_normalized.bedGraph
+done</code></pre>
+<p>(make directories for each condition rather than each replicate? but this also removes all the BAMs from being accessible for the peak calling step)</p>
+<pre class="bash"><code>for i in *ZNF*PE1.fastq.gz
 do
     name=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_PE1.fastq.gz&quot; &#39;{print $1}&#39;)
+    mkdir ${name}_files
     mv ${name}* ./${name}_files
 done</code></pre>
 </div>
 <div id="peak-calling" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Peak calling</h1>
-<pre class="bash"><code>#! /bin/sh
-#SBATCH --job-name=chip_peak_calling.sh     # name for job
+<pre class="bash"><code>#! /usr/bin/bash
+
+#SBATCH --job-name=chip_peak_calling_ZNF143     # name for job
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -c 2
@@ -960,11 +962,14 @@ done</code></pre>
 #SBATCH --qos=general
 #SBATCH --mem=32G
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=guertin@uchc.edu
-#SBATCH -o chip_peak_calling.sh_%j.out
-#SBATCH -e chip_peak_calling.sh_%j.err
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
 
-hostname
+cd /scratch/jhdtemp
+
+echo &quot;Current wd:&quot; $(pwd)
+echo &quot;Current node:&quot; $(hostname)
 
 module load macs3
 
