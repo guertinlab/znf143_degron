@@ -205,7 +205,7 @@ relevant track files are here:
 ```{r engine='bash', eval=F, echo=TRUE}
 #!/bin/bash
 module load ucsc_genome/2012.05.22
-sizes=/home/FCAM/meds5420/genomes/hg38.chrom.sizes
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
 
 for i in *ZNF*rep1_PE1.fastq.gz
 do
@@ -223,14 +223,19 @@ do
     awk -v scaleall="$scaleall" '{OFS="\t";} {print $1, $2, $3, $4*scaleall}' tmp.bg > ${name}_normalized.bedGraph
     rm tmp.bg
     wigToBigWig ${name}_normalized.bedGraph $sizes ${name}.bigWig
-    #awk -v var="$name" 'BEGIN {  print "browser position chr11:5,289,521-5,291,937"; print "track type=bedGraph name=\"" var "\" description=\"" var "_bedGraph\" visibility=full autoScale=on alwaysZero=on color=0,0,0"}  { print $0}' ${name}_normalized.bedGraph > ${name}_header_normalized.bedGraph
-    #gzip ${name}_header_normalized.bedGraph
+    awk -v var="$name" 'BEGIN {  print "browser position chr11:5,289,521-5,291,937"; print "track type=bedGraph name=\"" var "\" description=\"" var "_bedGraph\" visibility=full autoScale=on alwaysZero=on color=0,0,0"}  { print $0}' ${name}_normalized.bedGraph > ${name}_header_normalized.bedGraph
+    gzip ${name}_header_normalized.bedGraph
 done
+```
 
+(make directories for each condition rather than each replicate? but this also removes all the BAMs from being accessible for the peak calling step)
+
+```{r engine='bash', eval=F, echo=TRUE}
 for i in *ZNF*PE1.fastq.gz
 do
     name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_PE1.fastq.gz" '{print $1}')
-	mv ${name}* ./${name}_files
+    mkdir ${name}_files
+    mv ${name}* ./${name}_files
 done
 ```
 
@@ -238,8 +243,9 @@ done
 
 
 ```{r engine='bash', eval=F, echo=TRUE}
-#! /bin/sh
-#SBATCH --job-name=chip_peak_calling.sh     # name for job
+#! /usr/bin/bash
+
+#SBATCH --job-name=chip_peak_calling_ZNF143     # name for job
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -c 2
@@ -247,11 +253,14 @@ done
 #SBATCH --qos=general
 #SBATCH --mem=32G
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=guertin@uchc.edu
-#SBATCH -o chip_peak_calling.sh_%j.out
-#SBATCH -e chip_peak_calling.sh_%j.err
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
 
-hostname
+cd /scratch/jhdtemp
+
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
 
 module load macs3
 
@@ -280,10 +289,10 @@ sizes=/home/FCAM/meds5420/genomes/hg38.chrom.sizes
 
 for i in *_summits.bed
 do
-	name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_summits.bed" '{print $1}')
-	echo $name
-	grep -v "random" ${name}_summits.bed | grep -v "chrUn" | grep -v "chrEBV" | grep -v "chrM" | grep -v "alt" | intersectBed -v -a - -b $blacklist > ${name}_summits_final.bed
-	slopBed -b 70 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_summit_140window.bed
+    name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_summits.bed" '{print $1}')
+    echo $name
+    grep -v "random" ${name}_summits.bed | grep -v "chrUn" | grep -v "chrEBV" | grep -v "chrM" | grep -v "alt" | intersectBed -v -a - -b $blacklist > ${name}_summits_final.bed
+    slopBed -b 70 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_summit_140window.bed
    	slopBed -b 200 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_summit_400window.bed
 done
 
