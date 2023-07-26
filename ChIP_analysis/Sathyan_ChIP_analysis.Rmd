@@ -213,16 +213,16 @@ do
     name=$(echo $nm | awk -F"_rep1" '{print $1}')
     echo $name
     reps=$(ls ${name}_rep*normalized.bigWig | wc -w | bc)
-	echo $reps
+    echo $reps
     files=$(ls ${name}_rep*normalized.bigWig)
-	echo $files
+    echo $files
     bigWigMerge $files tmp.bg
     scaleall=$(bc <<< "scale=4 ; 1.0 / $reps")
     echo scale:
     echo $scaleall
     awk -v scaleall="$scaleall" '{OFS="\t";} {print $1, $2, $3, $4*scaleall}' tmp.bg > ${name}_normalized.bedGraph
-	rm tmp.bg
-	wigToBigWig ${name}_normalized.bedGraph $sizes ${name}.bigWig
+    rm tmp.bg
+    wigToBigWig ${name}_normalized.bedGraph $sizes ${name}.bigWig
     #awk -v var="$name" 'BEGIN {  print "browser position chr11:5,289,521-5,291,937"; print "track type=bedGraph name=\"" var "\" description=\"" var "_bedGraph\" visibility=full autoScale=on alwaysZero=on color=0,0,0"}  { print $0}' ${name}_normalized.bedGraph > ${name}_header_normalized.bedGraph
     #gzip ${name}_header_normalized.bedGraph
 done
