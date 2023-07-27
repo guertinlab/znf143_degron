@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-07-26" />
+<meta name="date" content="2023-07-27" />
 
 <title>ChIP-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">ChIP-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-07-26</h4>
+<h4 class="date">2023-07-27</h4>
 
 </div>
 
@@ -952,6 +952,18 @@ done</code></pre>
 </div>
 <div id="peak-calling" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Peak calling</h1>
+<p>We call peaks with MACS3’s <code>callpeak</code> function using the following arguments:</p>
+<ul>
+<li><code>--call-summits</code>: looks for subpeaks inside every peak called by the default process</li>
+<li><code>-t</code>: aligned treament files. If listing multiple, they will be pooled.</li>
+<li><code>-c</code>: aligned control files. If listing multiple, they will be pooled.</li>
+<li><code>-g hs</code>: mappable or effective genome size, or the amount of genome that can be sequenced. Smaller than total genome size due to repetitions. Different for various species; ‘hs’ (which=2.7e9) is for human genomes.</li>
+<li><code>q</code>: q-value (minimum false discovery rate) cutoff</li>
+<li><code>--keep-dup all</code>: keeps all tags(reads) at every location even if they are duplicates (same coordinate on same strand)</li>
+<li><code>-f BAMPE</code>: format of input. In this case, we need to specify these BAM files contain paired-end reads</li>
+<li><code>--nomodel</code>: by specifying <code>-f BAMPE</code> we are already bypassing building the shifting model, but this ensures that the model will not be built. Insert sizes determined from read pairs are used as fragments and no shifting is needed.</li>
+<li><code>--tempdir temp_macs</code>: create this prior to running macs3. Designated directory to store temporary files. Will be empty after the <code>callpeaks</code> completes</li>
+</ul>
 <pre class="bash"><code>#! /usr/bin/bash
 
 #SBATCH --job-name=chip_peak_calling_ZNF143     # name for job
@@ -974,8 +986,8 @@ echo &quot;Current node:&quot; $(hostname)
 module load macs3
 
 mkdir temp_macs
-macs3 callpeak --call-summits -t *_CTCF_*bam -c *IgG*bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
-macs3 callpeak --call-summits -t *cont_HA_*bam -c *IgG*bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs</code></pre>
+macs3 callpeak --call-summits -t *_CTCF_*sorted.bam -c *IgG*bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+macs3 callpeak --call-summits -t *cont_HA_*sorted.bam -c *IgG*bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs</code></pre>
 <div id="removing-peaks-on-contigs-and-within-blacklisted-regions" class="section level2" number="5.1">
 <h2><span class="header-section-number">5.1</span> Removing peaks on contigs and within blacklisted regions</h2>
 <p>You can Google “blacklisted genomic regions” to find a
@@ -983,6 +995,7 @@ set of region in the genome in <code>bed</code> format that have an over-represe
 reads regardless of the experiment. Recall this is even more necessary
 because we do not have a control data set. We can also remove peaks on non-canonical chromosomes with
 <code>grep -v</code>.</p>
+<p>We also do slopBed to…</p>
 <pre class="bash"><code>module load deeptools/3.5.0
 module load bedtools
 wget https://github.com/Boyle-Lab/Blacklist/raw/master/lists/hg38-blacklist.v2.bed.gz
@@ -1004,6 +1017,7 @@ done
 </div>
 <div id="size-factors-from-library" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Size factors from library</h1>
+<p>EXPLAIN</p>
 <pre class="bash"><code>
 #size factors
 
