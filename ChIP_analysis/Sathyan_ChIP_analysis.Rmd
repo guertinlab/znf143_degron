@@ -241,6 +241,17 @@ done
 
 # Peak calling
 
+We call peaks with MACS3's `callpeak` function using the following arguments:
+
+- `--call-summits`: looks for subpeaks inside every peak called by the default process
+- `-t`: aligned treament files. If listing multiple, they will be pooled.
+- `-c`: aligned control files. If listing multiple, they will be pooled.
+- `-g hs`: mappable or effective genome size, or the amount of genome that can be sequenced. Smaller than total genome size due to repetitions. Different for various species; 'hs' (which=2.7e9) is for human genomes.
+- `q`: q-value (minimum false discovery rate) cutoff 
+- `--keep-dup all`: keeps all tags(reads) at every location even if they are duplicates (same coordinate on same strand)
+- `-f BAMPE`: format of input. In this case, we need to specify these BAM files contain paired-end reads
+- `--nomodel`: by specifying `-f BAMPE` we are already bypassing building the shifting model, but this ensures that the model will not be built. Insert sizes determined from read pairs are used as fragments and no shifting is needed.
+- `--tempdir temp_macs`: create this prior to running macs3. Designated directory to store temporary files. Will be empty after the `callpeaks` completes
 
 ```{r engine='bash', eval=F, echo=TRUE}
 #! /usr/bin/bash
@@ -265,8 +276,8 @@ echo "Current node:" $(hostname)
 module load macs3
 
 mkdir temp_macs
-macs3 callpeak --call-summits -t *_CTCF_*bam -c *IgG*bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
-macs3 callpeak --call-summits -t *cont_HA_*bam -c *IgG*bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+macs3 callpeak --call-summits -t *_CTCF_*sorted.bam -c *IgG*bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+macs3 callpeak --call-summits -t *cont_HA_*sorted.bam -c *IgG*bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
 ```
 
 ## Removing peaks on contigs and within blacklisted regions
@@ -277,6 +288,8 @@ set of region in the genome in `bed` format that have an over-representation of
 reads regardless of the experiment. Recall this is even more necessary
 because we do not have a control data set. We can also remove peaks on non-canonical chromosomes with
 `grep -v`. 
+
+We also do slopBed to...
 
 ```{r engine='bash', eval=F, echo=TRUE}
 module load deeptools/3.5.0
@@ -299,6 +312,8 @@ done
 ```
 
 # Size factors from library 
+
+EXPLAIN
 
 ```{r engine='bash', eval=F, echo=TRUE}
 
