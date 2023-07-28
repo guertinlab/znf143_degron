@@ -275,9 +275,8 @@ echo "Current node:" $(hostname)
 
 module load macs3
 
-mkdir temp_macs
-macs3 callpeak --call-summits -t *_CTCF_*sorted.bam -c *IgG*bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
-macs3 callpeak --call-summits -t *cont_HA_*sorted.bam -c *IgG*bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+macs3 callpeak --call-summits -t *_CTCF_*sorted.bam -c *IgG*sorted.bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+macs3 callpeak --call-summits -t *cont_HA_*sorted.bam -c *IgG*sorted.bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
 ```
 
 ## Removing peaks on contigs and within blacklisted regions
@@ -289,7 +288,7 @@ reads regardless of the experiment. Recall this is even more necessary
 because we do not have a control data set. We can also remove peaks on non-canonical chromosomes with
 `grep -v`. 
 
-We also do slopBed to...
+We also do slopBed to create two different sizes of windows in which we can count the number of reads in peaks.
 
 ```{r engine='bash', eval=F, echo=TRUE}
 module load deeptools/3.5.0
@@ -297,8 +296,7 @@ module load bedtools
 wget https://github.com/Boyle-Lab/Blacklist/raw/master/lists/hg38-blacklist.v2.bed.gz
 gunzip hg38-blacklist.v2.bed.gz
 blacklist=hg38-blacklist.v2.bed
-sizes=/home/FCAM/meds5420/genomes/hg38.chrom.sizes
-
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
 
 for i in *_summits.bed
 do
@@ -313,10 +311,9 @@ done
 
 # Size factors from library 
 
-EXPLAIN
+To normalize our data later, we use samtools to count the number of reads that are paired and mapped in proper pairs (0x3). We do this for each replicate, and all the counts for a particular factor (ex. HA and CTCF below) are collected in the `*reads.txt` file. 
 
 ```{r engine='bash', eval=F, echo=TRUE}
-
 #size factors
 
 module load samtools/1.12
@@ -325,7 +322,7 @@ do
   echo $i
   > ${i}_header.txt
   > ${i}_reads.txt
-  for j in HEK_ZNF-dTAG*_${i}_*.bam
+  for j in HEK_ZNF-dTAG*_${i}_*sorted.bam
   do
     echo $j
     name=$(echo $j | awk -F".sorted.bam" '{print $1}')
@@ -339,6 +336,29 @@ do
   mv ${i}_tmp.txt ${i}_reads.txt
   rm ${i}_header.txt
 done 
+
+# repeat for CTCF
+for i in CTCF
+do
+  echo $i
+  > ${i}_header.txt
+  > ${i}_reads.txt
+  
+  for j in HEK_ZNF-dTAG*_${i}_*sorted.bam
+  do
+    echo $j
+    name=$(echo $j | awk -F".sorted.bam" '{print $1}')
+    echo $name | paste ${i}_header.txt - > ${i}_tmp.txt 
+    mv ${i}_tmp.txt ${i}_header.txt
+    reads=`samtools view -c -f 0x3 $j`
+    echo $reads | paste ${i}_reads.txt - > ${i}_tmp.txt 
+    mv ${i}_tmp.txt ${i}_reads.txt
+  done  
+  
+  cat ${i}_header.txt ${i}_reads.txt > ${i}_tmp.txt 
+  mv ${i}_tmp.txt ${i}_reads.txt 
+  rm ${i}_header.txt
+done
 
 ```
 
@@ -416,10 +436,6 @@ ma.plot.lattice <- function(ma.df, filename = 'file.name',
   dev.off()
   }
 
-
-
-
-
 categorize.deseq.df.repressed <- function(df, fdr = 0.1, log2fold = 0.0, treat
 = 'Auxin') {
 
@@ -468,33 +484,23 @@ categorize.deseq.df.repressed <- function(df, fdr = 0.1, log2fold = 0.0, treat
     return(df.effects.lattice)
 }
 
+# Begin analysis here
 
-#things to do:
-# 
-
-
-
-#ZNF143 size factors from read depth
-
-
-x = read.table('CTCF_ChIP_summit_400window_isolated.bed', sep = "\t", header=FALSE)
+x = read.table('CTCF_ChIP_summit_400window.bed', sep = "\t", header=FALSE)
 y = read.table('ZNF143_ChIP_summit_400window.bed', sep = "\t", header=FALSE)
 
-#normalized signal
-znf.signal.df = get.counts.interval(y, "/Users/guertinlab/Desktop/ZNF143_ChIP/normalized_bigWig")
+# normalized signal for znf143 and ctcf
+znf.signal.df = get.counts.interval(y, "/scratch/jhdtemp/norm_bigWigs")
+ctcf.signal.df = get.counts.interval(x, "/scratch/jhdtemp/norm_bigWigs")
 
-#likewise for CTCF
-ctcf.signal.df = get.counts.interval(x, "/Users/guertinlab/Desktop/ZNF143_ChIP/normalized_bigWig")
+# get un-normalized counts for znf143 and ctcf
+znf143.counts.df = get.counts.interval(y, "/scratch/jhdtemp/seqOutBias_bigWigs")
+ctcf.counts.df = get.counts.interval(x, "/scratch/jhdtemp/seqOutBias_bigWigs")
 
-
-ctcf.counts.df = get.counts.interval(x, "/Users/guertinlab/Desktop/ZNF143_ChIP")
-znf143.counts.df = get.counts.interval(y, "/Users/guertinlab/Desktop/ZNF143_ChIP")
-
-#
-
+# use read depth for ZNF143 size factors
 HA.SF <- read.table("HA_reads.txt", sep = '\t', header = TRUE)[,-1]
 
-HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
+#HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
 
 
 
@@ -504,7 +510,8 @@ HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
 #get sizefactors of HA degron and HACTCF degron for these peaks 
 #use the HACTCF degron and HACTCF ctrl to get normalized size factors between all conditions 
 
-all.regions = rbind(ctcf.counts.df, znf143.counts.df)
+# why combine? don't need to do this anymore?
+#all.regions = rbind(ctcf.counts.df, znf143.counts.df)
 
 #ctcf.all.regions=all.regions[,grepl("CTCF",colnames(all.regions))]
 #sample.conditions = factor(sapply(strsplit(colnames(ctcf.all.regions), '_rep'), '[', 1))
@@ -518,13 +525,16 @@ all.regions = rbind(ctcf.counts.df, znf143.counts.df)
 #anchor.SF = dds$sizeFactor
 
 
-#
-znf143.analysis.regions=all.regions[,grepl("_HA_",colnames(all.regions))]
+# Get the HA columns (control and dTAGV) from the znf143 region counts table
 
-znf143.analysis.regions = znf143.analysis.regions[rownames(znf143.analysis.regions) %in% rownames(znf143.counts.df),]
+#znf143.analysis.regions=all.regions[,grepl("_HA_",colnames(all.regions))]
+znf143.analysis.regions=znf143.counts.df[,grepl("_HA_",colnames(znf143.counts.df))]
 
+#znf143.analysis.regions = znf143.analysis.regions[rownames(znf143.analysis.regions) %in% rownames(znf143.counts.df),]
+identical(rownames(znf143.analysis.regions),rownames(znf143.counts.df))
+# [1] TRUE
 
-znf143.analysis.SF = HA.size.factors
+#znf143.analysis.SF = HA.size.factors
 
 sample.conditions = factor(sapply(strsplit(colnames(znf143.analysis.regions), '_rep'), '[', 1))
 
@@ -546,7 +556,9 @@ deseq.counts.table.4 = DESeqDataSetFromMatrix(countData = znf143.analysis.region
 
 #sizeFactors(deseq.counts.table.4) <- HA.sf.final/mean(HA.sf.final)
 
-sizeFactors(deseq.counts.table.4) <- znf143.analysis.SF
+#sizeFactors(deseq.counts.table.4) <- znf143.analysis.SF
+# Need to unlist HA.SF if using it directly because sizeFactors requires vectors as input, not lists
+sizeFactors(deseq.counts.table.4) <- unlist(HA.SF)
 
 dds.4 <- DESeq(deseq.counts.table.4)
 
