@@ -500,7 +500,7 @@ ctcf.counts.df = get.counts.interval(x, "/scratch/jhdtemp/seqOutBias_bigWigs")
 # use read depth for ZNF143 size factors
 HA.SF <- read.table("HA_reads.txt", sep = '\t', header = TRUE)[,-1]
 
-#HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
+HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
 
 
 
@@ -556,9 +556,7 @@ deseq.counts.table.4 = DESeqDataSetFromMatrix(countData = znf143.analysis.region
 
 #sizeFactors(deseq.counts.table.4) <- HA.sf.final/mean(HA.sf.final)
 
-#sizeFactors(deseq.counts.table.4) <- znf143.analysis.SF
-# Need to unlist HA.SF if using it directly because sizeFactors requires vectors as input, not lists
-sizeFactors(deseq.counts.table.4) <- unlist(HA.SF)
+sizeFactors(deseq.counts.table.4) <- HA.size.factors
 
 dds.4 <- DESeq(deseq.counts.table.4)
 
