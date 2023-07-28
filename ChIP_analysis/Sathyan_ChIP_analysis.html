@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-07-27" />
+<meta name="date" content="2023-07-28" />
 
 <title>ChIP-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">ChIP-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-07-27</h4>
+<h4 class="date">2023-07-28</h4>
 
 </div>
 
@@ -985,9 +985,8 @@ echo &quot;Current node:&quot; $(hostname)
 
 module load macs3
 
-mkdir temp_macs
-macs3 callpeak --call-summits -t *_CTCF_*sorted.bam -c *IgG*bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
-macs3 callpeak --call-summits -t *cont_HA_*sorted.bam -c *IgG*bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs</code></pre>
+macs3 callpeak --call-summits -t *_CTCF_*sorted.bam -c *IgG*sorted.bam -n CTCF_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+macs3 callpeak --call-summits -t *cont_HA_*sorted.bam -c *IgG*sorted.bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs</code></pre>
 <div id="removing-peaks-on-contigs-and-within-blacklisted-regions" class="section level2" number="5.1">
 <h2><span class="header-section-number">5.1</span> Removing peaks on contigs and within blacklisted regions</h2>
 <p>You can Google “blacklisted genomic regions” to find a
@@ -995,14 +994,13 @@ set of region in the genome in <code>bed</code> format that have an over-represe
 reads regardless of the experiment. Recall this is even more necessary
 because we do not have a control data set. We can also remove peaks on non-canonical chromosomes with
 <code>grep -v</code>.</p>
-<p>We also do slopBed to…</p>
+<p>We also do slopBed to create two different sizes of windows in which we can count the number of reads in peaks.</p>
 <pre class="bash"><code>module load deeptools/3.5.0
 module load bedtools
 wget https://github.com/Boyle-Lab/Blacklist/raw/master/lists/hg38-blacklist.v2.bed.gz
 gunzip hg38-blacklist.v2.bed.gz
 blacklist=hg38-blacklist.v2.bed
-sizes=/home/FCAM/meds5420/genomes/hg38.chrom.sizes
-
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
 
 for i in *_summits.bed
 do
@@ -1017,9 +1015,8 @@ done
 </div>
 <div id="size-factors-from-library" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Size factors from library</h1>
-<p>EXPLAIN</p>
-<pre class="bash"><code>
-#size factors
+<p>To normalize our data later, we use samtools to count the number of reads that are paired and mapped in proper pairs (0x3). We do this for each replicate, and all the counts for a particular factor (ex. HA and CTCF below) are collected in the <code>*reads.txt</code> file.</p>
+<pre class="bash"><code>#size factors
 
 module load samtools/1.12
 for i in HA
@@ -1027,7 +1024,7 @@ do
   echo $i
   &gt; ${i}_header.txt
   &gt; ${i}_reads.txt
-  for j in HEK_ZNF-dTAG*_${i}_*.bam
+  for j in HEK_ZNF-dTAG*_${i}_*sorted.bam
   do
     echo $j
     name=$(echo $j | awk -F&quot;.sorted.bam&quot; &#39;{print $1}&#39;)
@@ -1041,6 +1038,29 @@ do
   mv ${i}_tmp.txt ${i}_reads.txt
   rm ${i}_header.txt
 done 
+
+# repeat for CTCF
+for i in CTCF
+do
+  echo $i
+  &gt; ${i}_header.txt
+  &gt; ${i}_reads.txt
+  
+  for j in HEK_ZNF-dTAG*_${i}_*sorted.bam
+  do
+    echo $j
+    name=$(echo $j | awk -F&quot;.sorted.bam&quot; &#39;{print $1}&#39;)
+    echo $name | paste ${i}_header.txt - &gt; ${i}_tmp.txt 
+    mv ${i}_tmp.txt ${i}_header.txt
+    reads=`samtools view -c -f 0x3 $j`
+    echo $reads | paste ${i}_reads.txt - &gt; ${i}_tmp.txt 
+    mv ${i}_tmp.txt ${i}_reads.txt
+  done  
+  
+  cat ${i}_header.txt ${i}_reads.txt &gt; ${i}_tmp.txt 
+  mv ${i}_tmp.txt ${i}_reads.txt 
+  rm ${i}_header.txt
+done
 </code></pre>
 <div id="differential-binding-and-read-count-in-peaks" class="section level2" number="6.1">
 <h2><span class="header-section-number">6.1</span> Differential binding and read count in peaks</h2>
@@ -1111,10 +1131,6 @@ ma.plot.lattice &lt;- function(ma.df, filename = &#39;file.name&#39;,
   dev.off()
   }
 
-
-
-
-
 categorize.deseq.df.repressed &lt;- function(df, fdr = 0.1, log2fold = 0.0, treat
 = &#39;Auxin&#39;) {
 
@@ -1163,33 +1179,23 @@ categorize.deseq.df.repressed &lt;- function(df, fdr = 0.1, log2fold = 0.0, trea
     return(df.effects.lattice)
 }
 
+# Begin analysis here
 
-#things to do:
-# 
-
-
-
-#ZNF143 size factors from read depth
-
-
-x = read.table(&#39;CTCF_ChIP_summit_400window_isolated.bed&#39;, sep = &quot;\t&quot;, header=FALSE)
+x = read.table(&#39;CTCF_ChIP_summit_400window.bed&#39;, sep = &quot;\t&quot;, header=FALSE)
 y = read.table(&#39;ZNF143_ChIP_summit_400window.bed&#39;, sep = &quot;\t&quot;, header=FALSE)
 
-#normalized signal
-znf.signal.df = get.counts.interval(y, &quot;/Users/guertinlab/Desktop/ZNF143_ChIP/normalized_bigWig&quot;)
+# normalized signal for znf143 and ctcf
+znf.signal.df = get.counts.interval(y, &quot;/scratch/jhdtemp/norm_bigWigs&quot;)
+ctcf.signal.df = get.counts.interval(x, &quot;/scratch/jhdtemp/norm_bigWigs&quot;)
 
-#likewise for CTCF
-ctcf.signal.df = get.counts.interval(x, &quot;/Users/guertinlab/Desktop/ZNF143_ChIP/normalized_bigWig&quot;)
+# get un-normalized counts for znf143 and ctcf
+znf143.counts.df = get.counts.interval(y, &quot;/scratch/jhdtemp/seqOutBias_bigWigs&quot;)
+ctcf.counts.df = get.counts.interval(x, &quot;/scratch/jhdtemp/seqOutBias_bigWigs&quot;)
 
-
-ctcf.counts.df = get.counts.interval(x, &quot;/Users/guertinlab/Desktop/ZNF143_ChIP&quot;)
-znf143.counts.df = get.counts.interval(y, &quot;/Users/guertinlab/Desktop/ZNF143_ChIP&quot;)
-
-#
-
+# use read depth for ZNF143 size factors
 HA.SF &lt;- read.table(&quot;HA_reads.txt&quot;, sep = &#39;\t&#39;, header = TRUE)[,-1]
 
-HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
+#HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
 
 
 
@@ -1199,7 +1205,8 @@ HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
 #get sizefactors of HA degron and HACTCF degron for these peaks 
 #use the HACTCF degron and HACTCF ctrl to get normalized size factors between all conditions 
 
-all.regions = rbind(ctcf.counts.df, znf143.counts.df)
+# why combine? don&#39;t need to do this anymore?
+#all.regions = rbind(ctcf.counts.df, znf143.counts.df)
 
 #ctcf.all.regions=all.regions[,grepl(&quot;CTCF&quot;,colnames(all.regions))]
 #sample.conditions = factor(sapply(strsplit(colnames(ctcf.all.regions), &#39;_rep&#39;), &#39;[&#39;, 1))
@@ -1213,13 +1220,16 @@ all.regions = rbind(ctcf.counts.df, znf143.counts.df)
 #anchor.SF = dds$sizeFactor
 
 
-#
-znf143.analysis.regions=all.regions[,grepl(&quot;_HA_&quot;,colnames(all.regions))]
+# Get the HA columns (control and dTAGV) from the znf143 region counts table
 
-znf143.analysis.regions = znf143.analysis.regions[rownames(znf143.analysis.regions) %in% rownames(znf143.counts.df),]
+#znf143.analysis.regions=all.regions[,grepl(&quot;_HA_&quot;,colnames(all.regions))]
+znf143.analysis.regions=znf143.counts.df[,grepl(&quot;_HA_&quot;,colnames(znf143.counts.df))]
 
+#znf143.analysis.regions = znf143.analysis.regions[rownames(znf143.analysis.regions) %in% rownames(znf143.counts.df),]
+identical(rownames(znf143.analysis.regions),rownames(znf143.counts.df))
+# [1] TRUE
 
-znf143.analysis.SF = HA.size.factors
+#znf143.analysis.SF = HA.size.factors
 
 sample.conditions = factor(sapply(strsplit(colnames(znf143.analysis.regions), &#39;_rep&#39;), &#39;[&#39;, 1))
 
@@ -1241,7 +1251,9 @@ deseq.counts.table.4 = DESeqDataSetFromMatrix(countData = znf143.analysis.region
 
 #sizeFactors(deseq.counts.table.4) &lt;- HA.sf.final/mean(HA.sf.final)
 
-sizeFactors(deseq.counts.table.4) &lt;- znf143.analysis.SF
+#sizeFactors(deseq.counts.table.4) &lt;- znf143.analysis.SF
+# Need to unlist HA.SF if using it directly because sizeFactors requires vectors as input, not lists
+sizeFactors(deseq.counts.table.4) &lt;- unlist(HA.SF)
 
 dds.4 &lt;- DESeq(deseq.counts.table.4)
 
