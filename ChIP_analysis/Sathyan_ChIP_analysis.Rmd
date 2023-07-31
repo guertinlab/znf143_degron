@@ -148,7 +148,7 @@ gzip ${name}_PE2_no_adapt.fastq
 gzip ${name}_PE2.fastq
 gzip ${name}_PE1.fastq
 echo "Zipping done; begin BAM processing"
-samtools fixmate -m ${name}.bw.bam - | samtools sort -@ $ncore - | samtools markdup -s -r - ${name}.hg38.bam
+samtools fixmate -f 0x2 -m ${name}.bw.bam - | samtools sort -@ $ncore - | samtools markdup -s -r - ${name}.hg38.bam
 echo "Begin seqOutBias"
 seqOutBias ${genome} ${name}.hg38.bam --tallymer=$tallymerFile --shift-counts --no-scale --bw=${name}.bigWig --read-size=${read_size} 2>&1 | tee ${name}_seqOutBias.log
 echo "End seqOutBias"
