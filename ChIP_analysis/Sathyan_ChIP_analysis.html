@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-07-31" />
+<meta name="date" content="2023-08-02" />
 
 <title>ChIP-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">ChIP-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-07-31</h4>
+<h4 class="date">2023-08-02</h4>
 
 </div>
 
@@ -1082,6 +1082,13 @@ read depth to normalize.</p>
 </div>
 <div id="counting-reads-in-peaks-and-differential-binding" class="section level2" number="6.3">
 <h2><span class="header-section-number">6.3</span> Counting reads in peaks and differential binding</h2>
+<p>Points to consider:</p>
+<p>It is important to distinguish between the normalized and unnormalized bigWigs for this step.
+DESeq requires unnormalized data, so use the bigWigs created by seqOutBias in the alignment step
+as inputs for <code>znf143.counts.df</code>, since this becomes the basis for creating the DESeqDataSet object
+used in <code>DESeq()</code>. There should be one bigWig per replicate for each condition.</p>
+<p>We are also supplying our own size factors in the form of read counts (counted and collected above).
+It is also important to remember to normalize the read counts (done here by <code>estimateSizeFactorsForMatrix</code>) prior to running <code>DESeq()</code>.</p>
 <pre class="r"><code>#libraries
 library(DESeq2)
 library(lattice)
@@ -1194,7 +1201,6 @@ ctcf.counts.df = get.counts.interval(x, &quot;/scratch/jhdtemp/seqOutBias_bigWig
 
 # use read depth for ZNF143 size factors
 HA.SF &lt;- read.table(&quot;HA_reads.txt&quot;, sep = &#39;\t&#39;, header = TRUE)[,-1]
-
 HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
 
 
