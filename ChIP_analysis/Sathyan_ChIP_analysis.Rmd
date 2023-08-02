@@ -386,6 +386,16 @@ read depth to normalize.
 
 ## Counting reads in peaks and differential binding 
 
+Points to consider:
+
+It is important to distinguish between the normalized and unnormalized bigWigs for this step.
+DESeq requires unnormalized data, so use the bigWigs created by seqOutBias in the alignment step
+as inputs for `znf143.counts.df`, since this becomes the basis for creating the DESeqDataSet object
+used in `DESeq()`. There should be one bigWig per replicate for each condition.
+
+We are also supplying our own size factors in the form of read counts (counted and collected above).
+It is also important to remember to normalize the read counts (done here by `estimateSizeFactorsForMatrix`) prior to running `DESeq()`.
+
 ```{r, engine='R', eval=F, echo=T}
 #libraries
 library(DESeq2)
@@ -499,7 +509,6 @@ ctcf.counts.df = get.counts.interval(x, "/scratch/jhdtemp/seqOutBias_bigWigs")
 
 # use read depth for ZNF143 size factors
 HA.SF <- read.table("HA_reads.txt", sep = '\t', header = TRUE)[,-1]
-
 HA.size.factors = estimateSizeFactorsForMatrix(HA.SF)
 
 
