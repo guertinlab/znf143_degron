@@ -715,7 +715,7 @@ function toggle_visibility(id1) {
 <ul>
 <li><a href="#confirming-umi-length" id="toc-confirming-umi-length"><span class="toc-section-number">1.1</span> Confirming UMI length</a></li>
 </ul></li>
-<li><a href="#edit-this-for-pro-alignment-and-parallelization" id="toc-edit-this-for-pro-alignment-and-parallelization"><span class="toc-section-number">2</span> Edit this for PRO alignment and parallelization:</a>
+<li><a href="#pro-alignment-and-parallelization" id="toc-pro-alignment-and-parallelization"><span class="toc-section-number">2</span> PRO alignment and parallelization:</a>
 <ul>
 <li><a href="#run-the-previous-chunk-in-parallel" id="toc-run-the-previous-chunk-in-parallel"><span class="toc-section-number">2.1</span> Run the previous chunk in parallel</a></li>
 </ul></li>
@@ -957,31 +957,35 @@ for x in Z143_UMI_test_clipped*.fastq
 <p>Note the large spike in alignment rate when 8 bases are trimmed–this is another point in favor of the UMI length = 8.</p>
 </div>
 </div>
-<div id="edit-this-for-pro-alignment-and-parallelization" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Edit this for PRO alignment and parallelization:</h1>
-<pre class="bash"><code>#! /bin/sh
+<div id="pro-alignment-and-parallelization" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> PRO alignment and parallelization:</h1>
+<p>“pro_processing.sh”</p>
+<pre class="bash"><code>#! /usr/bin/bash
 
 #SBATCH --job-name=pro_processing_XXXXXXX.sh     # name for job
 #SBATCH -N 1                  
 #SBATCH -n 1                 
-#SBATCH -c 10                  
+#SBATCH -c 24                  
 #SBATCH -p general           
 #SBATCH --qos=general       
-#SBATCH --mem=32G               
+#SBATCH --mem=36G               
 #SBATCH --mail-type=ALL 
-#SBATCH --mail-user=guertin@uchc.edu
-#SBATCH -o pro_processing_XXXXXXX.sh_%j.out
-#SBATCH -e pro_processing_XXXXXXX.sh_%j.err
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
 
-hostname
+cd /labs/Guertin/ZNF143_PRO
+
+echo &quot;Current wd:&quot; $(pwd)
+echo &quot;Current node:&quot; $(hostname)
 
 name=XXXXXXX
 
 module load cutadapt/3.5
 module load seqtk/1.3
-seqOutBias=/home/FCAM/mguertin/software/seqOutBias
-fqdedup=/home/FCAM/mguertin/ZNF143_PRO/fqdedup-1.0.0/target/release/fqdedup
-flash=/home/FCAM/mguertin/software/flash
+seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
+fqdedup=/home/FCAM/jdong/software/fqdedup
+flash=/home/FCAM/jdong/software/flash
 module load fastq-pair/1.0
 module load samtools/1.16.1
 module load genometools/1.5.10
@@ -990,22 +994,21 @@ module load rust
 module load bowtie2
 module load bedtools
 
-sizes=hg38.chrom.sizes
-annotation_prefix=Homo_sapiens.GRCh38.109 
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+annotation_prefix=/home/FCAM/jdong/ZNF143_PRO_2023/Homo_sapiens.GRCh38.109 
 UMI_length=8
-read_size=62
-cores=10
-genome=hg38.fa
-genome_index=hg38
-prealign_rdna_index=human_rDNA
-tallymer=hg38.tal_${read_size}.gtTxt.gz
-table=hg38_${read_size}.4.2.2.tbl
+read_size=47
+cores=24
+genome=/home/FCAM/jdong/human38/hg38.fa
+genome_index=/home/FCAM/jdong/human38/hg38
+prealign_rdna_index=/home/FCAM/jdong/hum_rDNA
+tallymer=/home/FCAM/jdong/ZNF143_PRO_2023/hg38.tal_${read_size}.gtTxt.gz
+table=/home/FCAM/jdong/ZNF143_PRO_2023/hg38_${read_size}.4.2.2.tbl
 
 gunzip ${name}_PE1_final.fastq.gz
 gunzip ${name}_PE2_final.fastq.gz
 
 echo &#39;removing dual adapter ligations and calculating the fraction of adapter/adapters in&#39; $name
-
 cutadapt --cores=$cores -m $((UMI_length+2)) -O 1 -a TGGAATTCTCGGGTGCCAAGG ${name}_PE1_final.fastq \
         -o ${name}_PE1_noadap.fastq --too-short-output ${name}_PE1_short.fastq &gt; ${name}_PE1_cutadapt.txt
 cutadapt --cores=$cores -m $((UMI_length+10)) -O 1 -a GATCGTCGGACTGTAGAACTCTGAAC ${name}_PE2_final.fastq \
@@ -1016,10 +1019,11 @@ PE1_w_Adapter=$(wc -l ${name}_PE1_short.fastq | awk &#39;{print $1/4}&#39;)
 AAligation=$(echo &quot;scale=2 ; $PE1_w_Adapter / $PE1_total&quot; | bc)
 echo -e  &quot;value\texperiment\tthreshold\tmetric&quot; &gt; ${name}_QC_metrics.txt
 echo -e &quot;$AAligation\t$name\t0.80\tAdapter/Adapter&quot; &gt;&gt; ${name}_QC_metrics.txt
+
 echo &#39;removing short RNA insertions in&#39; $name
 seqtk seq -L $((UMI_length+10)) ${name}_PE1_noadap.fastq &gt; ${name}_PE1_noadap_trimmed.fastq 
-echo &#39;removing PCR duplicates from&#39; $name
 
+echo &#39;removing PCR duplicates from&#39; $name
 fqdedup -i ${name}_PE1_noadap_trimmed.fastq -o ${name}_PE1_dedup.fastq
 
 PE1_noAdapter=$(wc -l ${name}_PE1_dedup.fastq | awk &#39;{print $1/4}&#39;)
@@ -1027,26 +1031,27 @@ PE1_noAdapter=$(wc -l ${name}_PE1_dedup.fastq | awk &#39;{print $1/4}&#39;)
 fastq_pair -t $PE1_noAdapter ${name}_PE1_dedup.fastq ${name}_PE2_noadap.fastq
 
 echo &#39;calculating and plotting RNA insert sizes from&#39; $name
-
 flash -q --compress-prog=gzip --suffix=gz ${name}_PE1_dedup.fastq.paired.fq \
         ${name}_PE2_noadap.fastq.paired.fq -o ${name}
 
 insert_size.R ${name}.hist ${UMI_length}
+
 echo &#39;trimming off the UMI from&#39; $name
 seqtk trimfq -b ${UMI_length} ${name}_PE1_dedup.fastq | seqtk seq -r - &gt; ${name}_PE1_processed.fastq
 seqtk trimfq -e ${UMI_length} ${name}_PE2_noadap.fastq | seqtk seq -r - &gt; ${name}_PE2_processed.fastq
+
 echo &#39;aligning&#39; $name &#39;to rDNA and removing aligned reads&#39;
-    
 bowtie2 -p $((cores-2)) -x $prealign_rdna_index -U ${name}_PE1_processed.fastq 2&gt;${name}_bowtie2_rDNA.log | \
         samtools sort -n - | samtools fastq -f 0x4 - &gt; ${name}_PE1.rDNA.fastq
 reads=$(wc -l ${name}_PE1.rDNA.fastq | awk &#39;{print $1/4}&#39;)
 fastq_pair -t $reads ${name}_PE1.rDNA.fastq ${name}_PE2_processed.fastq
-echo &#39;aligning&#39; $name &#39;to the genome&#39;
 
+echo &#39;aligning&#39; $name &#39;to the genome&#39;
 bowtie2 -p $((cores-2)) --maxins 1000 -x $genome_index --rf -1 ${name}_PE1.rDNA.fastq.paired.fq \
         -2 ${name}_PE2_processed.fastq.paired.fq 2&gt;${name}_bowtie2.log | samtools view -b - | \
         samtools sort - -o ${name}.bam
 
+echo &#39;calculating rDNA alignment rate for&#39; $name
 PE1_prior_rDNA=$(wc -l ${name}_PE1_processed.fastq | awk &#39;{print $1/4}&#39;)
 PE1_post_rDNA=$(wc -l ${name}_PE1.rDNA.fastq | awk &#39;{print $1/4}&#39;)
 total_rDNA=$(echo &quot;$(($PE1_prior_rDNA-$PE1_post_rDNA))&quot;) 
@@ -1054,12 +1059,14 @@ concordant_pe1=$(samtools view -c -f 0x42 ${name}.bam)
 total=$(echo &quot;$(($concordant_pe1+$total_rDNA))&quot;)
 rDNA_alignment=$(echo &quot;scale=2 ; $total_rDNA / $total&quot; | bc)
 echo -e &quot;$rDNA_alignment\t$name\t0.10\trDNA Alignment Rate&quot; &gt;&gt; ${name}_QC_metrics.txt
+
+echo &#39;calculating alignment rate for&#39; $name
 map_pe1=$(samtools view -c -f 0x42 ${name}.bam)
 pre_alignment=$(wc -l ${name}_PE1.rDNA.fastq.paired.fq | awk &#39;{print $1/4}&#39;)
 alignment_rate=$(echo &quot;scale=2 ; $map_pe1 / $pre_alignment&quot; | bc)
 echo -e &quot;$alignment_rate\t$name\t0.80\tAlignment Rate&quot; &gt;&gt; ${name}_QC_metrics.txt
-echo &#39;plotting and calculating complexity for&#39; $name
 
+echo &#39;plotting and calculating complexity for&#39; $name
 fqComplexity -i ${name}_PE1_noadap_trimmed.fastq
 
 echo &#39;calculating and plotting theoretical sequencing depth&#39; 
@@ -1067,14 +1074,13 @@ echo &#39;to achieve a defined number of concordantly aligned reads for&#39; $na
 PE1_total=$(wc -l ${name}_PE1_final.fastq | awk &#39;{print $1/4}&#39;)
 PE1_noadap_trimmed=$(wc -l ${name}_PE1_noadap_trimmed.fastq | awk &#39;{print $1/4}&#39;)
 factorX=$(echo &quot;scale=2 ; $PE1_noadap_trimmed / $PE1_total&quot; | bc)
-echo fraction of reads that are not adapter/adapter ligation products or below 10 base inserts
+echo &#39;fraction of reads that are not adapter/adapter ligation products or below 10 base inserts:&#39;
 echo $factorX 
 PE1_dedup=$(wc -l ${name}_PE1_dedup.fastq | awk &#39;{print $1/4}&#39;)
 factorY=$(echo &quot;scale=2 ; $concordant_pe1 / $PE1_dedup&quot; | bc)
-    
 fqComplexity -i ${name}_PE1_noadap_trimmed.fastq -x $factorX -y $factorY
-echo &#39;Separating paired end reads and creating genomic BED and bigWig intensity files for&#39; $name
 
+echo &#39;Separating paired end reads and creating genomic BED and bigWig intensity files for&#39; $name
 seqOutBias scale $table ${name}.bam --no-scale --stranded --bed-stranded-positive \
         --bw=$name.bigWig --bed=$name.bed --out-split-pairends --only-paired \
         --tail-edge --read-size=$read_size --tallymer=$tallymer
@@ -1082,6 +1088,7 @@ seqOutBias scale $table ${name}.bam --no-scale --stranded --bed-stranded-positiv
 grep -v &quot;random&quot; ${name}_not_scaled_PE1.bed | grep -v &quot;chrUn&quot; | grep -v &quot;chrEBV&quot; | sort -k1,1 -k2,2n &gt; ${name}_tmp.txt 
 mv ${name}_tmp.txt ${name}_not_scaled_PE1.bed 
 
+echo &#39;calculating pause indices for&#39; $name
 mapBed -null &quot;0&quot; -s -a $annotation_prefix.pause.bed -b ${name}_not_scaled_PE1.bed | \
 awk &#39;$7&gt;0&#39; | sort -k5,5 -k7,7nr | sort -k5,5 -u &gt; ${name}_pause.bed
 
@@ -1095,6 +1102,7 @@ mapBed -null &quot;0&quot; -s -a ${name}_pause_counts_body_coordinates.bed \
         awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$3,$4,$5,$6,$7,$8,$9,$8/$9}&#39; &gt; ${name}_pause_body.bed
 
 pause_index.R ${name}_pause_body.bed
+
 echo &#39;Calculating exon density / intron density as a metric for nascent RNA purity for&#39; $name
 mapBed -null &quot;0&quot; -s -a $annotation_prefix.introns.bed \
         -b ${name}_not_scaled_PE1.bed | awk &#39;$7&gt;0&#39; | \
@@ -1104,6 +1112,8 @@ mapBed -null &quot;0&quot; -s -a $annotation_prefix.no.first.exons.named.bed \
         awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$3,$4,$4,$6,$7,($3 - $2)}&#39; &gt; ${name}_exon_counts.bed
 
 exon_intron_ratio.R ${name}_exon_counts.bed ${name}_intron_counts.bed
+
+echo &#39;removing intermediate files&#39;
 rm ${name}_PE1_short.fastq
 rm ${name}_PE2_short.fastq
 rm ${name}_PE1_noadap.fastq
@@ -1123,7 +1133,8 @@ rm ${name}_PE2_processed.fastq.single.fq
 rm ${name}.extendedFrags.fastq.gz
 rm ${name}.notCombined_1.fastq.gz
 rm ${name}.notCombined_2.fastq.gz
-</code></pre>
+
+echo &#39;script complete&#39;</code></pre>
 <div id="run-the-previous-chunk-in-parallel" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Run the previous chunk in parallel</h2>
 <pre class="bash"><code>
@@ -1138,9 +1149,14 @@ do
     sleep 1
 done
 </code></pre>
+<p>Re-zip raw sequencing files:</p>
+<pre class="bash"><code># check wildcards first
+gzip *_PE1_final.fastq
+gzip *_PE2_final.fastq</code></pre>
+<p>Combine all QC metrics and plot:</p>
 <pre class="bash"><code>cat *_QC_metrics.txt | awk &#39;!x[$0]++&#39; &gt; project_QC_metrics.txt 
 
-./plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
+plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
 </div>
 </div>
 <div id="input-for-pta" class="section level1" number="3">
