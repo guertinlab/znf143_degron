@@ -152,7 +152,7 @@ subtractBed -s -a Homo_sapiens.GRCh38.${release}.bed -b Homo_sapiens.GRCh38.${re
 
 This is important for removing adapter steps later. Even if you know this number from your experimental protocol it doesn't hurt to confirm it in your data. Before doing any tests, subset some reads from any one of your FASTQs so these tests don't take forever to run. Make sure you are subsetting from a PE1 file!
 
-```{bash}
+```{r engine='bash', eval=F, echo=TRUE}
 # grab 4 million reads
 zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 > Z143_UMI_test.fastq
 
@@ -160,9 +160,9 @@ zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 > Z1
 srun --partition=general --qos=general --mem=36G -N 1 -n 1 -c 12 --pty bash
 ```
 
-### Interpreting cutadapt output
+**Interpreting cutadapt output**
 
-```{bash}
+```{r engine='bash', eval=F, echo=TRUE}
 module load cutadapt
 
 # i think the adapter sequences are the same as last time
@@ -189,11 +189,11 @@ tail Z143_UMI_test_cutadapt.txt
 
 Counting how many sequences follow the spike in counts (at length 39): UMI length = 8.
 
-### Trim and Align
+**Trim and Align**
 
 Another method to confirm UMI length is to trim the PE1 reads from the 5' end, one base at a time, and see when a spike in alignment rate to the human genome takes place.
 
-```{bash}
+```{r engine='bash', eval=F, echo=TRUE}
 module load fastx
 
 # if we didn't do this we'd just be trimming the adapter one base at a time and that's not very informative
@@ -218,7 +218,7 @@ head -2 Z143_UMI_test_clipped_trim2.fastq
 ```
 
 Script for aligning the clipped FASTQs:
-```{bash}
+```{r engine='bash', eval=F, echo=TRUE}
 #! /usr/bin/bash
 #SBATCH --job-name=ZNF143_UMI_alignments
 #SBATCH -N 1                    
@@ -247,7 +247,7 @@ for x in Z143_UMI_test_clipped*.fastq
 ```
 
 Interpreting results:
-```{bash}
+```{r engine='bash', eval=F, echo=TRUE}
 grep -i "alignment rate" Z143_UMI_test_clipped_stderr.txt 
 65.72% overall alignment rate # 0 bases trimmed
 74.20% overall alignment rate # 1
