@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-07-21" />
+<meta name="date" content="2023-08-03" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,14 +704,17 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-07-21</h4>
+<h4 class="date">2023-08-03</h4>
 
 </div>
 
 <h1>Contents</h1>
 <div id="TOC">
 <ul>
-<li><a href="#pro-seq-analysis" id="toc-pro-seq-analysis"><span class="toc-section-number">1</span> PRO-seq analysis</a></li>
+<li><a href="#pro-seq-analysis" id="toc-pro-seq-analysis"><span class="toc-section-number">1</span> PRO-seq analysis</a>
+<ul>
+<li><a href="#confirming-umi-length" id="toc-confirming-umi-length"><span class="toc-section-number">1.1</span> Confirming UMI length</a></li>
+</ul></li>
 <li><a href="#edit-this-for-pro-alignment-and-parallelization" id="toc-edit-this-for-pro-alignment-and-parallelization"><span class="toc-section-number">2</span> Edit this for PRO alignment and parallelization:</a>
 <ul>
 <li><a href="#run-the-previous-chunk-in-parallel" id="toc-run-the-previous-chunk-in-parallel"><span class="toc-section-number">2.1</span> Run the previous chunk in parallel</a></li>
@@ -735,16 +738,16 @@ function toggle_visibility(id1) {
 <h1><span class="header-section-number">1</span> PRO-seq analysis</h1>
 <pre class="bash"><code>cd /labs/Guertin/ZNF143_PRO
 
-for i in *_dep1_*.fastq.gz
+for i in ./dep1/*_dep1_*.fastq.gz
 do
     echo $i
     pre=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_dep1_&quot; &#39;{print $1}&#39;)
     suf=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_dep1_&quot; &#39;{print $2}&#39;)
     x=$(echo $suf |  awk -F&quot;.fastq&quot; &#39;{print $1}&#39;)
-    echo $pre
-    echo $suf
-    echo $x
-    cat $i ${pre}_dep2_${suf} &gt; ${pre}_${x}_final.fastq.gz
+    echo $pre # cell type, treatment, condition
+    echo $suf # replicate number, PE2, fastq.gz
+    echo $x # replicate number, PE2
+    cat $i ./dep2/${pre}_dep2_${suf} &gt; ${pre}_${x}_final.fastq.gz
 done </code></pre>
 <pre class="bash"><code>module load bowtie2/2.5.0
 module load genometools/1.5.10
@@ -794,9 +797,10 @@ bowtie2-build human_rDNA.fa human_rDNA
 
 #Compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position
 #This is the most time-consuming step of the seqOutBias command but can be completed once before processing the sequencing data
-#install from source, if oyu have issues: guertin@uchc.edu
+#install from source, if you have issues: guertin@uchc.edu
 
-/home/FCAM/mguertin/software/seqOutBias seqtable hg38.fa --read-size=62
+# if seqOutBias is in a directory accessible by PATH, simply call it directly from the command line
+seqOutBias seqtable hg38.fa --read-size=47
 
 wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
 
@@ -857,6 +861,101 @@ awk  &#39;{OFS=&quot;\t&quot;;} $6 == &quot;+&quot; {print $1,$2+20,$2 + 120,$4,
 #define and name all introns 
 subtractBed -s -a Homo_sapiens.GRCh38.${release}.bed -b Homo_sapiens.GRCh38.${release}.all.exons.merged.bed | \
     sort -k1,1 -k2,2n &gt; Homo_sapiens.GRCh38.${release}.introns.bed </code></pre>
+<div id="confirming-umi-length" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Confirming UMI length</h2>
+<p>This is important for removing adapter steps later. Even if you know this number from your experimental protocol it doesn’t hurt to confirm it in your data. Before doing any tests, subset some reads from any one of your FASTQs so these tests don’t take forever to run. Make sure you are subsetting from a PE1 file!</p>
+<pre class="bash"><code># grab 4 million reads
+zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 &gt; Z143_UMI_test.fastq
+
+# do this in an interactive node
+srun --partition=general --qos=general --mem=36G -N 1 -n 1 -c 12 --pty bash</code></pre>
+<p><strong>Interpreting cutadapt output</strong></p>
+<pre class="bash"><code>module load cutadapt
+
+# i think the adapter sequences are the same as last time
+# cutadapt arguments:
+# -m : minimum length
+# -O : [capital letter o] minimum overlap length between adapter and read
+# -a : adapter sequence ligated to 3&#39; end, or of the first read in paired data
+# -o : [lowercase o] name of output file, which is a FASTQ with trimmed reads
+cutadapt --cores=12 -m 1 -O 1 -a TGGAATTCTCGGGTGCCAAGG Z143_UMI_test.fastq \
+  -o Z143_UMI_test_noadapt.fastq &gt; Z143_UMI_test_cutadapt.txt
+
+tail Z143_UMI_test_cutadapt.txt
+# 38  32011 0.0 2 28256 3368 387
+# 39  1976282 0.0 2 1842220 117943 16119
+# 40  81301 0.0 2 67815 12434 1052
+# 41  56103 0.0 2 50968 3886 1249
+# 42  45902 0.0 2 42491 2676 735
+# 43  41906 0.0 2 38847 2339 720
+# 44  38556 0.0 2 35661 2301 594
+# 45  37035 0.0 2 34420 2048 567
+# 46  43034 0.0 2 40439 2117 478
+# 47  45296 0.0 2 41996 2565 735</code></pre>
+<p>Counting how many sequences follow the spike in counts (at length 39): UMI length = 8.</p>
+<p><strong>Trim and Align</strong></p>
+<p>Another method to confirm UMI length is to trim the PE1 reads from the 5’ end, one base at a time, and see when a spike in alignment rate to the human genome takes place.</p>
+<pre class="bash"><code>module load fastx
+
+# if we didn&#39;t do this we&#39;d just be trimming the adapter one base at a time and that&#39;s not very informative
+cat Z143_UMI_test.fastq | fastx_clipper -Q 33 -a TGGAATTCTCGGGTGCCAAGG -o Z143_UMI_test_clipped.fastq
+
+# Trim by 1 base at a time
+for n in {1..9}
+do
+fastx_trimmer -f $(expr $n + 1) -i Z143_UMI_test_clipped.fastq -o Z143_UMI_test_clipped_trim$n.fastq
+done
+
+# -f means the first base to KEEP, so -f 2 will trim the first base (from the left/5&#39; side)
+head -2 Z143_UMI_test_clipped.fastq 
+# @NB551647:99:HVY2FBGXN:1:11101:24868:1042 1:N:0:ACTTGA
+# ACATAGTACTTTTAAAT
+head -2 Z143_UMI_test_clipped_trim1.fastq 
+# @NB551647:99:HVY2FBGXN:1:11101:24868:1042 1:N:0:ACTTGA
+#  CATAGTACTTTTAAAT
+head -2 Z143_UMI_test_clipped_trim2.fastq 
+# @NB551647:99:HVY2FBGXN:1:11101:24868:1042 1:N:0:ACTTGA
+#   ATAGTACTTTTAAAT</code></pre>
+<p>Script for aligning the clipped FASTQs:</p>
+<pre class="bash"><code>#! /usr/bin/bash
+#SBATCH --job-name=ZNF143_UMI_alignments
+#SBATCH -N 1                    
+#SBATCH -n 1                  
+#SBATCH -c 24                          
+#SBATCH -p general
+#SBATCH --qos=general       
+#SBATCH --mem=36G                    
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+module load bowtie2
+genome_index=/home/FCAM/jdong/human38/hg38
+directory=/labs/Guertin/ZNF143_PRO
+cd $directory
+
+# simple alignment with bowtie2
+for x in Z143_UMI_test_clipped*.fastq
+    do
+    name=$(echo $x | awk -F &quot;.fastq&quot; &#39;{print $1}&#39;)
+    echo &quot;Now aligning $name&quot;
+    bowtie2 -p 24 -t -x ${genome_index} -U ${x} -S ${name}.sam
+    done 2&gt; Z143_UMI_test_clipped_stderr.txt</code></pre>
+<p>Interpreting results:</p>
+<pre class="bash"><code>grep -i &quot;alignment rate&quot; Z143_UMI_test_clipped_stderr.txt 
+65.72% overall alignment rate # 0 bases trimmed
+74.20% overall alignment rate # 1
+78.63% overall alignment rate # 2
+82.87% overall alignment rate # 3
+84.89% overall alignment rate # 4
+86.72% overall alignment rate # 5
+89.22% overall alignment rate # 6
+74.36% overall alignment rate # 7
+95.84% overall alignment rate # 8 -- spike
+96.61% overall alignment rate # 9 </code></pre>
+<p>Note the large spike in alignment rate when 8 bases are trimmed–this is another point in favor of the UMI length = 8.</p>
+</div>
 </div>
 <div id="edit-this-for-pro-alignment-and-parallelization" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Edit this for PRO alignment and parallelization:</h1>
