@@ -160,7 +160,7 @@ zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 > Z1
 srun --partition=general --qos=general --mem=36G -N 1 -n 1 -c 12 --pty bash
 ```
 
-Interpreting cutadapt output:
+### Interpreting cutadapt output
 
 ```{bash}
 module load cutadapt
@@ -188,6 +188,81 @@ tail Z143_UMI_test_cutadapt.txt
 ```
 
 Counting how many sequences follow the spike in counts (at length 39): UMI length = 8.
+
+### Trim and Align
+
+Another method to confirm UMI length is to trim the PE1 reads from the 5' end, one base at a time, and see when a spike in alignment rate to the human genome takes place.
+
+```{bash}
+module load fastx
+
+# if we didn't do this we'd just be trimming the adapter one base at a time and that's not very informative
+cat Z143_UMI_test.fastq | fastx_clipper -Q 33 -a TGGAATTCTCGGGTGCCAAGG -o Z143_UMI_test_clipped.fastq
+
+# Trim by 1 base at a time
+for n in {1..9}
+do
+fastx_trimmer -f $(expr $n + 1) -i Z143_UMI_test_clipped.fastq -o Z143_UMI_test_clipped_trim$n.fastq
+done
+
+# -f means the first base to KEEP, so -f 2 will trim the first base (from the left/5' side)
+head -2 Z143_UMI_test_clipped.fastq 
+# @NB551647:99:HVY2FBGXN:1:11101:24868:1042 1:N:0:ACTTGA
+# ACATAGTACTTTTAAAT
+head -2 Z143_UMI_test_clipped_trim1.fastq 
+# @NB551647:99:HVY2FBGXN:1:11101:24868:1042 1:N:0:ACTTGA
+#  CATAGTACTTTTAAAT
+head -2 Z143_UMI_test_clipped_trim2.fastq 
+# @NB551647:99:HVY2FBGXN:1:11101:24868:1042 1:N:0:ACTTGA
+#   ATAGTACTTTTAAAT
+```
+
+Script for aligning the clipped FASTQs:
+```{bash}
+#! /usr/bin/bash
+#SBATCH --job-name=ZNF143_UMI_alignments
+#SBATCH -N 1                    
+#SBATCH -n 1                  
+#SBATCH -c 24                          
+#SBATCH -p general
+#SBATCH --qos=general       
+#SBATCH --mem=36G                    
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+module load bowtie2
+genome_index=/home/FCAM/jdong/human38/hg38
+directory=/labs/Guertin/ZNF143_PRO
+cd $directory
+
+# simple alignment with bowtie2
+for x in Z143_UMI_test_clipped*.fastq
+    do
+    name=$(echo $x | awk -F ".fastq" '{print $1}')
+    echo "Now aligning $name"
+    bowtie2 -p 24 -t -x ${genome_index} -U ${x} -S ${name}.sam
+    done 2> Z143_UMI_test_clipped_stderr.txt
+```
+
+Interpreting results:
+```{bash}
+grep -i "alignment rate" Z143_UMI_test_clipped_stderr.txt 
+65.72% overall alignment rate # 0 bases trimmed
+74.20% overall alignment rate # 1
+78.63% overall alignment rate # 2
+82.87% overall alignment rate # 3
+84.89% overall alignment rate # 4
+86.72% overall alignment rate # 5
+89.22% overall alignment rate # 6
+74.36% overall alignment rate # 7
+95.84% overall alignment rate # 8 -- spike
+96.61% overall alignment rate # 9 
+```
+
+Note the large spike in alignment rate when 8 bases are trimmed--this is another point in favor of the UMI length = 8. 
+
 
 # Edit this for PRO alignment and parallelization:
 
