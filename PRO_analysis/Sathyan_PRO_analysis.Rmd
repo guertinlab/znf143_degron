@@ -844,7 +844,7 @@ tighten_summit_window <- function(res.deseq) {
 }
 
 
-inferred.coords=read.table('HEK_ZNF143_gene_annotations.bed', header =FALSE)
+inferred.coords=read.table('HEK_ZNF143_gene_annotations.bed', sep="\t", header =FALSE)
 
 counts.df = abs(get.raw.counts.interval(inferred.coords, "/Users/guertinlab/Desktop/ZNF143_ChIP/bigWigs/", file.prefix = "H"))
 
@@ -975,7 +975,7 @@ bedTools.closest <- function(functionstring="/Users/guertinlab/Downloads/bedtool
   cat(command,"\n")
   try(system(command))
   
-  res=read.table('out.file.bed',header=F, comment.char='')
+  res=read.table('out.file.bed',sep ="\t", header=F, comment.char='')
   
   command3=paste('rm', 'a.file.bed', 'b.file.bed', 'a.file.sorted.bed', 'b.file.sorted.bed', 'out.file.bed')
   cat(command3,"\n")
@@ -1002,7 +1002,7 @@ filter.deseq.into.bed <- function(deseq.df, gene.file, cat = 'R1881 Activated') 
 }
 
 gene.file=read.table(file = "/Users/guertinlab/Desktop/ZNF143_ChIP/HEK_ZNF143_gene_annotations.bed", sep="\t", header=FALSE)
-df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table('/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed', header=FALSE))
+df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table('/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed', sep = '\t',header=FALSE))
 
 plot_cdf <- function(df.all, tf="quantile", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1)) {
 pdf(paste0(tf, "FIG_cdf_compare_Reg_classes.pdf"), width=6.2, height=3.83) 
@@ -1034,7 +1034,7 @@ for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quan
 	print(chip.peak)
 	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
 	print(quantile.name)
-	df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(chip.peak, header=FALSE))
+	df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(chip.peak, sep="\t",header=FALSE))
     plot_cdf(df.all, tf = quantile.name)
 	}
 	
@@ -1045,7 +1045,7 @@ for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quan
 	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
 	print(quantile.name)
 	df.all = cdf.deseq.df(df = df.x, genes = gene.file,
-    chip.peaks=read.table(chip.peak, header=FALSE))
+    chip.peaks=read.table(chip.peak, sep="\t", header=FALSE))
 	x = paste(as.character(df.all[,3]), quantile.name)
 	df.all[,3] = x
 	df.cdf = rbind(df.cdf, df.all)
