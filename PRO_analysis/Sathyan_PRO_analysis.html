@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-08-03" />
+<meta name="date" content="2023-08-06" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-08-03</h4>
+<h4 class="date">2023-08-06</h4>
 
 </div>
 
@@ -1492,7 +1492,7 @@ tighten_summit_window &lt;- function(res.deseq) {
 }
 
 
-inferred.coords=read.table(&#39;HEK_ZNF143_gene_annotations.bed&#39;, header =FALSE)
+inferred.coords=read.table(&#39;HEK_ZNF143_gene_annotations.bed&#39;, sep=&quot;\t&quot;, header =FALSE)
 
 counts.df = abs(get.raw.counts.interval(inferred.coords, &quot;/Users/guertinlab/Desktop/ZNF143_ChIP/bigWigs/&quot;, file.prefix = &quot;H&quot;))
 
@@ -1613,7 +1613,7 @@ bedTools.closest &lt;- function(functionstring=&quot;/Users/guertinlab/Downloads
   cat(command,&quot;\n&quot;)
   try(system(command))
   
-  res=read.table(&#39;out.file.bed&#39;,header=F, comment.char=&#39;&#39;)
+  res=read.table(&#39;out.file.bed&#39;,sep =&quot;\t&quot;, header=F, comment.char=&#39;&#39;)
   
   command3=paste(&#39;rm&#39;, &#39;a.file.bed&#39;, &#39;b.file.bed&#39;, &#39;a.file.sorted.bed&#39;, &#39;b.file.sorted.bed&#39;, &#39;out.file.bed&#39;)
   cat(command3,&quot;\n&quot;)
@@ -1640,7 +1640,7 @@ filter.deseq.into.bed &lt;- function(deseq.df, gene.file, cat = &#39;R1881 Activ
 }
 
 gene.file=read.table(file = &quot;/Users/guertinlab/Desktop/ZNF143_ChIP/HEK_ZNF143_gene_annotations.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
-df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(&#39;/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed&#39;, header=FALSE))
+df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(&#39;/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed&#39;, sep = &#39;\t&#39;,header=FALSE))
 
 plot_cdf &lt;- function(df.all, tf=&quot;quantile&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), line.type = c(1)) {
 pdf(paste0(tf, &quot;FIG_cdf_compare_Reg_classes.pdf&quot;), width=6.2, height=3.83) 
@@ -1672,7 +1672,7 @@ for (chip.peak in Sys.glob(file.path(&quot;/Users/guertinlab/Desktop/ZNF143_ChIP
     print(chip.peak)
     quantile.name = strsplit(strsplit(chip.peak, &quot;/&quot;)[[1]][length(strsplit(chip.peak, &quot;/&quot;)[[1]])], &#39;.bed&#39;)[[1]][1]
     print(quantile.name)
-    df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(chip.peak, header=FALSE))
+    df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(chip.peak, sep=&quot;\t&quot;,header=FALSE))
     plot_cdf(df.all, tf = quantile.name)
     }
     
@@ -1683,7 +1683,7 @@ for (chip.peak in Sys.glob(file.path(&quot;/Users/guertinlab/Desktop/ZNF143_ChIP
     quantile.name = strsplit(strsplit(chip.peak, &quot;/&quot;)[[1]][length(strsplit(chip.peak, &quot;/&quot;)[[1]])], &#39;.bed&#39;)[[1]][1]
     print(quantile.name)
     df.all = cdf.deseq.df(df = df.x, genes = gene.file,
-    chip.peaks=read.table(chip.peak, header=FALSE))
+    chip.peaks=read.table(chip.peak, sep=&quot;\t&quot;, header=FALSE))
     x = paste(as.character(df.all[,3]), quantile.name)
     df.all[,3] = x
     df.cdf = rbind(df.cdf, df.all)
