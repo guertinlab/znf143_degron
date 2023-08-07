@@ -480,13 +480,13 @@ plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO
 
 
 # Input for pTA
-Using this code to get the merged bigWigs for primaryTranscriptAnnotation
 
-
+Normalize bigWigs from seqOutBias:
 ```{r engine='bash', eval=F, echo=TRUE}
 PRO_normalization -c hg38.chrom.sizes
 ```
 
+Then merge bigWigs based on strand (control and experimental conditions together):
 ```{r engine='bash', eval=F, echo=TRUE}
 reps=8
 pair="_PE1"
@@ -513,14 +513,18 @@ rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg
 ```
 
-# TSSInference inputs
 
 
+# Input for TSSinference
+
+This is basically the same as the above, but for PE2 reads instead of PE1.
+
+Normalize bigWigs from seqOutBias:
 ```{r engine='bash', eval=F, echo=TRUE}
 PRO_normalization -c hg38.chrom.sizes
 ```
 
-
+Then merge bigWigs based on strand (control and experimental conditions together):
 ```{r engine='bash', eval=F, echo=TRUE}
 reps=8
 pair="_PE2"
