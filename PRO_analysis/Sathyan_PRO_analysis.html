@@ -720,7 +720,7 @@ function toggle_visibility(id1) {
 <li><a href="#run-the-previous-chunk-in-parallel" id="toc-run-the-previous-chunk-in-parallel"><span class="toc-section-number">2.1</span> Run the previous chunk in parallel</a></li>
 </ul></li>
 <li><a href="#input-for-pta" id="toc-input-for-pta"><span class="toc-section-number">3</span> Input for pTA</a></li>
-<li><a href="#tssinference-inputs" id="toc-tssinference-inputs"><span class="toc-section-number">4</span> TSSInference inputs</a>
+<li><a href="#input-for-tssinference" id="toc-input-for-tssinference"><span class="toc-section-number">4</span> Input for TSSinference</a>
 <ul>
 <li><a href="#annotations" id="toc-annotations"><span class="toc-section-number">4.1</span> Annotations</a></li>
 </ul></li>
@@ -1161,8 +1161,9 @@ plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
 </div>
 <div id="input-for-pta" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Input for pTA</h1>
-<p>Using this code to get the merged bigWigs for primaryTranscriptAnnotation</p>
+<p>Normalize bigWigs from seqOutBias:</p>
 <pre class="bash"><code>PRO_normalization -c hg38.chrom.sizes</code></pre>
+<p>Then merge bigWigs based on strand (control and experimental conditions together):</p>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE1&quot;
 name=&quot;HEK_CloneZD29_30min&quot;
@@ -1187,9 +1188,12 @@ rm ${name}_minus${pair}_scaled_sorted.bg
 rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg</code></pre>
 </div>
-<div id="tssinference-inputs" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> TSSInference inputs</h1>
+<div id="input-for-tssinference" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Input for TSSinference</h1>
+<p>This is basically the same as the above, but for PE2 reads instead of PE1.</p>
+<p>Normalize bigWigs from seqOutBias:</p>
 <pre class="bash"><code>PRO_normalization -c hg38.chrom.sizes</code></pre>
+<p>Then merge bigWigs based on strand (control and experimental conditions together):</p>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE2&quot;
 name=&quot;HEK_CloneZD29_30min&quot;
