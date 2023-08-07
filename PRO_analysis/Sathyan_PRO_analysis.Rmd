@@ -549,6 +549,8 @@ rm tmpMinus${pair}.bg
 
 ## Annotations
 
+The starting file for filtering these annotations was obtained from the gencode website here: [https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz), specifically the version of basic annotation which contained reference chromosomes only. 
+
 ```{r engine='R', eval=F, echo=TRUE}
 grep 'transcript_type "protein_coding"' gencode.v42.basic.annotation.gtf | \
     grep -v 'tag "readthrough_transcript"' | \
