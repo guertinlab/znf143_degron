@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-08-07" />
+<meta name="date" content="2023-08-11" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-08-07</h4>
+<h4 class="date">2023-08-11</h4>
 
 </div>
 
@@ -1167,7 +1167,7 @@ plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE1&quot;
 name=&quot;HEK_CloneZD29_30min&quot;
-chrSizes=&quot;hg38.chrom.sizes&quot; # path to chromosome sizes file
+chrSizes=&quot;/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes&quot;
 
 plusfiles=$(ls ${name}_*rep*_plus${pair}_scaled.bigWig)
 bigWigMerge $plusfiles tmpPlus${pair}.bg
@@ -1191,13 +1191,10 @@ rm tmpMinus${pair}.bg</code></pre>
 <div id="input-for-tssinference" class="section level1" number="4">
 <h1><span class="header-section-number">4</span> Input for TSSinference</h1>
 <p>This is basically the same as the above, but for PE2 reads instead of PE1.</p>
-<p>Normalize bigWigs from seqOutBias:</p>
-<pre class="bash"><code>PRO_normalization -c hg38.chrom.sizes</code></pre>
-<p>Then merge bigWigs based on strand (control and experimental conditions together):</p>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE2&quot;
 name=&quot;HEK_CloneZD29_30min&quot;
-chrSizes=&quot;hg38.chrom.sizes&quot; # path to chromosome sizes file
+chrSizes=&quot;/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes&quot;
 
 plusfiles=$(ls ${name}_*rep*_plus${pair}_scaled.bigWig)
 bigWigMerge $plusfiles tmpPlus${pair}.bg
@@ -1220,7 +1217,9 @@ rm tmpMinus${pair}.bg</code></pre>
 <div id="annotations" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Annotations</h2>
 <p>The starting file for filtering these annotations was obtained from the gencode website here: <a href="https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz">https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz</a>, specifically the version of basic annotation which contained reference chromosomes only.</p>
-<pre class="r"><code>grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
+<pre class="r"><code>gunzip gencode.v42.basic.annotation.gtf.gz
+
+grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
     grep -v &#39;tag &quot;readthrough_transcript&quot;&#39; | \
     grep -v &#39;tag &quot;RNA_Seq_supported_only&quot;&#39; | \
     grep -v &#39;tag &quot;RNA_Seq_supported_partial&quot;&#39; | \
@@ -1244,28 +1243,30 @@ gene.exon1 = parse.bed.exon1(&quot;gencode.hg38.v42.basic.firstExon.latest.filte
 bw.plus=&#39;HEK_CloneZD29_30min_plus_PE2_scaled.bigWig&#39;
 bw.minus=&#39;HEK_CloneZD29_30min_minus_PE2_scaled.bigWig&#39;
 
-#swap minus and plus
-potential.tss2 = TSSinference(gene.exon1, bw.minus, bw.plus, densityFilter=TRUE)</code></pre>
+# run TSSinference for primary TSSs with filtering by up/downstream density (reports one TSS per gene)
+potential.tss2 = TSSinference(gene.exon1, bw.plus, bw.minus, densityFilter=TRUE)</code></pre>
 </div>
 <div id="primarytranscriptannotation" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> primaryTranscriptAnnotation</h1>
-<pre class="bash"><code>
-gunzip gencode.v42.basic.annotation.gtf.gz
-
-grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
+<p>Prepare specific annotations:</p>
+<pre class="bash"><code>grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
    awk &#39;{if($3==&quot;exon&quot;){print $0}}&#39; | \
    grep -w &quot;exon_number 1&quot; | \
    cut -f1,4,5,7,9 | tr &quot;;&quot; &quot;\t&quot; | \
    awk &#39;{for(i=5;i&lt;=NF;i++){if($i~/^gene_name/){a=$(i+1)}} print $1,$2,$3,a,&quot;na&quot;,$4}&#39; | \
    tr &quot; &quot; &quot;\t&quot; | tr -d &#39;&quot;&#39; &gt; gencode.v42.firstExon.bed
    
-grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.annotation.gtf | \
+grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
     awk &#39;{if($3==&quot;transcript&quot;){print $0}} &#39; | \
     cut -f1,4,5,7,9 | tr &quot;;&quot; &quot;\t&quot; | \
     awk &#39;{for(i=5;i&lt;=NF;i++){if($i~/^gene_name/){a=$(i+1)}} print $1,$2,$3,a,&quot;na&quot;,$4}&#39; | \
     tr &quot; &quot; &quot;\t&quot; | tr -d &#39;&quot;&#39; &gt; gencode.v42.transcript.bed
 </code></pre>
-<pre class="r"><code>fname = &quot;gencode.v42.firstExon.bed&quot;
+<p>Download the pTA repository from <a href="https://github.com/WarrenDavidAnderson/genomicsRpackage/tree/master" class="uri">https://github.com/WarrenDavidAnderson/genomicsRpackage/tree/master</a> and load pTA functions from source:</p>
+<pre class="bash"><code>source(&quot;/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/gene_ann.R&quot;)
+source(&quot;/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/map_tu.R&quot;)</code></pre>
+<pre class="r"><code># set up annotations and variables
+fname = &quot;gencode.v42.firstExon.bed&quot;
 dat0 = read.table(fname,header=F,stringsAsFactors=F) 
 names(dat0) = c(&#39;chr&#39;, &#39;start&#39;, &#39;end&#39;, &#39;gene&#39;, &#39;xy&#39;, &#39;strand&#39;) 
 dat0 = unique(dat0)
@@ -1277,17 +1278,16 @@ names(dat0) = c(&#39;chr&#39;, &#39;start&#39;, &#39;end&#39;, &#39;gene&#39;, &
 dat0 = unique(dat0)
 gencode.transcript = dat0
 
-chrom.sizes = read.table(&quot;hg38.chrom.sizes&quot;,stringsAsFactors=F,header=F) 
+chrom.sizes = read.table(&quot;/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes&quot;,stringsAsFactors=F,header=F) 
 names(chrom.sizes) = c(&quot;chr&quot;,&quot;size&quot;)
 
-
-
+# load in normalized bigWigs
 plus.file = &quot;HEK_CloneZD29_30min_plus_PE1_scaled.bigWig&quot; 
 minus.file = &quot;HEK_CloneZD29_30min_minus_PE1_scaled.bigWig&quot; 
 bw.plus = load.bigWig(plus.file)
 bw.minus = load.bigWig(minus.file)
 
-
+# necessary libraries
 library(NMF)
 library(dplyr)
 library(bigWig)
@@ -1295,26 +1295,27 @@ library(pracma)
 library(RColorBrewer) 
 library(primaryTranscriptAnnotation)
 
-
+# for each gene: get largest interval and read counts for annotated transcripts
 largest.interval.bed = get.largest.interval(bed=gencode.transcript)
 transcript.reads = read.count.transcript(bed=gencode.transcript, bw.plus=bw.plus, bw.minus=bw.minus)
 
+# set up a graphical space with 1 row and 2 columns
 par(mfrow=c(1,2)) 
-
-hist(log(transcript.reads$density), breaks=200,
-col=&quot;black&quot;,xlab=&quot;log read density&quot;,main=&quot;&quot;) 
-
-hist(log(transcript.reads$counts), breaks=200,
-     col=&quot;black&quot;,xlab=&quot;log read count&quot;,main=&quot;&quot;)
-
-
+# make plots of the distribution of the logs of read density and read counts across the genes
+hist(log(transcript.reads$density), breaks=200, col=&quot;black&quot;,xlab=&quot;log read density&quot;,main=&quot;&quot;) 
+hist(log(transcript.reads$counts), breaks=200, col=&quot;black&quot;,xlab=&quot;log read count&quot;,main=&quot;&quot;)
+# plot saved as &quot;read_density_count.pdf&quot;</code></pre>
+<p>[insert plot here]</p>
+<pre class="r"><code># pick cut-offs for density and counts by looking at the plots 
 den.cut = -8
 cnt.cut = 1
+
 ind.cut.den = which(log(transcript.reads$density) &lt; den.cut) 
-
 ind.cut.cnt = which(log(transcript.reads$counts) &lt; cnt.cut) 
-
+# get indices for which transcripts fall below both cutoffs
 ind.cut = union(ind.cut.den, ind.cut.cnt)
+
+# remake the prevous plot but include locations of cutoffs
 par(mfrow=c(1,2))
 hist(log(transcript.reads$density), breaks=200,
 col=&quot;black&quot;,xlab=&quot;log read density&quot;,main=&quot;&quot;) 
@@ -1322,33 +1323,30 @@ abline(v=den.cut, col=&quot;red&quot;)
 hist(log(transcript.reads$counts), breaks=200,
 col=&quot;black&quot;,xlab=&quot;log read count&quot;,main=&quot;&quot;) 
 abline(v=cnt.cut, col=&quot;red&quot;)
-
-
+# plot saved as &quot;read_density_count_cutoff.pdf&quot;</code></pre>
+<p>[insert plot here]</p>
+<pre class="r"><code># remove genes below cutoffs (&quot;unexpressed&quot;)
 unexp = names(transcript.reads$counts)[ind.cut]
 largest.interval.expr.bed = largest.interval.bed[!(largest.interval.bed$gene %in% unexp),]
 
-
-# from TSSInference
+# get TSSs for each gene (from TSSinf)
 tss.interval.bed = merge(potential.tss2, largest.interval.expr.bed, by.x=&quot;gene&quot;, by.y=&quot;gene&quot;)
-
-
 tss.interval.bed$end.x[tss.interval.bed$strand.x == &quot;+&quot;] &lt;- tss.interval.bed$end.y[tss.interval.bed$strand.x == &quot;+&quot;]
 tss.interval.bed$start.x[tss.interval.bed$strand.x == &quot;-&quot;] &lt;- tss.interval.bed$start.y[tss.interval.bed$strand.x == &quot;-&quot;]
-
 tss.interval.bed= tss.interval.bed[,c(2:5, 7, 6)]
 colnames(tss.interval.bed) = c(&#39;chr&#39;, &#39;start&#39;, &#39;end&#39;, &#39;gene&#39;, &#39;xy&#39;, &#39;strand&#39;)
 tss.interval.bed$xy &lt;- 0
 
 #remove gene overlaps
-
 overlap.data = gene.overlaps( bed = tss.interval.bed ) 
-
 filtered.id.overlaps = remove.overlaps(bed=tss.interval.bed,
-overlaps=overlap.data$cases, 
-transcripts=gencode.transcript, bw.plus=bw.plus, bw.minus=bw.minus, by=&quot;den&quot;)
+                            overlaps=overlap.data$cases, 
+                            transcripts=gencode.transcript, 
+                            bw.plus=bw.plus, 
+                            bw.minus=bw.minus, 
+                            by=&quot;den&quot;)
 
-
-# TTS
+# Get TTS (transcription termination site)
 add.to.end = 100000
 fraction.end = 0.2
 dist.from.start = 50
@@ -1383,6 +1381,7 @@ sep = &quot;\t&quot;, row.names=FALSE, col.names=FALSE, quote=FALSE)</code></pre
 </div>
 <div id="differential-expression-analysis" class="section level1" number="7">
 <h1><span class="header-section-number">7</span> Differential expression analysis</h1>
+<p>Setup and get functions:</p>
 <pre class="r"><code>library(bigWig)
 library(lattice)
 library(DESeq2)
@@ -1494,10 +1493,9 @@ tighten_summit_window &lt;- function(res.deseq) {
   gene = sapply(strsplit(rownames(res.deseq), &quot;_&quot;), &quot;[&quot;, 2)
   df = cbind.data.frame(chr, start, end, gene)
   return(df)
-}
-
-
-inferred.coords=read.table(&#39;HEK_ZNF143_gene_annotations.bed&#39;, sep=&quot;\t&quot;, header =FALSE)
+}</code></pre>
+<p>Analysis:</p>
+<pre class="r"><code>inferred.coords=read.table(&#39;HEK_ZNF143_gene_annotations.bed&#39;, sep=&quot;\t&quot;, header =FALSE)
 
 counts.df = abs(get.raw.counts.interval(inferred.coords, &quot;/Users/guertinlab/Desktop/ZNF143_ChIP/bigWigs/&quot;, file.prefix = &quot;H&quot;))
 
@@ -1564,6 +1562,7 @@ for (i in levels(sample.conditions)[-1]) {
   df.x = rbind(df.x, unchanged)
   df.x = rbind(df.x, repressed)
 }</code></pre>
+<p>Create CDFs (reference code from course)</p>
 <pre class="r"><code>library(latticeExtra)
 
 cdf.deseq.df &lt;- function(df, genes = gene.file, chip.peaks = chip.peaks) {
