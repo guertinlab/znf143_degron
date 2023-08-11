@@ -605,7 +605,7 @@ grep 'transcript_type "protein_coding"' gencode.v42.basic.annotation.gtf | \
 ```
 
 Download the pTA repository from https://github.com/WarrenDavidAnderson/genomicsRpackage/tree/master and load pTA functions from source:
-```{r}
+```{r engine='bash', eval=F, echo=TRUE}
 source("/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/gene_ann.R")
 source("/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/map_tu.R")
 ```
