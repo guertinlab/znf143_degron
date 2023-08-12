@@ -1436,11 +1436,11 @@ awk &#39;{OFS=&quot;\t&quot;;} {if($9 == &quot;-&quot;) print $4,$5-8,$6,$7,$8,$
 awk &#39;{OFS=&quot;\t&quot;;} {if($9 == &quot;-&quot;) print $4,$5,$6+9,$7,$8,$9; else print $4,$5-9,$6,$7,$8,$9}&#39; motif1_znf143_peaks.bed &gt; expanded_motif1_znf143_peaks.bed
 
 cat expanded_motif*_znf143_peaks.bed | sort -k1,1 -k2,2n |  awk &#39;!seen[$1,$2]++&#39; &gt; expanded_motifs_in_peaks.bed
-closestBed -d -t first -a ZNF143_functional_peaks.bed -b expanded_motifs_in_peaks.bed | awk &#39;{OFS=&quot;\t&quot;;} {print $4,$5,$6,$7,$8,$9}&#39; &gt; expanded_motifs_closest.bed
+closestBed -d -t first -a ZNF143_functional_peaks.bed -b expanded_motifs_in_peaks.bed | awk &#39;{OFS=&quot;\t&quot;;} {if($10 &lt; 150) print $4,$5,$6,$7,$8,$9}&#39; &gt; expanded_motifs_closest.bed
 
 awk &#39;{OFS=&quot;\t&quot;;} {if($6 == &quot;-&quot;) print $1,$2-11,$3+9,$4,$5,$6; else print $1,$2-10,$3+10,$4,$5,$6}&#39; expanded_motifs_closest.bed &gt; expanded_motifs_window.bed
 
-fastaFromBed -s -fi $genome -bed expanded_motifs_window.bed &gt; expanded_motifs_for_PSWM.bed
+fastaFromBed -s -fi $genome -bed expanded_motifs_window.bed &gt; expanded_motifs_for_PSWM.fasta
 # see https://github.com/guertinlab/Tn5bias/blob/master/Manuscript_Vignette/Tn5_ATAC_bias.pdf section 2.4</code></pre>
 <!--
 # make a barchart for fraction of peaks with motifs 
