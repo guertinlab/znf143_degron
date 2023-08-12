@@ -1442,6 +1442,75 @@ awk &#39;{OFS=&quot;\t&quot;;} {if($6 == &quot;-&quot;) print $1,$2-11,$3+9,$4,$
 
 fastaFromBed -s -fi $genome -bed expanded_motifs_window.bed &gt; expanded_motifs_for_PSWM.fasta
 # see https://github.com/guertinlab/Tn5bias/blob/master/Manuscript_Vignette/Tn5_ATAC_bias.pdf section 2.4</code></pre>
+<pre class="r"><code>source(&quot;https://raw.githubusercontent.com/guertinlab/Tn5bias/master/Manuscript_Vignette/Vignette_Scripts/Figure1_Nucleotide_Count.R&quot;)
+x = read.table(&#39;expanded_motifs_for_PSWM.fasta&#39;, comment.char = &quot;&gt;&quot;, header =FALSE)
+x= data.frame(lapply(x, toupper))
+x.transfac = vector(&quot;list&quot;, length = ceiling(nrow(x)/100000))
+
+source(&#39;https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R&#39;) library(ggseqlogo)
+pswm.func.2 &lt;- function(x.ligation, out = &#39;outfilename&#39;) {
+a = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 1)
+b = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 2)
+c = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 3)
+d = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 4)
+e = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 5)
+f = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 6)
+g = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 7)
+h = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 8)
+i = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 9)
+j = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 10)
+k = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 11)
+l = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 12)
+m = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 13)
+n = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 14)
+o = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 15)
+p = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 16)
+q = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 17)
+r = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 18)
+s = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 19)
+t = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 20)
+u = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 21)
+aa = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 22)
+bb = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 23)
+cc = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 24)
+dd = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 25)
+ee = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 26)
+ff = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 27)
+gg = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 28)
+hh = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 29)
+ii = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 30)
+jj = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 31)
+kk = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 32)
+ll = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 33)
+mm = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 34)
+nn = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 35)
+oo = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 36)
+pp = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 37)
+qq = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 38)
+rr = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 39)
+ss = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 40)
+tt = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 41)
+uu = lapply(strsplit(as.character(x.ligation), &#39;&#39;), &quot;[&quot;, 42)
+col.matrix = cbind(a,b,c,d,e,f, g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,aa,bb,cc,dd,ee,ff, gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu)
+print(col.matrix)
+a.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == &quot;A&quot;))
+t.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == &quot;T&quot;))
+c.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == &quot;C&quot;))
+g.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == &quot;G&quot;))
+#pswm = cbind(a.nuc*(0.25/.2), c.nuc*(0.25/.3), g.nuc*(0.25/.3), t.nuc*(0.25/.2)) 
+pswm = cbind(a.nuc, c.nuc, g.nuc, t.nuc)
+print(pswm)
+outfile = file(paste0(out, &#39;.txt&#39;))
+on.exit(close(outfile))
+writeLines(c(&quot;MEME version 4&quot;, &quot;ALPHABET= ACGT&quot;, &quot;strands: + -&quot;, &quot; &quot;,
+&quot;Background letter frequencies (from uniform background):&quot;,
+&quot;A 0.20000 C 0.30000 G 0.30000 T 0.20000&quot;, paste(&quot;MOTIF&quot;, out), &quot; &quot;, &quot;letter-probability matrix: alength= 4 w= 42&quot;), outfile)
+pswm = pswm/rowSums(pswm)
+write.table(pswm, file = paste0(out, &#39;.txt&#39;), append = TRUE, quote=FALSE, row.names =FALSE, col.names = FALSE) #the followign line can be uncommented if ceqlogo is installed and in your $PATH
+system(paste(&#39;ceqlogo -i &#39;, out, &#39;.txt -m 1 &gt; &#39;, out, &#39;.eps&#39;, sep=&#39;&#39;))
+return(pswm) }
+
+pswm.func.2(x</code></pre>
 <!--
 # make a barchart for fraction of peaks with motifs 
 
