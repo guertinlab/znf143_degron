@@ -777,74 +777,43 @@ fastaFromBed -s -fi $genome -bed expanded_motifs_window.bed > expanded_motifs_fo
 ```{r, engine='R', eval=F, echo=T}
 
 source("https://raw.githubusercontent.com/guertinlab/Tn5bias/master/Manuscript_Vignette/Vignette_Scripts/Figure1_Nucleotide_Count.R")
-x = read.table('expanded_motifs_for_PSWM.fasta', comment.char = ">", header =FALSE)
-x= data.frame(lapply(x, toupper))
-x.transfac = vector("list", length = ceiling(nrow(x)/100000))
+
 
 source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R') library(ggseqlogo)
 pswm.func.2 <- function(x.ligation, out = 'outfilename') {
-a = lapply(strsplit(as.character(x.ligation), ''), "[", 1)
-b = lapply(strsplit(as.character(x.ligation), ''), "[", 2)
-c = lapply(strsplit(as.character(x.ligation), ''), "[", 3)
-d = lapply(strsplit(as.character(x.ligation), ''), "[", 4)
-e = lapply(strsplit(as.character(x.ligation), ''), "[", 5)
-f = lapply(strsplit(as.character(x.ligation), ''), "[", 6)
-g = lapply(strsplit(as.character(x.ligation), ''), "[", 7)
-h = lapply(strsplit(as.character(x.ligation), ''), "[", 8)
-i = lapply(strsplit(as.character(x.ligation), ''), "[", 9)
-j = lapply(strsplit(as.character(x.ligation), ''), "[", 10)
-k = lapply(strsplit(as.character(x.ligation), ''), "[", 11)
-l = lapply(strsplit(as.character(x.ligation), ''), "[", 12)
-m = lapply(strsplit(as.character(x.ligation), ''), "[", 13)
-n = lapply(strsplit(as.character(x.ligation), ''), "[", 14)
-o = lapply(strsplit(as.character(x.ligation), ''), "[", 15)
-p = lapply(strsplit(as.character(x.ligation), ''), "[", 16)
-q = lapply(strsplit(as.character(x.ligation), ''), "[", 17)
-r = lapply(strsplit(as.character(x.ligation), ''), "[", 18)
-s = lapply(strsplit(as.character(x.ligation), ''), "[", 19)
-t = lapply(strsplit(as.character(x.ligation), ''), "[", 20)
-u = lapply(strsplit(as.character(x.ligation), ''), "[", 21)
-aa = lapply(strsplit(as.character(x.ligation), ''), "[", 22)
-bb = lapply(strsplit(as.character(x.ligation), ''), "[", 23)
-cc = lapply(strsplit(as.character(x.ligation), ''), "[", 24)
-dd = lapply(strsplit(as.character(x.ligation), ''), "[", 25)
-ee = lapply(strsplit(as.character(x.ligation), ''), "[", 26)
-ff = lapply(strsplit(as.character(x.ligation), ''), "[", 27)
-gg = lapply(strsplit(as.character(x.ligation), ''), "[", 28)
-hh = lapply(strsplit(as.character(x.ligation), ''), "[", 29)
-ii = lapply(strsplit(as.character(x.ligation), ''), "[", 30)
-jj = lapply(strsplit(as.character(x.ligation), ''), "[", 31)
-kk = lapply(strsplit(as.character(x.ligation), ''), "[", 32)
-ll = lapply(strsplit(as.character(x.ligation), ''), "[", 33)
-mm = lapply(strsplit(as.character(x.ligation), ''), "[", 34)
-nn = lapply(strsplit(as.character(x.ligation), ''), "[", 35)
-oo = lapply(strsplit(as.character(x.ligation), ''), "[", 36)
-pp = lapply(strsplit(as.character(x.ligation), ''), "[", 37)
-qq = lapply(strsplit(as.character(x.ligation), ''), "[", 38)
-rr = lapply(strsplit(as.character(x.ligation), ''), "[", 39)
-ss = lapply(strsplit(as.character(x.ligation), ''), "[", 40)
-tt = lapply(strsplit(as.character(x.ligation), ''), "[", 41)
-uu = lapply(strsplit(as.character(x.ligation), ''), "[", 42)
-col.matrix = cbind(a,b,c,d,e,f, g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,aa,bb,cc,dd,ee,ff, gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu)
-print(col.matrix)
-a.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == "A"))
-t.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == "T"))
-c.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == "C"))
-g.nuc = sapply(1:42, function(x) sum(col.matrix[,x] == "G"))
-#pswm = cbind(a.nuc*(0.25/.2), c.nuc*(0.25/.3), g.nuc*(0.25/.3), t.nuc*(0.25/.2)) 
-pswm = cbind(a.nuc, c.nuc, g.nuc, t.nuc)
-print(pswm)
-outfile = file(paste0(out, '.txt'))
-on.exit(close(outfile))
-writeLines(c("MEME version 4", "ALPHABET= ACGT", "strands: + -", " ",
-"Background letter frequencies (from uniform background):",
-"A 0.20000 C 0.30000 G 0.30000 T 0.20000", paste("MOTIF", out), " ", "letter-probability matrix: alength= 4 w= 42"), outfile)
-pswm = pswm/rowSums(pswm)
-write.table(pswm, file = paste0(out, '.txt'), append = TRUE, quote=FALSE, row.names =FALSE, col.names = FALSE) #the followign line can be uncommented if ceqlogo is installed and in your $PATH
-system(paste('ceqlogo -i ', out, '.txt -m 1 > ', out, '.eps', sep=''))
-return(pswm) }
+  col.matrix <- matrix(unlist(strsplit(as.character(x.ligation), '')), ncol = 42, byrow = TRUE)
+  
+  a.nuc <- colSums(col.matrix == "A")
+  t.nuc <- colSums(col.matrix == "T")
+  c.nuc <- colSums(col.matrix == "C")
+  g.nuc <- colSums(col.matrix == "G")
+  
+  pswm <- cbind(a.nuc, c.nuc, g.nuc, t.nuc)
+  
+  pswm <- pswm / rowSums(pswm)
+  
+  outfile <- file(paste0(out, '.txt'))
+  on.exit(close(outfile))
+  writeLines(c(
+    "MEME version 4", 
+    "ALPHABET= ACGT", 
+    "strands: + -", 
+    " ",
+    "Background letter frequencies (from uniform background):",
+    "A 0.20000 C 0.30000 G 0.30000 T 0.20000", 
+    paste("MOTIF", out), 
+    " ", 
+    "letter-probability matrix: alength= 4 w= 42"
+  ), outfile)
+  
+  write.table(pswm, file = paste0(out, '.txt'), append = TRUE, quote = FALSE, row.names = FALSE, col.names = FALSE)
+  
+  return(pswm)
+}
 
-pswm.func.2(x
+
+x = read.table('expanded_motifs_for_PSWM.fasta', comment.char = ">", header =FALSE)
+pswm.func.2(x[,1], "ZNF143")
 ```
 <!--
 # make a barchart for fraction of peaks with motifs 
