@@ -766,11 +766,11 @@ awk '{OFS="\t";} {if($9 == "-") print $4,$5-8,$6,$7,$8,$9; else print $4,$5,$6+8
 awk '{OFS="\t";} {if($9 == "-") print $4,$5,$6+9,$7,$8,$9; else print $4,$5-9,$6,$7,$8,$9}' motif1_znf143_peaks.bed > expanded_motif1_znf143_peaks.bed
 
 cat expanded_motif*_znf143_peaks.bed | sort -k1,1 -k2,2n |  awk '!seen[$1,$2]++' > expanded_motifs_in_peaks.bed
-closestBed -d -t first -a ZNF143_functional_peaks.bed -b expanded_motifs_in_peaks.bed | awk '{OFS="\t";} {print $4,$5,$6,$7,$8,$9}' > expanded_motifs_closest.bed
+closestBed -d -t first -a ZNF143_functional_peaks.bed -b expanded_motifs_in_peaks.bed | awk '{OFS="\t";} {if($10 < 150) print $4,$5,$6,$7,$8,$9}' > expanded_motifs_closest.bed
 
 awk '{OFS="\t";} {if($6 == "-") print $1,$2-11,$3+9,$4,$5,$6; else print $1,$2-10,$3+10,$4,$5,$6}' expanded_motifs_closest.bed > expanded_motifs_window.bed
 
-fastaFromBed -s -fi $genome -bed expanded_motifs_window.bed > expanded_motifs_for_PSWM.bed
+fastaFromBed -s -fi $genome -bed expanded_motifs_window.bed > expanded_motifs_for_PSWM.fasta
 # see https://github.com/guertinlab/Tn5bias/blob/master/Manuscript_Vignette/Tn5_ATAC_bias.pdf section 2.4
 ```
 
