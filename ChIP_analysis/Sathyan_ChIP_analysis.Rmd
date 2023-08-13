@@ -800,7 +800,7 @@ pswm.func.2 <- function(x.ligation, out = 'outfilename') {
     "strands: + -", 
     " ",
     "Background letter frequencies (from uniform background):",
-    "A 0.20000 C 0.30000 G 0.30000 T 0.20000", 
+    "A 0.30000 C 0.20000 G 0.20000 T 0.30000", 
     paste("MOTIF", out), 
     " ", 
     "letter-probability matrix: alength= 4 w= 42"
