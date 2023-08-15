@@ -1109,6 +1109,8 @@ for (chip.peak in Sys.glob(file.path("/labs/Guertin/ZNF143_ChIP/quantile*bed")))
 plot_cdf(df.cdf, tf = "ZNF143", cat = cat, col.lines = c(rep("grey60",20),colorRampPalette(c("red","pink"))(16),colorRampPalette(c("blue", "light blue"))(4)), line.type = c(rep(2, 20), rep(1,20)), cex = 0.25)
 ```
 
+[image]
+
 Create CDF for activated genes
 
 ```{r engine='R', eval=F, echo=TRUE}
@@ -1143,61 +1145,62 @@ df.cdf$status = factor(df.cdf$status, levels = levels)
 
 plot_cdf(df.cdf, tf = "ZNF143", cat = cat, col.lines = c(rep("grey60",20),colorRampPalette(c("red","pink"))(20)), line.type = c(rep(2, 20), rep(1,20)), cex = 0.25)
 ```
+[image]
 
 ```{r engine='R', eval=F, echo=TRUE}
 # old stuff:
 
-df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table('/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed', sep = '\t',header=FALSE))
+# df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table('/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed', sep = '\t',header=FALSE))
 
-plot_cdf <- function(df.all, tf="quantile", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1)) {
-pdf(paste0(tf, "FIG_cdf_compare_Reg_classes.pdf"), width=6.2, height=3.83) 
-	print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
-         auto.key = list(lines=TRUE, points=FALSE),
-         col = col.lines,
-         aspect = 1,
-                                        #xlim = c(0, 50000),
-         scales=list(relation="free",alternating=c(1,1,1,1)),
-         ylab = 'Cumulative Distribution Function',
-         xlab = expression('log'[10]~'ZNF143 Distance from TSS'),
-                                        #index.cond = list(c(2,1)),
-         between=list(y=1.0),
-         type = 'a',
-         xlim = c(0,8),
-         lwd=2,
-		 lty=line.type,
-         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
-         panel = function(...) {
-             panel.abline(v= 200, lty =2)
-             panel.ecdfplot(...)
-         }))
-	dev.off()
-}
+# plot_cdf <- function(df.all, tf="quantile", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1)) {
+# pdf(paste0(tf, "FIG_cdf_compare_Reg_classes.pdf"), width=6.2, height=3.83) 
+# 	print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
+#          auto.key = list(lines=TRUE, points=FALSE),
+#          col = col.lines,
+#          aspect = 1,
+#                                         #xlim = c(0, 50000),
+#          scales=list(relation="free",alternating=c(1,1,1,1)),
+#          ylab = 'Cumulative Distribution Function',
+#          xlab = expression('log'[10]~'ZNF143 Distance from TSS'),
+#                                         #index.cond = list(c(2,1)),
+#          between=list(y=1.0),
+#          type = 'a',
+#          xlim = c(0,8),
+#          lwd=2,
+# 		 lty=line.type,
+#          par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
+#          panel = function(...) {
+#              panel.abline(v= 200, lty =2)
+#              panel.ecdfplot(...)
+#          }))
+# 	dev.off()
+# }
 
 
-#make sure that the "cdf.deseq.df" function is the one from above, not sourced
-for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quantile*bed"))) {
-	print(chip.peak)
-	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-	print(quantile.name)
-	df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(chip.peak, sep="\t",header=FALSE))
-    plot_cdf(df.all, tf = quantile.name)
-	}
+# #make sure that the "cdf.deseq.df" function is the one from above, not sourced
+# for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quantile*bed"))) {
+# 	print(chip.peak)
+# 	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
+# 	print(quantile.name)
+# 	df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(chip.peak, sep="\t",header=FALSE))
+#     plot_cdf(df.all, tf = quantile.name)
+# 	}
 	
-df.cdf = data.frame(matrix(nrow = 0, ncol = 3)) 	
-colnames(df.cdf) = c("V4", "dis", "status")
-for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quantile*bed"))) {
-	print(chip.peak)
-	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-	print(quantile.name)
-	df.all = cdf.deseq.df(df = df.x, genes = gene.file,
-    chip.peaks=read.table(chip.peak, sep="\t", header=FALSE))
-	x = paste(as.character(df.all[,3]), quantile.name)
-	df.all[,3] = x
-	df.cdf = rbind(df.cdf, df.all)
-    #plot_cdf(df.all, tf = quantile)
+# df.cdf = data.frame(matrix(nrow = 0, ncol = 3)) 	
+# colnames(df.cdf) = c("V4", "dis", "status")
+# for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quantile*bed"))) {
+# 	print(chip.peak)
+# 	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
+# 	print(quantile.name)
+# 	df.all = cdf.deseq.df(df = df.x, genes = gene.file,
+#     chip.peaks=read.table(chip.peak, sep="\t", header=FALSE))
+# 	x = paste(as.character(df.all[,3]), quantile.name)
+# 	df.all[,3] = x
+# 	df.cdf = rbind(df.cdf, df.all)
+#     #plot_cdf(df.all, tf = quantile)
 	
-	}
-plot_cdf(df.cdf, tf = "ZNF143", col.lines = c(rep("grey60",20),colorRampPalette(c("red","pink"))(13),colorRampPalette(c("blue", "light blue"))(7)), line.type = c(rep(2, 20), rep(1,20)))
+# 	}
+# plot_cdf(df.cdf, tf = "ZNF143", col.lines = c(rep("grey60",20),colorRampPalette(c("red","pink"))(13),colorRampPalette(c("blue", "light blue"))(7)), line.type = c(rep(2, 20), rep(1,20)))
 ```
 
 
