@@ -820,9 +820,7 @@ plotPCAlattice <- function(df, file = 'PCA_lattice.pdf') {
 
 
 run.deseq.list <- function(mat, untreated = 4, treated=4) {
-  sample.conditions = factor(c(rep("untreated",untreated), rep("treated", treated)), levels=c("untreated","treated"))        
-  
-  
+  sample.conditions = factor(c(rep("untreated",untreated), rep("treated", treated)), levels=c("untreated","treated")) 
   deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
   colData(deseq.counts.table)$condition<-factor(colData(deseq.counts.table)$sample.conditions, levels=c('untreated','treated'));
   dds = DESeq(deseq.counts.table);
@@ -858,7 +856,8 @@ Analysis:
 ```{r engine='R', eval=F, echo=TRUE}
 inferred.coords=read.table('HEK_ZNF143_gene_annotations.bed', sep="\t", header =FALSE)
 
-counts.df = abs(get.raw.counts.interval(inferred.coords, "/Users/guertinlab/Desktop/ZNF143_ChIP/bigWigs/", file.prefix = "H"))
+# use unnormalized bigWigs
+counts.df = abs(get.raw.counts.interval(inferred.coords, "/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/seqOutBias_bw", file.prefix = "H"))
 
 estimateSizeFactorsForMatrix(counts.df)
 
@@ -868,8 +867,9 @@ estimateSizeFactorsForMatrix(counts.df)
 dds = run.deseq.list.dds(counts.df)
 rld <- rlog(dds)
 
-plotPCA(rld)
+plotPCA(rld) # basic plot
 
+# more informative plot:
 pca.plot = plotPCA(rld, intgroup="sample.conditions", returnData=TRUE)
 pca.plot$sample.conditions = rownames(pca.plot)
 plotPCAlattice(pca.plot, file = 'PCA_ZNF143_PRO.pdf')
@@ -881,6 +881,7 @@ sample.conditions = factor(c("untreated","untreated","untreated","untreated","tr
 deseq.df = DESeqDataSetFromMatrix(counts.df, cbind.data.frame(sample.conditions, rep), ~ rep + sample.conditions)
 deseq.df = DESeq(deseq.df)
 
+# Create tables of activated/repressed genes and their matching genes 
 for (i in levels(sample.conditions)[-1]) {
   res.deseq = results(deseq.df, contrast = c("sample.conditions", i, "untreated"))
   sum(res.deseq$padj < 0.1 & !is.na(res.deseq$padj))
