@@ -1208,6 +1208,39 @@ plot_cdf(df.cdf, tf = "ZNF143", cat = cat, col.lines = c(rep("grey60",20),colorR
 
 ## Plot an MA plot for activated and repressed and unchanged
 
-
 Unchanged can be the combine matched genes (match a set for act and a
 set for repressed).
+
+```{r engine='R', eval=F, echo=TRUE}
+# use df.x from DESeq above
+temp = df.x
+unique(temp$treatment)
+temp[temp$treatment == "Matched to Activated",]$treatment = "Unchanged"
+temp[temp$treatment == "Matched to Repressed",]$treatment = "Unchanged"
+
+# Adapting this plotting function from the genex course's ATAC-seq vignette
+ma.plot.lattice <- function(ma.df, filename = 'file.name', 
+         title.main = "Differential ATAC-seq Accessibility",
+         col = c("grey90",  "grey60", "#ce228e" , "#2290cf"))
+  {
+  pdf(paste("MA_plot_", filename, ".pdf", sep=''), 
+      useDingbats = FALSE, width=3.83, height=3.83);
+  print(xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
+               groups=ma.df$treatment,
+               col= col,
+                main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
+               ylab=expression("log"[2]~"PRO-seq fold change"), 
+               xlab=expression("log"[10]~"Mean of Normalized Counts"),
+               par.settings=list(par.xlab.text=list(cex=1.1,font=2), 
+                                 par.ylab.text=list(cex=1.1,font=2))));
+  dev.off()
+  }
+
+ma.plot.lattice(ma.df, filename='ZNF143_dTAG_PRO_v4', title.main="Differential Expression", col=c("#ce228e" ,"#2290cf", "grey90"))
+```
+
+```{r  echo=F, fig.align = "center", fig.cap="Differential Expression after ZNF143 degradation"}
+#library(knitr) # only need to do this for the first image in the vignette
+knitr::include_graphics("./MA_plot_ZNF143_dTAG_PRO.png") 
+```
+
