@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-08-11" />
+<meta name="date" content="2023-08-15" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-08-11</h4>
+<h4 class="date">2023-08-15</h4>
 
 </div>
 
@@ -1462,9 +1462,7 @@ plotPCAlattice &lt;- function(df, file = &#39;PCA_lattice.pdf&#39;) {
 
 
 run.deseq.list &lt;- function(mat, untreated = 4, treated=4) {
-  sample.conditions = factor(c(rep(&quot;untreated&quot;,untreated), rep(&quot;treated&quot;, treated)), levels=c(&quot;untreated&quot;,&quot;treated&quot;))        
-  
-  
+  sample.conditions = factor(c(rep(&quot;untreated&quot;,untreated), rep(&quot;treated&quot;, treated)), levels=c(&quot;untreated&quot;,&quot;treated&quot;)) 
   deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
   colData(deseq.counts.table)$condition&lt;-factor(colData(deseq.counts.table)$sample.conditions, levels=c(&#39;untreated&#39;,&#39;treated&#39;));
   dds = DESeq(deseq.counts.table);
@@ -1497,7 +1495,8 @@ tighten_summit_window &lt;- function(res.deseq) {
 <p>Analysis:</p>
 <pre class="r"><code>inferred.coords=read.table(&#39;HEK_ZNF143_gene_annotations.bed&#39;, sep=&quot;\t&quot;, header =FALSE)
 
-counts.df = abs(get.raw.counts.interval(inferred.coords, &quot;/Users/guertinlab/Desktop/ZNF143_ChIP/bigWigs/&quot;, file.prefix = &quot;H&quot;))
+# use unnormalized bigWigs
+counts.df = abs(get.raw.counts.interval(inferred.coords, &quot;/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/seqOutBias_bw&quot;, file.prefix = &quot;H&quot;))
 
 estimateSizeFactorsForMatrix(counts.df)
 
@@ -1507,8 +1506,9 @@ estimateSizeFactorsForMatrix(counts.df)
 dds = run.deseq.list.dds(counts.df)
 rld &lt;- rlog(dds)
 
-plotPCA(rld)
+plotPCA(rld) # basic plot
 
+# more informative plot:
 pca.plot = plotPCA(rld, intgroup=&quot;sample.conditions&quot;, returnData=TRUE)
 pca.plot$sample.conditions = rownames(pca.plot)
 plotPCAlattice(pca.plot, file = &#39;PCA_ZNF143_PRO.pdf&#39;)
@@ -1520,6 +1520,7 @@ sample.conditions = factor(c(&quot;untreated&quot;,&quot;untreated&quot;,&quot;u
 deseq.df = DESeqDataSetFromMatrix(counts.df, cbind.data.frame(sample.conditions, rep), ~ rep + sample.conditions)
 deseq.df = DESeq(deseq.df)
 
+# Create tables of activated/repressed genes and their matching genes 
 for (i in levels(sample.conditions)[-1]) {
   res.deseq = results(deseq.df, contrast = c(&quot;sample.conditions&quot;, i, &quot;untreated&quot;))
   sum(res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj))
