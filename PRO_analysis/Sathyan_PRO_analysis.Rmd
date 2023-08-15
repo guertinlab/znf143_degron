@@ -681,7 +681,7 @@ abline(v=cnt.cut, col="red")
 
 ```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts cutoff for defining expressed genes"}
 #library(knitr)
-knitr::include_graphics("./read_density_count_cutoff.pdf") 
+knitr::include_graphics("./read_density_count_cutoff.png") 
 ```
 
 ```{r engine='R', eval=F, echo=TRUE}
