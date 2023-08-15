@@ -679,7 +679,10 @@ abline(v=cnt.cut, col="red")
 # plot saved as "read_density_count_cutoff.pdf"
 ```
 
-[insert plot here]
+```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts cutoff for defining expressed genes"}
+#library(knitr)
+knitr::include_graphics("./read_density_count_cutoff.pdf") 
+```
 
 ```{r engine='R', eval=F, echo=TRUE}
 # remove genes below cutoffs ("unexpressed")
