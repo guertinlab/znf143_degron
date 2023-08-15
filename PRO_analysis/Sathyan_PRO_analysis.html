@@ -1563,42 +1563,90 @@ for (i in levels(sample.conditions)[-1]) {
   df.x = rbind(df.x, unchanged)
   df.x = rbind(df.x, repressed)
 }</code></pre>
-<p>Create CDFs (reference code from course)</p>
+<p>Create CDFs (reference code from genex course)</p>
+<p>Set up functions and packages:</p>
 <pre class="r"><code>library(latticeExtra)
+library(DESeq2)
+library(lattice)
+library(dplyr)
+library(ggplot2)
+library(limma)
+library(bigWig)
+library(gplots)
 
-cdf.deseq.df &lt;- function(df, genes = gene.file, chip.peaks = chip.peaks) {
-  bed.tss.activated = filter.deseq.into.bed(df, genes, cat = &quot;Repressed&quot;)
-  bed.tss.unchanged = filter.deseq.into.bed(df, genes, cat = &quot;Matched to Repressed&quot;)
-  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;-D a&#39;)
-  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;-D a&#39;)
+# make sure these functions are sourced
+source(&#39;https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R&#39;)
+source(&#39;https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R&#39;)
+source(&#39;https://raw.githubusercontent.com/guertinlab/genex/main/ChIP_analysis/cdf_functions.R&#39;)
 
-  df.up.can = cbind(act.distance[,c(4, 10)], &quot;Repressed&quot;)
-  df.un.can = cbind(unreg.distance[,c(4, 10)], &quot;Matched to Repressed&quot;)
+# previous version of cdf.deseq.df:
+# cdf.deseq.df &lt;- function(df, genes = gene.file, chip.peaks = chip.peaks) {
+#   bed.tss.activated = filter.deseq.into.bed(df, genes, cat = &quot;Repressed&quot;)
+#   bed.tss.unchanged = filter.deseq.into.bed(df, genes, cat = &quot;Matched to Repressed&quot;)
+#   act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;-D a&#39;)
+#   unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;-D a&#39;)
+
+#   df.up.can = cbind(act.distance[,c(4, 10)], &quot;Repressed&quot;)
+#   df.un.can = cbind(unreg.distance[,c(4, 10)], &quot;Matched to Repressed&quot;)
+
+#   colnames(df.up.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
+#   colnames(df.un.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
+
+#   df.all = rbind(df.up.can, df.un.can)
+#   df.all$status = factor(df.all$status, levels = c(&quot;Repressed&quot;, &quot;Matched to Repressed&quot;))
+#   return(df.all)
+# }
+
+# filter.deseq.into.bed &lt;- function(deseq.df, gene.file, cat = &#39;R1881 Activated&#39;) {
+#   deseq.df = deseq.df[deseq.df$treatment == cat,]
+#   #print(dim(deseq.df))
+#   #scientific notation was messing this up occasionally
+#   x = gene.file$V4
+#   #print(length(x))
+#   y = gene.file[x %in% rownames(deseq.df),]
+#   #print(dim(y))
+#   z = get.tss(y)
+#   #print(dim(z))
+#   return(z)
+# }
+
+# filter.deseq.into.bed &lt;- function(deseq.df, gene.file, cat = &#39;R1881 Activated&#39;) {
+#   deseq.df = deseq.df[deseq.df$treatment == cat,]
+#   print(dim(deseq.df))
+#   #scientific notation was messing this up occasionally
+#   x = gene.file$V4
+#   print(length(x))
+#   xy=sapply(strsplit(sapply(strsplit(rownames(deseq.df), &#39;:&#39;), &#39;[&#39;, 2), &quot;-&quot;), &quot;[&quot;, 2)
+#   gene = sapply(strsplit(xy, &quot;_&quot;), &quot;[&quot;, 2)
+#   y = gene.file[x %in% gene,]
+#   #print(dim(y))
+#   z = get.tss(y)
+#   #print(dim(z))
+#   return(z)
+# }
+
+# version of cdf.deseq.df used:
+cdf.deseq.df &lt;- function(genes = gene.file, chip.peaks = chip.peaks, cat = &quot;Repressed&quot;) {
+  bed.tss.activated = get.tss(genes[genes$V5 == cat,])
+  bed.tss.unchanged = get.tss(genes[genes$V5 == paste0(&quot;Matched to &quot;, cat),])
+  # I used the long way to call closestBed because of how I installed bedtools
+  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;closest -D a&#39;)
+  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;closest -D a&#39;)
+
+  df.up.can = cbind(act.distance[,c(4, 10)], cat)
+  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0(&quot;Matched to &quot;, cat))
 
   colnames(df.up.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
   colnames(df.un.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
 
   df.all = rbind(df.up.can, df.un.can)
-  df.all$status = factor(df.all$status, levels = c(&quot;Repressed&quot;, &quot;Matched to Repressed&quot;))
+  df.all$status = factor(df.all$status, levels = c(cat, paste0(&quot;Matched to &quot;, cat)))
   return(df.all)
-}
-
-filter.deseq.into.bed &lt;- function(deseq.df, gene.file, cat = &#39;R1881 Activated&#39;) {
-  deseq.df = deseq.df[deseq.df$treatment == cat,]
-  #print(dim(deseq.df))
-  #scientific notation was messing this up occasionally
-  x = gene.file$V4
-  #print(length(x))
-  y = gene.file[x %in% rownames(deseq.df),]
-  #print(dim(y))
-  z = get.tss(y)
-  #print(dim(z))
-  return(z)
 }
 
 col.lines = c(&quot;#FF0000&quot;, &quot;grey60&quot;)
 
-bedTools.closest &lt;- function(functionstring=&quot;/Users/guertinlab/Downloads/bedtools2/bin/closestBed&quot;,bed1,bed2,opt.string=&quot;&quot;) {
+bedTools.closest &lt;- function(functionstring=&quot;/home/FCAM/jdong/software/bedtools&quot;,bed1,bed2,opt.string=&quot;&quot;) {
   
   options(scipen =99) # not to use scientific notation when writing out
   
@@ -1628,23 +1676,93 @@ bedTools.closest &lt;- function(functionstring=&quot;/Users/guertinlab/Downloads
   return(res)
 }
 
+# I also adjusted plot_cdf to reposition the key
+plot_cdf &lt;- function(df.all, tf=&quot;quantile&quot;, cat = &quot;Repressed&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), line.type = c(1), cex = 1) {
+pdf(paste0(tf, &quot;_FIG_cdf_compare_Reg_classes_&quot;, cat, &quot;.pdf&quot;), width=6.2, height=3.83) 
+         print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
+         auto.key = list(lines=TRUE, points=FALSE, cex = cex, space=&quot;right&quot;),
+         col = col.lines,
+         aspect = 1,
+                                        #xlim = c(0, 50000),
+         scales=list(relation=&quot;free&quot;,alternating=c(1,1,1,1)),
+         ylab = &#39;Cumulative Distribution Function&#39;,
+         xlab = expression(&#39;log&#39;[10]~&#39;ZNF143 Distance from TSS&#39;),
+                                        #index.cond = list(c(2,1)),
+         between=list(y=1.0),
+         type = &#39;a&#39;,
+         xlim = c(0,8),
+         lwd=2,
+         lty=line.type,
+         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col=&quot;grey85&quot;)),
+         panel = function(...) {
+             panel.abline(v= 200, lty =2)
+             panel.ecdfplot(...)
+         }))
+    dev.off()
+}</code></pre>
+<p>Create CDF for repressed genes</p>
+<pre class="r"><code>gene.file=read.table(file = &quot;HEK_ZNF143_gene_annotations.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
+cat = &quot;Repressed&quot;
 
-filter.deseq.into.bed &lt;- function(deseq.df, gene.file, cat = &#39;R1881 Activated&#39;) {
-  deseq.df = deseq.df[deseq.df$treatment == cat,]
-  print(dim(deseq.df))
-  #scientific notation was messing this up occasionally
-  x = gene.file$V4
-  print(length(x))
-  xy=sapply(strsplit(sapply(strsplit(rownames(deseq.df), &#39;:&#39;), &#39;[&#39;, 2), &quot;-&quot;), &quot;[&quot;, 2)
-  gene = sapply(strsplit(xy, &quot;_&quot;), &quot;[&quot;, 2)
-  y = gene.file[x %in% gene,]
-  #print(dim(y))
-  z = get.tss(y)
-  #print(dim(z))
-  return(z)
-}
+# make a CDF plot for each quantile
+for (chip.peak in Sys.glob(file.path(&quot;/labs/Guertin/ZNF143_ChIP/quantile*bed&quot;))) {
+    print(chip.peak)
+    quantile.name = strsplit(strsplit(chip.peak, &quot;/&quot;)[[1]][length(strsplit(chip.peak, &quot;/&quot;)[[1]])], &#39;.bed&#39;)[[1]][1]
+    print(quantile.name)
+    df.all = cdf.deseq.df(genes = gene.file, chip.peaks=read.table(chip.peak, header=FALSE), cat = cat)
+    plot_cdf(df.all, tf = quantile.name, cat = cat)
+    }
 
-gene.file=read.table(file = &quot;/Users/guertinlab/Desktop/ZNF143_ChIP/HEK_ZNF143_gene_annotations.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
+df.cdf = data.frame(matrix(nrow = 0, ncol = 3))   
+colnames(df.cdf) = c(&quot;V4&quot;, &quot;dis&quot;, &quot;status&quot;)
+
+for (chip.peak in Sys.glob(file.path(&quot;/labs/Guertin/ZNF143_ChIP/quantile*bed&quot;))) {
+    print(chip.peak)
+    quantile.name = strsplit(strsplit(chip.peak, &quot;/&quot;)[[1]][length(strsplit(chip.peak, &quot;/&quot;)[[1]])], &#39;.bed&#39;)[[1]][1]
+    print(quantile.name)
+    df.all = cdf.deseq.df(genes = gene.file,
+        chip.peaks=read.table(chip.peak, header=FALSE),
+        cat = cat)
+    x = paste(as.character(df.all[,3]), quantile.name)
+    df.all[,3] = x
+    df.cdf = rbind(df.cdf, df.all)
+    #plot_cdf(df.all, tf = quantile)
+    }
+
+plot_cdf(df.cdf, tf = &quot;ZNF143&quot;, cat = cat, col.lines = c(rep(&quot;grey60&quot;,20),colorRampPalette(c(&quot;red&quot;,&quot;pink&quot;))(16),colorRampPalette(c(&quot;blue&quot;, &quot;light blue&quot;))(4)), line.type = c(rep(2, 20), rep(1,20)), cex = 0.25)</code></pre>
+<p>Create CDF for activated genes</p>
+<pre class="r"><code>cat = &quot;Activated&quot;
+
+for (chip.peak in Sys.glob(file.path(&quot;/labs/Guertin/ZNF143_ChIP/quantile*bed&quot;))) {
+    print(chip.peak)
+    quantile.name = strsplit(strsplit(chip.peak, &quot;/&quot;)[[1]][length(strsplit(chip.peak, &quot;/&quot;)[[1]])], &#39;.bed&#39;)[[1]][1]
+    print(quantile.name)
+    df.all = cdf.deseq.df(genes = gene.file, chip.peaks=read.table(chip.peak, header=FALSE), cat = cat)
+    plot_cdf(df.all, tf = quantile.name, cat = cat)
+    }
+
+df.cdf = data.frame(matrix(nrow = 0, ncol = 3))  
+colnames(df.cdf) = c(&quot;V4&quot;, &quot;dis&quot;, &quot;status&quot;)
+
+for (chip.peak in Sys.glob(file.path(&quot;/labs/Guertin/ZNF143_ChIP/quantile*bed&quot;))) {
+    print(chip.peak)
+    quantile.name = strsplit(strsplit(chip.peak, &quot;/&quot;)[[1]][length(strsplit(chip.peak, &quot;/&quot;)[[1]])], &#39;.bed&#39;)[[1]][1]
+    print(quantile.name)
+    df.all = cdf.deseq.df(genes = gene.file,
+        chip.peaks=read.table(chip.peak, header=FALSE),
+    cat = cat)
+    x = paste(as.character(df.all[,3]), quantile.name)
+    df.all[,3] = x
+    df.cdf = rbind(df.cdf, df.all)
+    }
+
+levels = levels(factor(df.cdf$status))
+levels = c(levels[grepl(&quot;Matched&quot;, levels)], levels[!grepl(&quot;Matched&quot;, levels)])
+df.cdf$status = factor(df.cdf$status, levels = levels)
+
+plot_cdf(df.cdf, tf = &quot;ZNF143&quot;, cat = cat, col.lines = c(rep(&quot;grey60&quot;,20),colorRampPalette(c(&quot;red&quot;,&quot;pink&quot;))(20)), line.type = c(rep(2, 20), rep(1,20)), cex = 0.25)</code></pre>
+<pre class="r"><code># old stuff:
+
 df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(&#39;/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed&#39;, sep = &#39;\t&#39;,header=FALSE))
 
 plot_cdf &lt;- function(df.all, tf=&quot;quantile&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), line.type = c(1)) {
