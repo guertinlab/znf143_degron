@@ -653,7 +653,7 @@ hist(log(transcript.reads$counts), breaks=200, col="black",xlab="log read count"
 # plot saved as "read_density_count.pdf"
 ```
 
-```{r  out.width = "504px", out.height = "504px", echo=F, fig.align = "center", fig.cap="Log read density and counts"}
+```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts"}
 library(knitr)
 knitr::include_graphics("./read_density_count.pdf") 
 ```
