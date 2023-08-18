@@ -629,6 +629,14 @@ j = i
 
 # Now switch over to the PRO-seq vignette to determine the functional peaks
 
+
+## Establish threshold to define functional (final) peaks
+
+1. Plot cumulative quantile CDF (like nesting quantile traces)
+2. Note where overlaps begin to happen and use that to pick threshold for "functional" quantiles
+3. Use threshold to obtain set of functional peaks 
+
+
 ```{r, engine='R', eval=F, echo=T}
 
 #take the CDF plots from genex course with upstream vs downstream
