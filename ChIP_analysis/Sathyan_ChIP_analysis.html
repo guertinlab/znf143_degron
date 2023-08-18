@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-08-13" />
+<meta name="date" content="2023-08-18" />
 
 <title>ChIP-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">ChIP-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-08-13</h4>
+<h4 class="date">2023-08-18</h4>
 
 </div>
 
@@ -730,7 +730,10 @@ function toggle_visibility(id1) {
 <li><a href="#things-to-do-for-the-znf143" id="toc-things-to-do-for-the-znf143"><span class="toc-section-number">6.2</span> things to do for the ZNF143</a></li>
 <li><a href="#counting-reads-in-peaks-and-differential-binding" id="toc-counting-reads-in-peaks-and-differential-binding"><span class="toc-section-number">6.3</span> Counting reads in peaks and differential binding</a></li>
 </ul></li>
-<li><a href="#now-switch-over-to-the-pro-seq-vignette-to-determine-the-functional-peaks" id="toc-now-switch-over-to-the-pro-seq-vignette-to-determine-the-functional-peaks"><span class="toc-section-number">7</span> Now switch over to the PRO-seq vignette to determine the functional peaks</a></li>
+<li><a href="#now-switch-over-to-the-pro-seq-vignette-to-determine-the-functional-peaks" id="toc-now-switch-over-to-the-pro-seq-vignette-to-determine-the-functional-peaks"><span class="toc-section-number">7</span> Now switch over to the PRO-seq vignette to determine the functional peaks</a>
+<ul>
+<li><a href="#establish-threshold-to-define-functional-final-peaks" id="toc-establish-threshold-to-define-functional-final-peaks"><span class="toc-section-number">7.1</span> Establish threshold to define functional (final) peaks</a></li>
+</ul></li>
 <li><a href="#motif-analysis-of-other-and-functional-znf143-peaks" id="toc-motif-analysis-of-other-and-functional-znf143-peaks"><span class="toc-section-number">8</span> motif analysis of other and functional ZNF143 peaks</a></li>
 <li><a href="#deeptools-heatmap-of-znf143-functional-and-non-functional-peaks" id="toc-deeptools-heatmap-of-znf143-functional-and-non-functional-peaks"><span class="toc-section-number">9</span> deeptools heatmap of ZNF143 functional and non-functional peaks</a></li>
 <li><a href="#de-novo-motif-analysis-of-znf143-peaks" id="toc-de-novo-motif-analysis-of-znf143-peaks"><span class="toc-section-number">10</span> De novo motif analysis of ZNF143 peaks</a></li>
@@ -1322,12 +1325,20 @@ j = i
 </div>
 <div id="now-switch-over-to-the-pro-seq-vignette-to-determine-the-functional-peaks" class="section level1" number="7">
 <h1><span class="header-section-number">7</span> Now switch over to the PRO-seq vignette to determine the functional peaks</h1>
+<div id="establish-threshold-to-define-functional-final-peaks" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> Establish threshold to define functional (final) peaks</h2>
+<ol style="list-style-type: decimal">
+<li>Plot cumulative quantile CDF (like nesting quantile traces)</li>
+<li>Note where overlaps begin to happen and use that to pick threshold for “functional” quantiles</li>
+<li>Use threshold to obtain set of functional peaks</li>
+</ol>
 <pre class="r"><code>#take the CDF plots from genex course with upstream vs downstream
 length(peak.intensities[peak.intensities &gt;= quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[12]])
 
 func.znf143.peaks = peak.intensities[peak.intensities &gt;= quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[12]]
 
 other.znf143.peaks = peak.intensities[peak.intensities &lt; quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[12]]</code></pre>
+</div>
 </div>
 <div id="motif-analysis-of-other-and-functional-znf143-peaks" class="section level1" number="8">
 <h1><span class="header-section-number">8</span> motif analysis of other and functional ZNF143 peaks</h1>
