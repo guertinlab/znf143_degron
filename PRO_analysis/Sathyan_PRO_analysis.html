@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-08-15" />
+<meta name="date" content="2023-08-22" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-08-15</h4>
+<h4 class="date">2023-08-22</h4>
 
 </div>
 
@@ -730,6 +730,11 @@ function toggle_visibility(id1) {
 <li><a href="#jinhong-to-do" id="toc-jinhong-to-do"><span class="toc-section-number">8</span> Jinhong: to do</a>
 <ul>
 <li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">8.1</span> Plot an MA plot for activated and repressed and unchanged</a></li>
+</ul></li>
+<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">9</span> Determining threshold for “functional” ChIP peaks</a>
+<ul>
+<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">9.1</span> Merge quantile beds</a></li>
+<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">9.2</span> Plot all cumulative quantiles together</a></li>
 </ul></li>
 </ul>
 </div>
@@ -1864,6 +1869,153 @@ ma.plot.lattice(ma.df, filename=&#39;ZNF143_dTAG_PRO_v4&#39;, title.main=&quot;D
 Figure 3: <span class="caption-title">Differential Expression after ZNF143 degradation</span><br>
 </p>
 </div>
+</div>
+</div>
+<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Determining threshold for “functional” ChIP peaks</h1>
+<div id="merge-quantile-beds" class="section level2" number="9.1">
+<h2><span class="header-section-number">9.1</span> Merge quantile beds</h2>
+<p>Make cumulative bed files of the ChIP quantile peaks starting from the most intense and including each level in the next merged file.</p>
+<pre class="bash"><code>cd /labs/Guertin/ZNF143_ChIP/
+
+cat quantile1.bed quantile0.95.bed &gt; qmerge1.bed
+quants=($(seq 0.9 -0.05 0.05))
+newQ=()
+# remove trailing zeroes to match existing file names
+for i in {0..17}
+do
+    newQ[$i]=$(echo ${quants[$i]} | sed &#39;/\./ s/\.\{0,1\}0\{1,\}$//&#39;)
+done
+
+# serially merge quantiles together
+for i in {1..18}
+do
+    k=${newQ[$((i-1))]} #bash arrays are 0-indexed
+    echo $i
+    echo $k
+    cat qmerge${i}.bed quantile${k}.bed &gt; qmerge$((i+1)).bed
+done</code></pre>
+</div>
+<div id="plot-all-cumulative-quantiles-together" class="section level2" number="9.2">
+<h2><span class="header-section-number">9.2</span> Plot all cumulative quantiles together</h2>
+<p>Note: this takes place in a different directory than the immediately preceding code chunk.</p>
+<pre class="bash"><code>srun --partition=general --qos=general --pty --mem=16G -c 2 bash
+cd /labs/Guertin/ZNF143_PRO
+module load R/4.1.2
+R</code></pre>
+<p>Setup (mostly same as above)</p>
+<pre class="r"><code>library(latticeExtra)
+library(DESeq2)
+library(lattice)
+library(dplyr)
+library(ggplot2)
+library(limma)
+library(bigWig)
+library(gplots)
+library(RColorBrewer)
+library(viridis)
+source(&#39;https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R&#39;)
+source(&#39;https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R&#39;)
+source(&#39;https://raw.githubusercontent.com/guertinlab/genex/main/ChIP_analysis/cdf_functions.R&#39;)
+
+# use these functions instead of their sourced versions
+cdf.deseq.df &lt;- function(genes = gene.file, chip.peaks = chip.peaks, cat = &quot;Repressed&quot;) {
+  bed.tss.activated = get.tss(genes[genes$V5 == cat,])
+  bed.tss.unchanged = get.tss(genes[genes$V5 == paste0(&quot;Matched to &quot;, cat),])
+  # I used the long way to call closestBed because of how I installed bedtools
+  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;closest -D a&#39;)
+  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;closest -D a&#39;)
+
+  df.up.can = cbind(act.distance[,c(4, 10)], cat)
+  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0(&quot;Matched to &quot;, cat))
+
+  colnames(df.up.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
+  colnames(df.un.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
+
+  df.all = rbind(df.up.can, df.un.can)
+  df.all$status = factor(df.all$status, levels = c(cat, paste0(&quot;Matched to &quot;, cat)))
+  return(df.all)
+}
+
+bedTools.closest &lt;- function(functionstring=&quot;/home/FCAM/jdong/software/bedtools&quot;,bed1,bed2,opt.string=&quot;&quot;) {
+  
+  options(scipen =99) # not to use scientific notation when writing out
+  
+  #write bed formatted dataframes to tempfile
+  write.table(bed1,file= &#39;a.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  write.table(bed2,file= &#39;b.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  
+  # create the command string and call the command using system()
+  command1=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;a.file.bed&#39;, &#39;&gt; a.file.sorted.bed&#39;)
+  cat(command1,&quot;\n&quot;)
+  try(system(command1))
+  command2=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;b.file.bed&#39;, &#39;&gt; b.file.sorted.bed&#39;)
+  cat(command2,&quot;\n&quot;)
+  try(system(command2))
+  
+  command=paste(functionstring, opt.string,&quot;-a&quot;,&#39;a.file.sorted.bed&#39;,&quot;-b&quot;,&#39;b.file.sorted.bed&#39;,&quot;&gt;&quot;,&#39;out.file.bed&#39;,sep=&quot; &quot;)
+  cat(command,&quot;\n&quot;)
+  try(system(command))
+  
+  res=read.table(&#39;out.file.bed&#39;,sep =&quot;\t&quot;, header=F, comment.char=&#39;&#39;)
+  
+  command3=paste(&#39;rm&#39;, &#39;a.file.bed&#39;, &#39;b.file.bed&#39;, &#39;a.file.sorted.bed&#39;, &#39;b.file.sorted.bed&#39;, &#39;out.file.bed&#39;)
+  cat(command3,&quot;\n&quot;)
+  try(system(command3))
+  
+  colnames(res) = c(colnames(bed1), colnames(bed2), &#39;dis&#39; )
+  return(res)
+}</code></pre>
+<p>Making CDF plot:</p>
+<pre class="r"><code>gene.file=read.table(file = &quot;HEK_ZNF143_gene_annotations.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
+cat = &quot;Repressed&quot;
+
+df.cdf = data.frame(matrix(nrow = 0, ncol = 3))   
+colnames(df.cdf) = c(&quot;V4&quot;, &quot;dis&quot;, &quot;status&quot;)
+
+for (chip.peak in Sys.glob(file.path(&quot;/labs/Guertin/ZNF143_ChIP/qmerge*bed&quot;))) {
+    print(chip.peak)
+    quantile.name = strsplit(strsplit(chip.peak, &quot;/&quot;)[[1]][length(strsplit(chip.peak, &quot;/&quot;)[[1]])], &#39;.bed&#39;)[[1]][1]
+    print(quantile.name)
+    df.all = cdf.deseq.df(genes = gene.file,
+        chip.peaks=read.table(chip.peak, header=FALSE),
+        cat = cat)
+    x = paste(as.character(df.all[,3]), quantile.name)
+    df.all[,3] = x
+    df.cdf = rbind(df.cdf, df.all)
+    }
+
+# check that all plotting arguments are correct
+plot_cdf &lt;- function(df.all, tf=&quot;qmerge&quot;, cat = &quot;Repressed&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), line.type = c(1), cex = 1) {
+pdf(paste0(tf, &quot;_ZNF143_cumulative_cdf_&quot;, cat, &quot;.pdf&quot;), width=6.2, height=3.83) 
+         print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
+         auto.key = list(lines=TRUE, points=FALSE, cex = cex, space=&quot;right&quot;),
+         col = col.lines,
+         aspect = 1,
+                                        #xlim = c(0, 50000),
+         scales=list(relation=&quot;free&quot;,alternating=c(1,1,1,1)),
+         ylab = &#39;Cumulative Distribution Function&#39;,
+         xlab = expression(&#39;log&#39;[10]~&#39;ZNF143 Distance from TSS&#39;),
+                                        #index.cond = list(c(2,1)),
+         between=list(y=1.0),
+         type = &#39;a&#39;,
+         xlim = c(0,8),
+         lwd=2,
+         lty=line.type,
+         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col=&quot;grey85&quot;)),
+         panel = function(...) {
+             panel.abline(v= 200, lty =2)
+             panel.ecdfplot(...)
+         }))
+    dev.off()
+}
+
+colorChunks=c(plasma(13)[1:11], brewer.pal(8,&quot;Spectral&quot;))
+
+plot_cdf(df.cdf, tf = &quot;qmerge&quot;, cat = cat, col.lines = c(rep(&quot;grey60&quot;,19),colorChunks), line.type = c(rep(2, 19), rep(1,19)), cex = 0.3)</code></pre>
+<p>[image here, might change colors]
+qmerge_ZNF143_cumulative_cdf_Repressed.pdf</p>
+<p>The threshold is set at the trace for <code>qmerge6</code>, which corresponds to quantile 0.65 and above. Using this threshold, return to ChIP vignette for motif analysis.</p>
 </div>
 </div>
 
