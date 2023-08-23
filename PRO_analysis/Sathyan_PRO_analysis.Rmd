@@ -858,6 +858,17 @@ tighten_summit_window <- function(res.deseq) {
 }
 ```
 
+# Code for making integrated UCSC tracks
+
+https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh
+https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh
+
+# Code for inferring regulatory elements using bidirectional TXN
+
+https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh
+
+
+
 Analysis:
 ```{r engine='R', eval=F, echo=TRUE}
 inferred.coords=read.table('HEK_ZNF143_gene_annotations.bed', sep="\t", header =FALSE)
