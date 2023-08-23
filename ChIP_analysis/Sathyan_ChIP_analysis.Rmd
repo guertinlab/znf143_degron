@@ -727,8 +727,8 @@ analysis.
 module load meme/5.4.1
 module load bedtools
 
-genome=/home/FCAM/meds5420/genomes/hg38.fa
-sizes=/home/FCAM/meds5420/genomes/hg38.chrom.sizes
+genome=/home/FCAM/jdong/human38/hg38.fa
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
 
 for i in ZNF143_*_peaks.bed
 do
@@ -739,23 +739,33 @@ do
 	fastaFromBed -fi $genome -bed ${name}_summit_140window.bed -fo ${name}_summit_140window.fasta
 done
 
-for i in ZNF143_*_peaks.bed
-do
-	name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_peaks.bed" '{print $1}')
-	echo $name
-	meme -p 16 -oc ${name}_motif_functional.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ${name}_summit_140window.fasta
-done
+# for i in ZNF143_*_peaks.bed
+# do
+# 	name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_peaks.bed" '{print $1}')
+# 	echo $name
+# 	meme -p 16 -oc ${name}_motif_functional.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ${name}_summit_140window.fasta
+# done
 
+# meme round 1
+# note: I'm only going to meme the functional peaks, so I didn't do the loop above
+meme -p 40 -oc ZNF143_functional_motif_functional.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ZNF143_functional_summit_140window.fasta
 
 fimo --max-strand --max-stored-scores 10000000 --oc ZNF143_functional_motif_functional.fimo_output ZNF143_functional_motif_functional.meme_output/meme.txt $genome
 
 tail -n +2 ZNF143_functional_motif_functional.fimo_output/fimo.tsv | awk '{OFS="\t";} {print $3,$4,$5,$7,$8,$6}' | grep -v Individual| grep -v format | grep -v "max-stored-scores" | sort -k1,1 -k2,2n | tail -n +2 > fimo_ZNF143_functional_round1.bed
 
+wc -l fimo_ZNF143_functional_round1.bed
+# 1455305 fimo_ZNF143_functional_round1.bed
+
 intersectBed -v -wa -a ZNF143_functional_summit_140window.bed -b fimo_ZNF143_functional_round1.bed > ZNF143_ChIP_summit_140window_no_func_motif_1.bed
+
+wc -l ZNF143_ChIP_summit_140window_no_func_motif_1.bed
+# 655 ZNF143_ChIP_summit_140window_no_func_motif_1.bed
 
 fastaFromBed -fi $genome -bed ZNF143_ChIP_summit_140window_no_func_motif_1.bed -fo ZNF143_ChIP_summit_140window_no_func_motif_1.fasta
 
-meme -p 16 -oc ZNF143_functional_motif_functional_second.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ZNF143_ChIP_summit_140window_no_func_motif_1.fasta
+# meme round 2
+meme -p 40 -oc ZNF143_functional_motif_functional_second.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ZNF143_ChIP_summit_140window_no_func_motif_1.fasta
 
 fimo --max-strand --max-stored-scores 10000000 --oc ZNF143_functional_motif_functional_second.fimo_output ZNF143_functional_motif_functional_second.meme_output/meme.txt $genome
 
@@ -763,14 +773,15 @@ tail -n +2 ZNF143_functional_motif_functional_second.fimo_output/fimo.tsv | awk 
 
 intersectBed -v -wa -a ZNF143_ChIP_summit_140window_no_func_motif_1.bed -b fimo_ZNF143_functional_round2.bed > ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed
 
-fastaFromBed -fi $genome -bed ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed -fo ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.fasta
-
-meme -p 16 -oc ZNF143_functional_motif_functional_third.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.fasta
-
-#this returned garbage
-
 wc -l ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed
+# 93 ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed
+
+# fastaFromBed -fi $genome -bed ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed -fo ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.fasta
+
+# meme -p 16 -oc ZNF143_functional_motif_functional_third.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.fasta
+
 wc -l ZNF143_functional_summit_140window.bed
+# 2182 ZNF143_functional_summit_140window.bed
 
 #96% have either motif
 # what comparison comparison set of regions can we use as a control?
