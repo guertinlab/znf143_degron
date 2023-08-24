@@ -607,8 +607,8 @@ peak.intensities = rowMeans(normalized.counts.znf143[,1:3])
 names(peak.intensities) = rownames(normalized.counts.znf143)
 chr = sapply(strsplit(names(peak.intensities), ":"), "[", 1)
 rnge = sapply(strsplit(names(peak.intensities), ":"), "[", 2)
-start =	as.numeric(sapply(strsplit(rnge, "-"), "[", 1)) + 100
-end = as.numeric(sapply(strsplit(rnge, "-"), "[", 2)) - 100
+start = as.numeric(sapply(strsplit(rnge, "-"), "[", 1)) + 200
+end = as.numeric(sapply(strsplit(rnge, "-"), "[", 2)) - 200
 
 quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))
 
@@ -620,7 +620,7 @@ for (i in quantile(peak.intensities, probs = seq(.05, 1.00, by =
 {
 count = count +1
 
-write.table(file = paste0('quantile', as.character(q[count]), '.bed'), data.frame(chr[peak.intensities > j & peak.intensities <= i], start[peak.intensities > j & peak.intensities <= i], end[peak.intensities > j & peak.intensities <= i], peak.intensities[peak.intensities > j & peak.intensities <= i]), sep = '\t', quote=FALSE, col.names=FALSE, row.names=FALSE )
+write.table(file = paste0('quantile', as.character(q[count]), '_summits.bed'), data.frame(chr[peak.intensities > j & peak.intensities <= i], start[peak.intensities > j & peak.intensities <= i], end[peak.intensities > j & peak.intensities <= i], peak.intensities[peak.intensities > j & peak.intensities <= i]), sep = '\t', quote=FALSE, col.names=FALSE, row.names=FALSE )
 j = i
 }
 
@@ -674,7 +674,7 @@ col.names =FALSE, row.names=FALSE, sep = "\t")
 ```
 
 
-# deeptools heatmap of ZNF143 functional and non-functional peaks
+# deeptools heatmap of ZNF143 functional and non-functional peaks [not done yet]
 
 ```{r, engine='bash', eval=F, echo=T}
 
@@ -724,6 +724,8 @@ work to automate systematic iterative exhaustive de novo motif
 analysis. 
 
 ```{r engine='bash', eval=F, echo=TRUE}
+cd /labs/Guertin/ZNF143_ChIP/
+
 module load meme/5.4.1
 module load bedtools
 
@@ -757,6 +759,7 @@ tail -n +2 ZNF143_functional_motif_functional.fimo_output/fimo.tsv | awk '{OFS="
 wc -l fimo_ZNF143_functional_round1.bed
 # 1455305 fimo_ZNF143_functional_round1.bed
 
+# get peaks that DON'T overlap with motif locations we just found
 intersectBed -v -wa -a ZNF143_functional_summit_140window.bed -b fimo_ZNF143_functional_round1.bed > ZNF143_ChIP_summit_140window_no_func_motif_1.bed
 
 wc -l ZNF143_ChIP_summit_140window_no_func_motif_1.bed
@@ -776,8 +779,8 @@ intersectBed -v -wa -a ZNF143_ChIP_summit_140window_no_func_motif_1.bed -b fimo_
 wc -l ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed
 # 93 ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed
 
+# did not do third round
 # fastaFromBed -fi $genome -bed ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.bed -fo ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.fasta
-
 # meme -p 16 -oc ZNF143_functional_motif_functional_third.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 25 -revcomp -dna -markov_order 3 -maxsize 100000000 ZNF143_ChIP_summit_140window_no_func_motif_1_or_2.fasta
 
 wc -l ZNF143_functional_summit_140window.bed
@@ -792,35 +795,49 @@ wc -l ZNF143_functional_summit_140window.bed
 we could also incorporate the third motif, but the vast majority of peaks have one of the first two
 
 ```{r engine='bash', eval=F, echo=TRUE}
-genome=/Users/guertinlab/meds5420_2023/genomes/hg38.fa
+genome=/home/FCAM/jdong/human38/hg38.fa
 #cat fimo_ZNF143_functional_round1.bed fimo_ZNF143_functional_round2.bed | sort -k1,1 -k2,2n > all_ZNF143_motifs.bed
 closestBed -d -t first -a ZNF143_functional_peaks.bed -b fimo_ZNF143_functional_round1.bed > motif1_znf143_peaks.bed
 closestBed -d -t first -a ZNF143_functional_peaks.bed -b fimo_ZNF143_functional_round2.bed > motif2_znf143_peaks.bed
 
-#motif 2 subtract 8 from start if a minus motif
+#motif 2 subtract 9 from start if a minus motif
 #motif 1 add 9 to end if a minus motif
 #motif 1 subtract 9 from start if a plus motif
-#motif 2 add 8 to end if a plus motif
+#motif 2 add 9 to end if a plus motif
 
-awk '{OFS="\t";} {if($9 == "-") print $4,$5-8,$6,$7,$8,$9; else print $4,$5,$6+8,$7,$8,$9}' motif2_znf143_peaks.bed > expanded_motif2_znf143_peaks.bed
+awk '{OFS="\t";} {if($9 == "-") print $4,$5-9,$6,$7,$8,$9; else print $4,$5,$6+9,$7,$8,$9}' motif2_znf143_peaks.bed > expanded_motif2_znf143_peaks.bed
 awk '{OFS="\t";} {if($9 == "-") print $4,$5,$6+9,$7,$8,$9; else print $4,$5-9,$6,$7,$8,$9}' motif1_znf143_peaks.bed > expanded_motif1_znf143_peaks.bed
 
+# big list of (unique) fimo regions
 cat expanded_motif*_znf143_peaks.bed | sort -k1,1 -k2,2n |  awk '!seen[$1,$2]++' > expanded_motifs_in_peaks.bed
+
+# look again for closest regions, but using the expanded regions this time
+# and still print only the fimo regions ($4-$9) with a distance less than 150bp
 closestBed -d -t first -a ZNF143_functional_peaks.bed -b expanded_motifs_in_peaks.bed | awk '{OFS="\t";} {if($10 < 150) print $4,$5,$6,$7,$8,$9}' > expanded_motifs_closest.bed
 
-awk '{OFS="\t";} {if($6 == "-") print $1,$2-11,$3+9,$4,$5,$6; else print $1,$2-10,$3+10,$4,$5,$6}' expanded_motifs_closest.bed > expanded_motifs_window.bed
+# turn this into 42bp-width windows 
+awk '{OFS="\t";} {if($6 == "-") print $1,$2-10,$3+10,$4,$5,$6; else print $1,$2-10,$3+10,$4,$5,$6}' expanded_motifs_closest.bed > expanded_motifs_window.bed
 
 fastaFromBed -s -fi $genome -bed expanded_motifs_window.bed > expanded_motifs_for_PSWM.fasta
 # see https://github.com/guertinlab/Tn5bias/blob/master/Manuscript_Vignette/Tn5_ATAC_bias.pdf section 2.4
 ```
+
+After looking at the resulting FASTA, the 'GGG' sequence was not aligned for all of the regions. The plus regions needed to be shifted by one base pair, but that resulted in an aligned FASTA which we used for creating the PSWM. 
+
+```{r engine='bash', eval=F, echo=TRUE}
+awk '{OFS="\t";} {if($6 == "+") print $1,$2-1,$3-1,$4,$5,$6; else print $0}' expanded_motifs_window.bed > expanded_motifs_window_plus-1_shift.bed
+
+fastaFromBed -s -fi $genome -bed expanded_motifs_window_plus-1_shift.bed > expanded_motifs_for_PSWM_plus-1.fasta
+```
+
 ## move into R to make a PSWM for `meme`
 
 ```{r, engine='R', eval=F, echo=T}
 
 source("https://raw.githubusercontent.com/guertinlab/Tn5bias/master/Manuscript_Vignette/Vignette_Scripts/Figure1_Nucleotide_Count.R")
+source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R') 
+library(ggseqlogo)
 
-
-source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R') library(ggseqlogo)
 pswm.func.2 <- function(x.ligation, out = 'outfilename') {
   col.matrix <- matrix(unlist(strsplit(as.character(x.ligation), '')), ncol = 42, byrow = TRUE)
   
@@ -853,8 +870,9 @@ pswm.func.2 <- function(x.ligation, out = 'outfilename') {
 }
 
 
-x = read.table('expanded_motifs_for_PSWM.fasta', comment.char = ">", header =FALSE)
-pswm.func.2(x[,1], "ZNF143")
+x = read.table('expanded_motifs_for_PSWM_plus-1.fasta', comment.char = ">", header =FALSE)
+znf143pswm = pswm.func.2(x[,1], "ZNF143")
+write.table(znf143pswm, file = "znf143_denovo_pswm_ACGT.txt", sep="\t", quote = FALSE, col.names =FALSE, row.names=FALSE)
 ```
 
 ## make matrix with `meme` suite
@@ -863,11 +881,12 @@ pswm.func.2(x[,1], "ZNF143")
 ceqlogo -i ZNF143.txt -m ZNF143 -o ZNF143_combined.eps
 ```
 
-
 ```{r  out.width = "50%", out.height = "50%", echo=F, fig.align = "center", fig.cap="combined ZNF143 seqLogo"}
 library(knitr)
 knitr::include_graphics("ZNF143_combined_final.png") 
 ```
+
+ZNF143_combined_2023-08-24.png
 
 # Make CDF plots of peaks above and below the threshold, repressed and activated
 
@@ -982,7 +1001,9 @@ df.act = cdf.deseq.df(genes = gene.file, chip.peaks=highQuantPeaks, cat = "Activ
 df.high.rep.act = rbind(df.rep.high,df.act)
 
 plot_cdf(df.high.rep.act, tf = "ZNF143_aboveThresh_rep_act", col.lines = c("#ce228e", "grey60", "#f7461e","grey90"), cat = "Both", line.type = c(1), cex = 0.75)
+```
 
+```{r, engine='R', eval=F, echo=T}
 # Find point where repressed and matched CDF traces start being parallel 
 match = ecdf(abs(df.rep.high$dis)[df.rep.high$status == 'Over threshold Matched to Repressed'])
 rep = ecdf(abs(df.rep.high$dis)[df.rep.high$status == 'Over threshold Repressed'])
@@ -1017,14 +1038,21 @@ plot(rep.y, rep(rep.y) - match(match.y),
      abline(v = rep.y[min(which(pred1$y<=0)) - 1], col =2, lty =2)
       lines(pred[[1]], pred[[2]], col = 'blue')
 dev.off()
+```
+empirical_distance_determination_ZNF143_latest.pdf
 
+empirical_distance_determination_ZNF143_wide_latest.pdf
+
+```{r, engine='R', eval=F, echo=T}
 # Replot the two CDFs above, but add the line where repressed and matched CDF traces start being parallel
 plot_cdf(df.rep.all, tf = "ZNF143_repAll_above_below_thresh", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), cat = cat, line.type = c(1), cex = 0.75, abline=440)
 
 plot_cdf(df.high.rep.act, tf = "ZNF143_aboveThresh_rep_act", col.lines = c("#ce228e", "grey60", "#f7461e","grey90"), cat = "Both", line.type = c(1), cex = 0.75, abline=440)
 
 ```
+ZNF143_repAll_above_below_thresh_CDF_Repressed.pdf
 
+ZNF143_aboveThresh_rep_act_CDF_Both.pdf
 
 
 <!--
@@ -1055,13 +1083,13 @@ done
 
 # Jinhong: To do
 
-## run through the entire vignette and add context paragraphs and include figures
+## [in progress] run through the entire vignette and add context paragraphs and include figures
 
-## make a composite PSWM of motif 1 and motif 2 from the functional peaks [in progress]
+## [x] make a composite PSWM of motif 1 and motif 2 from the functional peaks 
 
-## make a composite FIMO motif signal at peak summits
+## [x] make a composite FIMO motif signal at peak summits
 
-## de novo motif analysis on other (non-functional peaks)
+## [] de novo motif analysis on other (non-functional peaks)
 
 ## Calculate the fraction of reads in peaks (FRiP) score for:
 
