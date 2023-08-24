@@ -1334,11 +1334,11 @@ j = i
 <li>Use threshold to obtain set of functional peaks</li>
 </ol>
 <pre class="r"><code>#take the CDF plots from genex course with upstream vs downstream
-length(peak.intensities[peak.intensities &gt;= quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[12]])
+length(peak.intensities[peak.intensities &gt;= quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[13]])
 
-func.znf143.peaks = peak.intensities[peak.intensities &gt;= quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[12]]
+func.znf143.peaks = peak.intensities[peak.intensities &gt;= quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[13]]
 
-other.znf143.peaks = peak.intensities[peak.intensities &lt; quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[12]]</code></pre>
+other.znf143.peaks = peak.intensities[peak.intensities &lt; quantile(peak.intensities, probs = seq(.05, 1.00, by = .05))[13]]</code></pre>
 </div>
 </div>
 <div id="motif-analysis-of-other-and-functional-znf143-peaks" class="section level1" number="8">
