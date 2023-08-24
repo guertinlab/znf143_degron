@@ -1,0 +1,5470 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   241  100   120  100   121   2105   2122 --:--:-- --:--:-- --:--:--  4228
+Using: R --vanilla --slave --args HEK_CloneZD29_merged_plus_PE1.bigWig HEK_CloneZD29_merged_minus_PE1.bigWig ZNF143_total /ocean/projects/bio210011p/dreg2016/gateway/newmodel/asvm.gdm.6.6M.20170828.rdata   10 2 /ocean/projects/bio210011p/dreg2016/gateway < /ocean/projects/bio210011p/dreg2016/gateway/run_dREG.R
+[1] "C"
+Loading required package: dREG
+Loading required package: bigWig
+Loading required package: e1071
+Loading required package: rphast
+Loading required package: snowfall
+Loading required package: snow
+Loading required package: data.table
+Loading required package: rmutil
+
+Attaching package: 'rmutil'
+
+The following object is masked from 'package:stats':
+
+    nobs
+
+The following objects are masked from 'package:base':
+
+    as.data.frame, units
+
+Loading required package: mvtnorm
+Loading required package: randomForest
+randomForest 4.6-14
+Type rfNews() to see new features/changes/bug fixes.
+Warning message:
+replacing previous import 'stats::nobs' by 'rmutil::nobs' when loading 'dREG' 
+Bigwig(plus): HEK_CloneZD29_merged_plus_PE1.bigWig 
+Bigwig(minus): HEK_CloneZD29_merged_minus_PE1.bigWig 
+Output: ZNF143_total 
+dREG model: /ocean/projects/bio210011p/dreg2016/gateway/newmodel/asvm.gdm.6.6M.20170828.rdata 
+ncores: 10 
+GPU: 2 
+Check BigWigs TRUE 
+1) -------- Checking bigWig files
+2) -------- Loading model
+3) -------- Peak calling
+Loading required package: Rgtsvm
+Registered S3 methods overwritten by 'Rgtsvm':
+  method             from 
+  summary.tune       e1071
+  print.tune         e1071
+  plot.tune          e1071
+  print.summary.tune e1071
+
+Attaching package: 'Rgtsvm'
+
+The following objects are masked from 'package:e1071':
+
+    svm, tune.control, tune.svm
+
+   user  system elapsed 
+ 72.104   0.236  72.538 
+[1] "chr1"
+[1] "chr10"
+[1] "chr10_GL383545v1_alt"
+[1] "chr10_GL383546v1_alt"
+[1] "chr10_KI270824v1_alt"
+[1] "chr10_KI270825v1_alt"
+[1] "chr11"
+[1] "chr11_GL383547v1_alt"
+[1] "chr11_JH159136v1_alt"
+[1] "chr11_JH159137v1_alt"
+[1] "chr11_KI270721v1_random"
+[1] "chr11_KI270826v1_alt"
+[1] "chr11_KI270827v1_alt"
+[1] "chr11_KI270829v1_alt"
+[1] "chr11_KI270830v1_alt"
+[1] "chr11_KI270831v1_alt"
+[1] "chr11_KI270832v1_alt"
+[1] "chr11_KI270902v1_alt"
+[1] "chr11_KI270903v1_alt"
+[1] "chr11_KI270927v1_alt"
+[1] "chr12"
+[1] "chr12_GL383549v1_alt"
+[1] "chr12_GL383550v2_alt"
+[1] "chr12_GL383551v1_alt"
+[1] "chr12_GL383552v1_alt"
+[1] "chr12_GL383553v2_alt"
+[1] "chr12_GL877875v1_alt"
+[1] "chr12_GL877876v1_alt"
+[1] "chr12_KI270833v1_alt"
+[1] "chr12_KI270834v1_alt"
+[1] "chr12_KI270835v1_alt"
+[1] "chr12_KI270836v1_alt"
+[1] "chr12_KI270837v1_alt"
+[1] "chr12_KI270904v1_alt"
+[1] "chr13"
+[1] "chr13_KI270838v1_alt"
+[1] "chr13_KI270839v1_alt"
+[1] "chr13_KI270840v1_alt"
+[1] "chr13_KI270841v1_alt"
+[1] "chr13_KI270842v1_alt"
+[1] "chr13_KI270843v1_alt"
+[1] "chr14"
+[1] "chr14_GL000009v2_random"
+[1] "chr14_GL000194v1_random"
+[1] "chr14_GL000225v1_random"
+[1] "chr14_KI270722v1_random"
+[1] "chr14_KI270723v1_random"
+[1] "chr14_KI270724v1_random"
+[1] "chr14_KI270725v1_random"
+[1] "chr14_KI270726v1_random"
+[1] "chr14_KI270844v1_alt"
+[1] "chr14_KI270845v1_alt"
+[1] "chr14_KI270846v1_alt"
+[1] "chr14_KI270847v1_alt"
+[1] "chr15"
+[1] "chr15_GL383554v1_alt"
+[1] "chr15_GL383555v2_alt"
+[1] "chr15_KI270727v1_random"
+[1] "chr15_KI270848v1_alt"
+[1] "chr15_KI270849v1_alt"
+[1] "chr15_KI270850v1_alt"
+[1] "chr15_KI270851v1_alt"
+[1] "chr15_KI270852v1_alt"
+[1] "chr15_KI270905v1_alt"
+[1] "chr15_KI270906v1_alt"
+[1] "chr16"
+[1] "chr16_GL383556v1_alt"
+[1] "chr16_GL383557v1_alt"
+[1] "chr16_KI270728v1_random"
+[1] "chr16_KI270853v1_alt"
+[1] "chr16_KI270854v1_alt"
+[1] "chr16_KI270855v1_alt"
+[1] "chr16_KI270856v1_alt"
+[1] "chr17"
+[1] "chr17_GL000205v2_random"
+[1] "chr17_GL000258v2_alt"
+[1] "chr17_GL383563v3_alt"
+[1] "chr17_GL383564v2_alt"
+[1] "chr17_GL383565v1_alt"
+[1] "chr17_GL383566v1_alt"
+[1] "chr17_JH159146v1_alt"
+[1] "chr17_JH159147v1_alt"
+[1] "chr17_JH159148v1_alt"
+[1] "chr17_KI270729v1_random"
+[1] "chr17_KI270730v1_random"
+[1] "chr17_KI270857v1_alt"
+[1] "chr17_KI270858v1_alt"
+[1] "chr17_KI270859v1_alt"
+[1] "chr17_KI270860v1_alt"
+[1] "chr17_KI270861v1_alt"
+[1] "chr17_KI270862v1_alt"
+[1] "chr17_KI270907v1_alt"
+[1] "chr17_KI270908v1_alt"
+[1] "chr17_KI270909v1_alt"
+[1] "chr17_KI270910v1_alt"
+[1] "chr18"
+[1] "chr18_GL383567v1_alt"
+[1] "chr18_GL383568v1_alt"
+[1] "chr18_GL383569v1_alt"
+[1] "chr18_GL383570v1_alt"
+[1] "chr18_GL383571v1_alt"
+[1] "chr18_GL383572v1_alt"
+[1] "chr18_KI270863v1_alt"
+[1] "chr18_KI270864v1_alt"
+[1] "chr18_KI270911v1_alt"
+[1] "chr18_KI270912v1_alt"
+[1] "chr19"
+[1] "chr19_GL000209v2_alt"
+[1] "chr19_GL383573v1_alt"
+[1] "chr19_GL383574v1_alt"
+[1] "chr19_GL383575v2_alt"
+[1] "chr19_GL383576v1_alt"
+[1] "chr19_GL949746v1_alt"
+[1] "chr19_GL949747v2_alt"
+[1] "chr19_GL949748v2_alt"
+[1] "chr19_GL949749v2_alt"
+[1] "chr19_GL949750v2_alt"
+[1] "chr19_GL949751v2_alt"
+[1] "chr19_GL949752v1_alt"
+[1] "chr19_GL949753v2_alt"
+[1] "chr19_KI270865v1_alt"
+[1] "chr19_KI270866v1_alt"
+[1] "chr19_KI270867v1_alt"
+[1] "chr19_KI270868v1_alt"
+[1] "chr19_KI270882v1_alt"
+[1] "chr19_KI270883v1_alt"
+[1] "chr19_KI270884v1_alt"
+[1] "chr19_KI270885v1_alt"
+[1] "chr19_KI270886v1_alt"
+[1] "chr19_KI270887v1_alt"
+[1] "chr19_KI270888v1_alt"
+[1] "chr19_KI270889v1_alt"
+[1] "chr19_KI270890v1_alt"
+[1] "chr19_KI270891v1_alt"
+[1] "chr19_KI270914v1_alt"
+[1] "chr19_KI270915v1_alt"
+[1] "chr19_KI270916v1_alt"
+[1] "chr19_KI270917v1_alt"
+[1] "chr19_KI270918v1_alt"
+[1] "chr19_KI270919v1_alt"
+[1] "chr19_KI270920v1_alt"
+[1] "chr19_KI270921v1_alt"
+[1] "chr19_KI270922v1_alt"
+[1] "chr19_KI270923v1_alt"
+[1] "chr19_KI270929v1_alt"
+[1] "chr19_KI270930v1_alt"
+[1] "chr19_KI270931v1_alt"
+[1] "chr19_KI270932v1_alt"
+[1] "chr19_KI270933v1_alt"
+[1] "chr19_KI270938v1_alt"
+[1] "chr1_GL383518v1_alt"
+[1] "chr1_GL383519v1_alt"
+[1] "chr1_GL383520v2_alt"
+[1] "chr1_KI270706v1_random"
+[1] "chr1_KI270707v1_random"
+[1] "chr1_KI270708v1_random"
+[1] "chr1_KI270709v1_random"
+[1] "chr1_KI270710v1_random"
+[1] "chr1_KI270711v1_random"
+[1] "chr1_KI270712v1_random"
+[1] "chr1_KI270713v1_random"
+[1] "chr1_KI270714v1_random"
+[1] "chr1_KI270759v1_alt"
+[1] "chr1_KI270760v1_alt"
+[1] "chr1_KI270761v1_alt"
+[1] "chr1_KI270762v1_alt"
+[1] "chr1_KI270763v1_alt"
+[1] "chr1_KI270764v1_alt"
+[1] "chr1_KI270765v1_alt"
+[1] "chr1_KI270766v1_alt"
+[1] "chr1_KI270892v1_alt"
+[1] "chr2"
+[1] "chr20"
+[1] "chr20_GL383577v2_alt"
+[1] "chr20_KI270869v1_alt"
+[1] "chr20_KI270870v1_alt"
+[1] "chr20_KI270871v1_alt"
+[1] "chr21"
+[1] "chr21_GL383578v2_alt"
+[1] "chr21_GL383579v2_alt"
+[1] "chr21_GL383580v2_alt"
+[1] "chr21_GL383581v2_alt"
+[1] "chr21_KI270872v1_alt"
+[1] "chr21_KI270873v1_alt"
+[1] "chr21_KI270874v1_alt"
+[1] "chr22"
+[1] "chr22_GL383582v2_alt"
+[1] "chr22_GL383583v2_alt"
+[1] "chr22_KB663609v1_alt"
+[1] "chr22_KI270731v1_random"
+[1] "chr22_KI270732v1_random"
+[1] "chr22_KI270733v1_random"
+[1] "chr22_KI270734v1_random"
+[1] "chr22_KI270735v1_random"
+[1] "chr22_KI270736v1_random"
+[1] "chr22_KI270737v1_random"
+[1] "chr22_KI270738v1_random"
+[1] "chr22_KI270739v1_random"
+[1] "chr22_KI270875v1_alt"
+[1] "chr22_KI270876v1_alt"
+[1] "chr22_KI270877v1_alt"
+[1] "chr22_KI270878v1_alt"
+[1] "chr22_KI270879v1_alt"
+[1] "chr22_KI270928v1_alt"
+[1] "chr2_GL383521v1_alt"
+[1] "chr2_GL383522v1_alt"
+[1] "chr2_GL582966v2_alt"
+[1] "chr2_KI270715v1_random"
+[1] "chr2_KI270716v1_random"
+[1] "chr2_KI270767v1_alt"
+[1] "chr2_KI270768v1_alt"
+[1] "chr2_KI270769v1_alt"
+[1] "chr2_KI270770v1_alt"
+[1] "chr2_KI270771v1_alt"
+[1] "chr2_KI270772v1_alt"
+[1] "chr2_KI270773v1_alt"
+[1] "chr2_KI270774v1_alt"
+[1] "chr2_KI270775v1_alt"
+[1] "chr2_KI270776v1_alt"
+[1] "chr2_KI270893v1_alt"
+[1] "chr2_KI270894v1_alt"
+[1] "chr3"
+[1] "chr3_GL000221v1_random"
+[1] "chr3_GL383526v1_alt"
+[1] "chr3_JH636055v2_alt"
+[1] "chr3_KI270777v1_alt"
+[1] "chr3_KI270778v1_alt"
+[1] "chr3_KI270779v1_alt"
+[1] "chr3_KI270780v1_alt"
+[1] "chr3_KI270781v1_alt"
+[1] "chr3_KI270782v1_alt"
+[1] "chr3_KI270783v1_alt"
+[1] "chr3_KI270784v1_alt"
+[1] "chr3_KI270895v1_alt"
+[1] "chr3_KI270924v1_alt"
+[1] "chr3_KI270934v1_alt"
+[1] "chr3_KI270935v1_alt"
+[1] "chr3_KI270936v1_alt"
+[1] "chr3_KI270937v1_alt"
+[1] "chr4"
+[1] "chr4_GL000008v2_random"
+[1] "chr4_GL000257v2_alt"
+[1] "chr4_GL383527v1_alt"
+[1] "chr4_GL383528v1_alt"
+[1] "chr4_KI270785v1_alt"
+[1] "chr4_KI270786v1_alt"
+[1] "chr4_KI270787v1_alt"
+[1] "chr4_KI270788v1_alt"
+[1] "chr4_KI270789v1_alt"
+[1] "chr4_KI270790v1_alt"
+[1] "chr4_KI270896v1_alt"
+[1] "chr4_KI270925v1_alt"
+[1] "chr5"
+[1] "chr5_GL000208v1_random"
+[1] "chr5_GL339449v2_alt"
+[1] "chr5_GL383530v1_alt"
+[1] "chr5_GL383531v1_alt"
+[1] "chr5_GL383532v1_alt"
+[1] "chr5_GL949742v1_alt"
+[1] "chr5_KI270791v1_alt"
+[1] "chr5_KI270792v1_alt"
+[1] "chr5_KI270793v1_alt"
+[1] "chr5_KI270794v1_alt"
+[1] "chr5_KI270795v1_alt"
+[1] "chr5_KI270796v1_alt"
+[1] "chr5_KI270897v1_alt"
+[1] "chr5_KI270898v1_alt"
+[1] "chr6"
+[1] "chr6_GL000250v2_alt"
+[1] "chr6_GL000251v2_alt"
+[1] "chr6_GL000252v2_alt"
+[1] "chr6_GL000253v2_alt"
+[1] "chr6_GL000254v2_alt"
+[1] "chr6_GL000255v2_alt"
+[1] "chr6_GL000256v2_alt"
+[1] "chr6_GL383533v1_alt"
+[1] "chr6_KB021644v2_alt"
+[1] "chr6_KI270758v1_alt"
+[1] "chr6_KI270797v1_alt"
+[1] "chr6_KI270798v1_alt"
+[1] "chr6_KI270799v1_alt"
+[1] "chr6_KI270800v1_alt"
+[1] "chr6_KI270801v1_alt"
+[1] "chr6_KI270802v1_alt"
+[1] "chr7"
+[1] "chr7_GL383534v2_alt"
+[1] "chr7_KI270803v1_alt"
+[1] "chr7_KI270804v1_alt"
+[1] "chr7_KI270805v1_alt"
+[1] "chr7_KI270806v1_alt"
+[1] "chr7_KI270807v1_alt"
+[1] "chr7_KI270808v1_alt"
+[1] "chr7_KI270809v1_alt"
+[1] "chr7_KI270899v1_alt"
+[1] "chr8"
+[1] "chr8_KI270810v1_alt"
+[1] "chr8_KI270811v1_alt"
+[1] "chr8_KI270812v1_alt"
+[1] "chr8_KI270813v1_alt"
+[1] "chr8_KI270814v1_alt"
+[1] "chr8_KI270815v1_alt"
+[1] "chr8_KI270816v1_alt"
+[1] "chr8_KI270817v1_alt"
+[1] "chr8_KI270818v1_alt"
+[1] "chr8_KI270819v1_alt"
+[1] "chr8_KI270820v1_alt"
+[1] "chr8_KI270821v1_alt"
+[1] "chr8_KI270822v1_alt"
+[1] "chr8_KI270900v1_alt"
+[1] "chr8_KI270901v1_alt"
+[1] "chr8_KI270926v1_alt"
+[1] "chr9"
+[1] "chr9_GL383539v1_alt"
+[1] "chr9_GL383540v1_alt"
+[1] "chr9_GL383541v1_alt"
+[1] "chr9_GL383542v1_alt"
+[1] "chr9_KI270717v1_random"
+[1] "chr9_KI270718v1_random"
+[1] "chr9_KI270719v1_random"
+[1] "chr9_KI270720v1_random"
+[1] "chr9_KI270823v1_alt"
+[1] "chrM"
+[1] "chrUn_GL000195v1"
+[1] "chrUn_GL000213v1"
+[1] "chrUn_GL000214v1"
+[1] "chrUn_GL000216v2"
+[1] "chrUn_GL000218v1"
+[1] "chrUn_GL000219v1"
+[1] "chrUn_GL000220v1"
+[1] "chrUn_GL000224v1"
+[1] "chrUn_GL000226v1"
+[1] "chrUn_KI270311v1"
+[1] "chrUn_KI270317v1"
+[1] "chrUn_KI270320v1"
+[1] "chrUn_KI270322v1"
+[1] "chrUn_KI270333v1"
+[1] "chrUn_KI270362v1"
+[1] "chrUn_KI270364v1"
+[1] "chrUn_KI270366v1"
+[1] "chrUn_KI270371v1"
+[1] "chrUn_KI270374v1"
+[1] "chrUn_KI270382v1"
+[1] "chrUn_KI270411v1"
+[1] "chrUn_KI270435v1"
+[1] "chrUn_KI270438v1"
+[1] "chrUn_KI270442v1"
+[1] "chrUn_KI270448v1"
+[1] "chrUn_KI270467v1"
+[1] "chrUn_KI270468v1"
+[1] "chrUn_KI270507v1"
+[1] "chrUn_KI270511v1"
+[1] "chrUn_KI270512v1"
+[1] "chrUn_KI270515v1"
+[1] "chrUn_KI270517v1"
+[1] "chrUn_KI270519v1"
+[1] "chrUn_KI270521v1"
+[1] "chrUn_KI270522v1"
+[1] "chrUn_KI270528v1"
+[1] "chrUn_KI270538v1"
+[1] "chrUn_KI270579v1"
+[1] "chrUn_KI270581v1"
+[1] "chrUn_KI270582v1"
+[1] "chrUn_KI270584v1"
+[1] "chrUn_KI270587v1"
+[1] "chrUn_KI270588v1"
+[1] "chrUn_KI270589v1"
+[1] "chrUn_KI270590v1"
+[1] "chrUn_KI270591v1"
+[1] "chrUn_KI270593v1"
+[1] "chrUn_KI270741v1"
+[1] "chrUn_KI270742v1"
+[1] "chrUn_KI270743v1"
+[1] "chrUn_KI270744v1"
+[1] "chrUn_KI270745v1"
+[1] "chrUn_KI270746v1"
+[1] "chrUn_KI270747v1"
+[1] "chrUn_KI270748v1"
+[1] "chrUn_KI270749v1"
+[1] "chrUn_KI270750v1"
+[1] "chrUn_KI270751v1"
+[1] "chrUn_KI270752v1"
+[1] "chrUn_KI270753v1"
+[1] "chrUn_KI270754v1"
+[1] "chrUn_KI270755v1"
+[1] "chrUn_KI270756v1"
+[1] "chrUn_KI270757v1"
+[1] "chrX"
+[1] "chrX_KI270880v1_alt"
+[1] "chrX_KI270881v1_alt"
+[1] "chrX_KI270913v1_alt"
+[1] "chrY"
+[1] "chrY_KI270740v1_random"
+[1] "1 of 553"
+[1] "2 of 553"
+[1] "3 of 553"
+[1] "4 of 553"
+[1] "5 of 553"
+[1] "6 of 553"
+[1] "7 of 553"
+[1] "8 of 553"
+[1] "9 of 553"
+[1] "10 of 553"
+R Version:  R version 4.0.3 (2020-10-10) 
+
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1671 = 1519+114+38 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3231.5 Mbytes of vectors used (31%)
+[1] "11 of 553"
+[1] "12 of 553"
+[1] "13 of 553"
+[1] "14 of 553"
+[1] "15 of 553"
+[1] "16 of 553"
+[1] "17 of 553"
+[1] "18 of 553"
+[1] "19 of 553"
+[1] "20 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1673 = 1520+114+39 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3239.3 Mbytes of vectors used (31%)
+[1] "21 of 553"
+[1] "22 of 553"
+[1] "23 of 553"
+[1] "24 of 553"
+[1] "25 of 553"
+[1] "26 of 553"
+[1] "27 of 553"
+[1] "28 of 553"
+[1] "29 of 553"
+[1] "30 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1675 = 1521+114+40 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3247.0 Mbytes of vectors used (31%)
+[1] "31 of 553"
+[1] "32 of 553"
+[1] "33 of 553"
+[1] "34 of 553"
+[1] "35 of 553"
+[1] "36 of 553"
+[1] "37 of 553"
+[1] "38 of 553"
+[1] "39 of 553"
+[1] "40 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1677 = 1522+114+41 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3254.6 Mbytes of vectors used (31%)
+[1] "41 of 553"
+[1] "42 of 553"
+[1] "43 of 553"
+[1] "44 of 553"
+[1] "45 of 553"
+[1] "46 of 553"
+[1] "47 of 553"
+[1] "48 of 553"
+[1] "49 of 553"
+[1] "50 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1679 = 1523+114+42 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3262.2 Mbytes of vectors used (31%)
+[1] "51 of 553"
+[1] "52 of 553"
+[1] "53 of 553"
+[1] "54 of 553"
+[1] "55 of 553"
+[1] "56 of 553"
+[1] "57 of 553"
+[1] "58 of 553"
+[1] "59 of 553"
+[1] "60 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1681 = 1524+114+43 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3269.9 Mbytes of vectors used (31%)
+[1] "61 of 553"
+[1] "62 of 553"
+[1] "63 of 553"
+[1] "64 of 553"
+[1] "65 of 553"
+[1] "66 of 553"
+[1] "67 of 553"
+[1] "68 of 553"
+[1] "69 of 553"
+[1] "70 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1683 = 1525+114+44 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3277.5 Mbytes of vectors used (31%)
+[1] "71 of 553"
+[1] "72 of 553"
+[1] "73 of 553"
+[1] "74 of 553"
+[1] "75 of 553"
+[1] "76 of 553"
+[1] "77 of 553"
+[1] "78 of 553"
+[1] "79 of 553"
+[1] "80 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1685 = 1526+114+45 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3285.1 Mbytes of vectors used (32%)
+[1] "81 of 553"
+[1] "82 of 553"
+[1] "83 of 553"
+[1] "84 of 553"
+[1] "85 of 553"
+[1] "86 of 553"
+[1] "87 of 553"
+[1] "88 of 553"
+[1] "89 of 553"
+[1] "90 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1687 = 1527+114+46 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3292.8 Mbytes of vectors used (32%)
+[1] "91 of 553"
+[1] "92 of 553"
+[1] "93 of 553"
+[1] "94 of 553"
+[1] "95 of 553"
+[1] "96 of 553"
+[1] "97 of 553"
+[1] "98 of 553"
+[1] "99 of 553"
+[1] "100 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1689 = 1528+114+47 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3300.4 Mbytes of vectors used (32%)
+[1] "101 of 553"
+[1] "102 of 553"
+[1] "103 of 553"
+[1] "104 of 553"
+[1] "105 of 553"
+[1] "106 of 553"
+[1] "107 of 553"
+[1] "108 of 553"
+[1] "109 of 553"
+[1] "110 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1691 = 1529+114+48 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3308.0 Mbytes of vectors used (32%)
+[1] "111 of 553"
+[1] "112 of 553"
+[1] "113 of 553"
+[1] "114 of 553"
+[1] "115 of 553"
+[1] "116 of 553"
+[1] "117 of 553"
+[1] "118 of 553"
+[1] "119 of 553"
+[1] "120 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1693 = 1530+114+49 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3315.6 Mbytes of vectors used (32%)
+[1] "121 of 553"
+[1] "122 of 553"
+[1] "123 of 553"
+[1] "124 of 553"
+[1] "125 of 553"
+[1] "126 of 553"
+[1] "127 of 553"
+[1] "128 of 553"
+[1] "129 of 553"
+[1] "130 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1695 = 1531+114+50 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3323.3 Mbytes of vectors used (32%)
+[1] "131 of 553"
+[1] "132 of 553"
+[1] "133 of 553"
+[1] "134 of 553"
+[1] "135 of 553"
+[1] "136 of 553"
+[1] "137 of 553"
+[1] "138 of 553"
+[1] "139 of 553"
+[1] "140 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1697 = 1532+114+51 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3330.9 Mbytes of vectors used (32%)
+[1] "141 of 553"
+[1] "142 of 553"
+[1] "143 of 553"
+[1] "144 of 553"
+[1] "145 of 553"
+[1] "146 of 553"
+[1] "147 of 553"
+[1] "148 of 553"
+[1] "149 of 553"
+[1] "150 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1699 = 1533+114+52 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3338.5 Mbytes of vectors used (32%)
+[1] "151 of 553"
+[1] "152 of 553"
+[1] "153 of 553"
+[1] "154 of 553"
+[1] "155 of 553"
+[1] "156 of 553"
+[1] "157 of 553"
+[1] "158 of 553"
+[1] "159 of 553"
+[1] "160 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1701 = 1534+114+53 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3346.2 Mbytes of vectors used (32%)
+[1] "161 of 553"
+[1] "162 of 553"
+[1] "163 of 553"
+[1] "164 of 553"
+[1] "165 of 553"
+[1] "166 of 553"
+[1] "167 of 553"
+[1] "168 of 553"
+[1] "169 of 553"
+[1] "170 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1703 = 1535+114+54 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3353.8 Mbytes of vectors used (32%)
+[1] "171 of 553"
+[1] "172 of 553"
+[1] "173 of 553"
+[1] "174 of 553"
+[1] "175 of 553"
+[1] "176 of 553"
+[1] "177 of 553"
+[1] "178 of 553"
+[1] "179 of 553"
+[1] "180 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1705 = 1536+114+55 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3361.4 Mbytes of vectors used (32%)
+[1] "181 of 553"
+[1] "182 of 553"
+[1] "183 of 553"
+[1] "184 of 553"
+[1] "185 of 553"
+[1] "186 of 553"
+[1] "187 of 553"
+[1] "188 of 553"
+[1] "189 of 553"
+[1] "190 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1707 = 1537+114+56 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3369.0 Mbytes of vectors used (32%)
+[1] "191 of 553"
+[1] "192 of 553"
+[1] "193 of 553"
+[1] "194 of 553"
+[1] "195 of 553"
+[1] "196 of 553"
+[1] "197 of 553"
+[1] "198 of 553"
+[1] "199 of 553"
+[1] "200 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1709 = 1538+114+57 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3376.7 Mbytes of vectors used (32%)
+[1] "201 of 553"
+[1] "202 of 553"
+[1] "203 of 553"
+[1] "204 of 553"
+[1] "205 of 553"
+[1] "206 of 553"
+[1] "207 of 553"
+[1] "208 of 553"
+[1] "209 of 553"
+[1] "210 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1711 = 1539+114+58 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3384.3 Mbytes of vectors used (32%)
+[1] "211 of 553"
+[1] "212 of 553"
+[1] "213 of 553"
+[1] "214 of 553"
+[1] "215 of 553"
+[1] "216 of 553"
+[1] "217 of 553"
+[1] "218 of 553"
+[1] "219 of 553"
+[1] "220 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1713 = 1539+114+60 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3391.9 Mbytes of vectors used (33%)
+[1] "221 of 553"
+[1] "222 of 553"
+[1] "223 of 553"
+[1] "224 of 553"
+[1] "225 of 553"
+[1] "226 of 553"
+[1] "227 of 553"
+[1] "228 of 553"
+[1] "229 of 553"
+[1] "230 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1715 = 1540+114+61 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3399.6 Mbytes of vectors used (33%)
+[1] "231 of 553"
+[1] "232 of 553"
+[1] "233 of 553"
+[1] "234 of 553"
+[1] "235 of 553"
+[1] "236 of 553"
+[1] "237 of 553"
+[1] "238 of 553"
+[1] "239 of 553"
+[1] "240 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1717 = 1541+114+62 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3407.2 Mbytes of vectors used (33%)
+[1] "241 of 553"
+[1] "242 of 553"
+[1] "243 of 553"
+[1] "244 of 553"
+[1] "245 of 553"
+[1] "246 of 553"
+[1] "247 of 553"
+[1] "248 of 553"
+[1] "249 of 553"
+[1] "250 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1719 = 1542+114+63 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3414.8 Mbytes of vectors used (33%)
+[1] "251 of 553"
+[1] "252 of 553"
+[1] "253 of 553"
+[1] "254 of 553"
+[1] "255 of 553"
+[1] "256 of 553"
+[1] "257 of 553"
+[1] "258 of 553"
+[1] "259 of 553"
+[1] "260 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1721 = 1543+114+64 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3422.5 Mbytes of vectors used (33%)
+[1] "261 of 553"
+[1] "262 of 553"
+[1] "263 of 553"
+[1] "264 of 553"
+[1] "265 of 553"
+[1] "266 of 553"
+[1] "267 of 553"
+[1] "268 of 553"
+[1] "269 of 553"
+[1] "270 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1723 = 1544+114+65 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3430.1 Mbytes of vectors used (33%)
+[1] "271 of 553"
+[1] "272 of 553"
+[1] "273 of 553"
+[1] "274 of 553"
+[1] "275 of 553"
+[1] "276 of 553"
+[1] "277 of 553"
+[1] "278 of 553"
+[1] "279 of 553"
+[1] "280 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1725 = 1545+114+66 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3437.7 Mbytes of vectors used (33%)
+[1] "281 of 553"
+[1] "282 of 553"
+[1] "283 of 553"
+[1] "284 of 553"
+[1] "285 of 553"
+[1] "286 of 553"
+[1] "287 of 553"
+[1] "288 of 553"
+[1] "289 of 553"
+[1] "290 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1727 = 1546+114+67 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3445.3 Mbytes of vectors used (33%)
+[1] "291 of 553"
+[1] "292 of 553"
+[1] "293 of 553"
+[1] "294 of 553"
+[1] "295 of 553"
+[1] "296 of 553"
+[1] "297 of 553"
+[1] "298 of 553"
+[1] "299 of 553"
+[1] "300 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1729 = 1547+114+68 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3453.0 Mbytes of vectors used (33%)
+[1] "301 of 553"
+[1] "302 of 553"
+[1] "303 of 553"
+[1] "304 of 553"
+[1] "305 of 553"
+[1] "306 of 553"
+[1] "307 of 553"
+[1] "308 of 553"
+[1] "309 of 553"
+[1] "310 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1731 = 1548+114+69 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3460.6 Mbytes of vectors used (33%)
+[1] "311 of 553"
+[1] "312 of 553"
+[1] "313 of 553"
+[1] "314 of 553"
+[1] "315 of 553"
+[1] "316 of 553"
+[1] "317 of 553"
+[1] "318 of 553"
+[1] "319 of 553"
+[1] "320 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1733 = 1549+114+70 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3468.2 Mbytes of vectors used (33%)
+[1] "321 of 553"
+[1] "322 of 553"
+[1] "323 of 553"
+[1] "324 of 553"
+[1] "325 of 553"
+[1] "326 of 553"
+[1] "327 of 553"
+[1] "328 of 553"
+[1] "329 of 553"
+[1] "330 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1735 = 1550+114+71 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3475.9 Mbytes of vectors used (33%)
+[1] "331 of 553"
+[1] "332 of 553"
+[1] "333 of 553"
+[1] "334 of 553"
+[1] "335 of 553"
+[1] "336 of 553"
+[1] "337 of 553"
+[1] "338 of 553"
+[1] "339 of 553"
+[1] "340 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1737 = 1551+114+72 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3483.5 Mbytes of vectors used (33%)
+[1] "341 of 553"
+[1] "342 of 553"
+[1] "343 of 553"
+[1] "344 of 553"
+[1] "345 of 553"
+[1] "346 of 553"
+[1] "347 of 553"
+[1] "348 of 553"
+[1] "349 of 553"
+[1] "350 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1739 = 1552+114+73 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3491.1 Mbytes of vectors used (34%)
+[1] "351 of 553"
+[1] "352 of 553"
+[1] "353 of 553"
+[1] "354 of 553"
+[1] "355 of 553"
+[1] "356 of 553"
+[1] "357 of 553"
+[1] "358 of 553"
+[1] "359 of 553"
+[1] "360 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1741 = 1553+114+74 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3498.7 Mbytes of vectors used (34%)
+[1] "361 of 553"
+[1] "362 of 553"
+[1] "363 of 553"
+[1] "364 of 553"
+[1] "365 of 553"
+[1] "366 of 553"
+[1] "367 of 553"
+[1] "368 of 553"
+[1] "369 of 553"
+[1] "370 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1743 = 1554+114+75 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3506.4 Mbytes of vectors used (34%)
+[1] "371 of 553"
+[1] "372 of 553"
+[1] "373 of 553"
+[1] "374 of 553"
+[1] "375 of 553"
+[1] "376 of 553"
+[1] "377 of 553"
+[1] "378 of 553"
+[1] "379 of 553"
+[1] "380 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1745 = 1555+114+76 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3514.0 Mbytes of vectors used (34%)
+[1] "381 of 553"
+[1] "382 of 553"
+[1] "383 of 553"
+[1] "384 of 553"
+[1] "385 of 553"
+[1] "386 of 553"
+[1] "387 of 553"
+[1] "388 of 553"
+[1] "389 of 553"
+[1] "390 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1747 = 1556+114+77 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3521.6 Mbytes of vectors used (34%)
+[1] "391 of 553"
+[1] "392 of 553"
+[1] "393 of 553"
+[1] "394 of 553"
+[1] "395 of 553"
+[1] "396 of 553"
+[1] "397 of 553"
+[1] "398 of 553"
+[1] "399 of 553"
+[1] "400 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1749 = 1557+114+78 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3529.3 Mbytes of vectors used (34%)
+[1] "401 of 553"
+[1] "402 of 553"
+[1] "403 of 553"
+[1] "404 of 553"
+[1] "405 of 553"
+[1] "406 of 553"
+[1] "407 of 553"
+[1] "408 of 553"
+[1] "409 of 553"
+[1] "410 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1751 = 1558+114+79 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3536.9 Mbytes of vectors used (34%)
+[1] "411 of 553"
+[1] "412 of 553"
+[1] "413 of 553"
+[1] "414 of 553"
+[1] "415 of 553"
+[1] "416 of 553"
+[1] "417 of 553"
+[1] "418 of 553"
+[1] "419 of 553"
+[1] "420 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1753 = 1559+114+80 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3544.5 Mbytes of vectors used (34%)
+[1] "421 of 553"
+[1] "422 of 553"
+[1] "423 of 553"
+[1] "424 of 553"
+[1] "425 of 553"
+[1] "426 of 553"
+[1] "427 of 553"
+[1] "428 of 553"
+[1] "429 of 553"
+[1] "430 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1755 = 1559+115+81 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3552.2 Mbytes of vectors used (34%)
+[1] "431 of 553"
+[1] "432 of 553"
+[1] "433 of 553"
+[1] "434 of 553"
+[1] "435 of 553"
+[1] "436 of 553"
+[1] "437 of 553"
+[1] "438 of 553"
+[1] "439 of 553"
+[1] "440 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1757 = 1560+115+82 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3559.8 Mbytes of vectors used (34%)
+[1] "441 of 553"
+[1] "442 of 553"
+[1] "443 of 553"
+[1] "444 of 553"
+[1] "445 of 553"
+[1] "446 of 553"
+[1] "447 of 553"
+[1] "448 of 553"
+[1] "449 of 553"
+[1] "450 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1759 = 1561+115+83 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3567.4 Mbytes of vectors used (34%)
+[1] "451 of 553"
+[1] "452 of 553"
+[1] "453 of 553"
+[1] "454 of 553"
+[1] "455 of 553"
+[1] "456 of 553"
+[1] "457 of 553"
+[1] "458 of 553"
+[1] "459 of 553"
+[1] "460 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1761 = 1562+115+84 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3575.0 Mbytes of vectors used (34%)
+[1] "461 of 553"
+[1] "462 of 553"
+[1] "463 of 553"
+[1] "464 of 553"
+[1] "465 of 553"
+[1] "466 of 553"
+[1] "467 of 553"
+[1] "468 of 553"
+[1] "469 of 553"
+[1] "470 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1763 = 1563+115+85 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3582.7 Mbytes of vectors used (34%)
+[1] "471 of 553"
+[1] "472 of 553"
+[1] "473 of 553"
+[1] "474 of 553"
+[1] "475 of 553"
+[1] "476 of 553"
+[1] "477 of 553"
+[1] "478 of 553"
+[1] "479 of 553"
+[1] "480 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1765 = 1564+115+86 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3590.3 Mbytes of vectors used (34%)
+[1] "481 of 553"
+[1] "482 of 553"
+[1] "483 of 553"
+[1] "484 of 553"
+[1] "485 of 553"
+[1] "486 of 553"
+[1] "487 of 553"
+[1] "488 of 553"
+[1] "489 of 553"
+[1] "490 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1767 = 1565+115+87 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3597.9 Mbytes of vectors used (35%)
+[1] "491 of 553"
+[1] "492 of 553"
+[1] "493 of 553"
+[1] "494 of 553"
+[1] "495 of 553"
+[1] "496 of 553"
+[1] "497 of 553"
+[1] "498 of 553"
+[1] "499 of 553"
+[1] "500 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1769 = 1566+115+88 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3605.6 Mbytes of vectors used (35%)
+[1] "501 of 553"
+[1] "502 of 553"
+[1] "503 of 553"
+[1] "504 of 553"
+[1] "505 of 553"
+[1] "506 of 553"
+[1] "507 of 553"
+[1] "508 of 553"
+[1] "509 of 553"
+[1] "510 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1771 = 1567+115+89 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3613.2 Mbytes of vectors used (35%)
+[1] "511 of 553"
+[1] "512 of 553"
+[1] "513 of 553"
+[1] "514 of 553"
+[1] "515 of 553"
+[1] "516 of 553"
+[1] "517 of 553"
+[1] "518 of 553"
+[1] "519 of 553"
+[1] "520 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1773 = 1568+115+90 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3620.8 Mbytes of vectors used (35%)
+[1] "521 of 553"
+[1] "522 of 553"
+[1] "523 of 553"
+[1] "524 of 553"
+[1] "525 of 553"
+[1] "526 of 553"
+[1] "527 of 553"
+[1] "528 of 553"
+[1] "529 of 553"
+[1] "530 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1775 = 1569+115+91 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3628.4 Mbytes of vectors used (35%)
+[1] "531 of 553"
+[1] "532 of 553"
+[1] "533 of 553"
+[1] "534 of 553"
+[1] "535 of 553"
+[1] "536 of 553"
+[1] "537 of 553"
+[1] "538 of 553"
+[1] "539 of 553"
+[1] "540 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1777 = 1570+115+92 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3636.1 Mbytes of vectors used (35%)
+[1] "541 of 553"
+[1] "542 of 553"
+[1] "543 of 553"
+[1] "544 of 553"
+[1] "545 of 553"
+[1] "546 of 553"
+[1] "547 of 553"
+[1] "548 of 553"
+[1] "549 of 553"
+[1] "550 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1779 = 1571+115+93 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3643.7 Mbytes of vectors used (35%)
+[1] "551 of 553"
+[1] "552 of 553"
+[1] "553 of 553"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1780 = 1571+115+94 (level 2) ... 
+79.8 Mbytes of cons cells used (54%)
+3636.5 Mbytes of vectors used (35%)
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1789 = 1573+115+101 (level 2) ... 
+68.2 Mbytes of cons cells used (3%)
+3069.6 Mbytes of vectors used (31%)
+   chr start   end no       min     max    mean    sum   stdev count
+1 chr1 10050 11301  1 -0.003102 0.48650 0.19520 5.0753 0.12513    26
+2 chr1 13350 13501  2  0.047043 0.14559 0.09915 0.2975 0.04952     3
+3 chr1 16100 16651  3  0.030048 0.26006 0.13724 1.6469 0.08217    12
+4 chr1 19750 20051  4  0.013912 0.27751 0.13113 0.9179 0.10014     7
+5 chr1 28550 29501  5 -0.005066 0.31726 0.12546 1.3801 0.11065    11
+6 chr1 57450 57651  6  0.027510 0.07688 0.05883 0.2353 0.02312     4
+===== chr1 
+[1] "1 of 15"
+[1] "2 of 15"
+[1] "3 of 15"
+[1] "4 of 15"
+[1] "5 of 15"
+[1] "6 of 15"
+[1] "7 of 15"
+[1] "8 of 15"
+[1] "9 of 15"
+[1] "10 of 15"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1801 = 1581+117+103 (level 2) ... 
+1515.3 Mbytes of cons cells used (58%)
+4870.9 Mbytes of vectors used (41%)
+[1] "11 of 15"
+[1] "12 of 15"
+[1] "13 of 15"
+[1] "14 of 15"
+[1] "15 of 15"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1802 = 1581+117+104 (level 2) ... 
+1515.3 Mbytes of cons cells used (58%)
+4867.2 Mbytes of vectors used (40%)
+===== chr10 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1805 = 1583+117+105 (level 2) ... 
+1543.1 Mbytes of cons cells used (59%)
+6169.6 Mbytes of vectors used (51%)
+===== chr10_GL383545v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1806 = 1583+117+106 (level 2) ... 
+1555.9 Mbytes of cons cells used (59%)
+6081.0 Mbytes of vectors used (51%)
+===== chr10_GL383546v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1807 = 1583+117+107 (level 2) ... 
+1555.9 Mbytes of cons cells used (59%)
+6072.7 Mbytes of vectors used (51%)
+===== chr10_KI270825v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1808 = 1583+117+108 (level 2) ... 
+1555.9 Mbytes of cons cells used (59%)
+6072.7 Mbytes of vectors used (51%)
+===== chr11 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1812 = 1586+117+109 (level 2) ... 
+1555.9 Mbytes of cons cells used (59%)
+6165.5 Mbytes of vectors used (51%)
+===== chr11_KI270721v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1813 = 1586+117+110 (level 2) ... 
+1569.1 Mbytes of cons cells used (60%)
+6096.9 Mbytes of vectors used (51%)
+===== chr11_KI270830v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1814 = 1586+117+111 (level 2) ... 
+1569.1 Mbytes of cons cells used (60%)
+6088.4 Mbytes of vectors used (51%)
+===== chr11_KI270831v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1815 = 1586+117+112 (level 2) ... 
+1569.2 Mbytes of cons cells used (60%)
+6088.5 Mbytes of vectors used (51%)
+===== chr11_KI270832v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1816 = 1586+117+113 (level 2) ... 
+1569.2 Mbytes of cons cells used (60%)
+6088.6 Mbytes of vectors used (51%)
+===== chr11_KI270902v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1817 = 1586+117+114 (level 2) ... 
+1569.2 Mbytes of cons cells used (60%)
+6088.5 Mbytes of vectors used (51%)
+===== chr11_KI270903v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1818 = 1586+117+115 (level 2) ... 
+1569.2 Mbytes of cons cells used (60%)
+6088.5 Mbytes of vectors used (51%)
+===== chr11_KI270927v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1819 = 1586+117+116 (level 2) ... 
+1569.2 Mbytes of cons cells used (60%)
+6088.5 Mbytes of vectors used (51%)
+===== chr12 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1824 = 1589+118+117 (level 2) ... 
+1569.2 Mbytes of cons cells used (60%)
+6186.6 Mbytes of vectors used (51%)
+===== chr12_GL383549v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1825 = 1589+118+118 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6114.3 Mbytes of vectors used (51%)
+===== chr12_GL383550v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1826 = 1589+118+119 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6105.3 Mbytes of vectors used (51%)
+===== chr12_GL383552v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1827 = 1589+118+120 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6105.2 Mbytes of vectors used (51%)
+===== chr12_GL383553v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1828 = 1589+118+121 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6105.2 Mbytes of vectors used (51%)
+===== chr12_GL877876v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1829 = 1589+118+122 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6105.2 Mbytes of vectors used (51%)
+===== chr12_KI270835v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1830 = 1589+118+123 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6105.2 Mbytes of vectors used (51%)
+===== chr12_KI270904v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1831 = 1589+118+124 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6105.3 Mbytes of vectors used (51%)
+===== chr13 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1834 = 1591+118+125 (level 2) ... 
+1583.4 Mbytes of cons cells used (60%)
+6164.3 Mbytes of vectors used (51%)
+===== chr13_KI270839v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1835 = 1591+118+126 (level 2) ... 
+1590.6 Mbytes of cons cells used (61%)
+6118.4 Mbytes of vectors used (51%)
+===== chr13_KI270840v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1836 = 1591+118+127 (level 2) ... 
+1590.6 Mbytes of cons cells used (61%)
+6113.7 Mbytes of vectors used (51%)
+===== chr14 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1839 = 1593+118+128 (level 2) ... 
+1590.6 Mbytes of cons cells used (61%)
+6178.7 Mbytes of vectors used (51%)
+===== chr14_GL000009v2_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1840 = 1593+118+129 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6130.1 Mbytes of vectors used (51%)
+===== chr14_GL000194v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1841 = 1593+118+130 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6124.4 Mbytes of vectors used (51%)
+===== chr14_GL000225v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1842 = 1593+118+131 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6124.4 Mbytes of vectors used (51%)
+===== chr14_KI270722v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1843 = 1593+118+132 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6124.3 Mbytes of vectors used (51%)
+===== chr14_KI270723v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1844 = 1593+118+133 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6124.3 Mbytes of vectors used (51%)
+===== chr14_KI270724v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1845 = 1593+118+134 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6124.4 Mbytes of vectors used (51%)
+===== chr14_KI270725v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1846 = 1593+118+135 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6124.3 Mbytes of vectors used (51%)
+===== chr15 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1849 = 1594+118+137 (level 2) ... 
+1599.6 Mbytes of cons cells used (61%)
+6187.1 Mbytes of vectors used (51%)
+===== chr15_GL383555v2_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1850 = 1594+118+138 (level 2) ... 
+1609.0 Mbytes of cons cells used (61%)
+6141.3 Mbytes of vectors used (51%)
+===== chr15_KI270848v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1851 = 1594+118+139 (level 2) ... 
+1609.0 Mbytes of cons cells used (61%)
+6135.4 Mbytes of vectors used (51%)
+===== chr15_KI270849v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1852 = 1594+118+140 (level 2) ... 
+1609.0 Mbytes of cons cells used (61%)
+6135.4 Mbytes of vectors used (51%)
+===== chr15_KI270850v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1853 = 1594+118+141 (level 2) ... 
+1609.0 Mbytes of cons cells used (61%)
+6135.7 Mbytes of vectors used (51%)
+===== chr15_KI270851v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1854 = 1594+118+142 (level 2) ... 
+1609.1 Mbytes of cons cells used (61%)
+6135.5 Mbytes of vectors used (51%)
+===== chr15_KI270905v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1855 = 1594+118+143 (level 2) ... 
+1609.1 Mbytes of cons cells used (61%)
+6136.2 Mbytes of vectors used (51%)
+===== chr16 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1858 = 1596+118+144 (level 2) ... 
+1609.2 Mbytes of cons cells used (61%)
+6199.9 Mbytes of vectors used (52%)
+===== chr16_GL383557v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1859 = 1596+118+145 (level 2) ... 
+1619.4 Mbytes of cons cells used (62%)
+6154.3 Mbytes of vectors used (51%)
+===== chr16_KI270728v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1860 = 1596+118+146 (level 2) ... 
+1619.4 Mbytes of cons cells used (62%)
+6147.8 Mbytes of vectors used (51%)
+===== chr16_KI270853v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1861 = 1596+118+147 (level 2) ... 
+1619.4 Mbytes of cons cells used (62%)
+6148.4 Mbytes of vectors used (51%)
+===== chr16_KI270854v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1862 = 1596+118+148 (level 2) ... 
+1619.6 Mbytes of cons cells used (62%)
+6148.0 Mbytes of vectors used (51%)
+===== chr16_KI270855v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1863 = 1596+118+149 (level 2) ... 
+1619.6 Mbytes of cons cells used (62%)
+6147.9 Mbytes of vectors used (51%)
+===== chr17 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1867 = 1599+118+150 (level 2) ... 
+1619.6 Mbytes of cons cells used (62%)
+6226.6 Mbytes of vectors used (52%)
+===== chr17_GL000205v2_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1868 = 1599+118+151 (level 2) ... 
+1633.1 Mbytes of cons cells used (62%)
+6172.6 Mbytes of vectors used (51%)
+===== chr17_GL000258v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1869 = 1599+118+152 (level 2) ... 
+1633.1 Mbytes of cons cells used (62%)
+6164.7 Mbytes of vectors used (51%)
+===== chr17_GL383563v3_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1870 = 1599+118+153 (level 2) ... 
+1633.3 Mbytes of cons cells used (62%)
+6164.2 Mbytes of vectors used (51%)
+===== chr17_GL383564v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1871 = 1599+118+154 (level 2) ... 
+1633.3 Mbytes of cons cells used (62%)
+6164.1 Mbytes of vectors used (51%)
+===== chr17_JH159146v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1872 = 1599+118+155 (level 2) ... 
+1633.3 Mbytes of cons cells used (62%)
+6164.0 Mbytes of vectors used (51%)
+===== chr17_JH159148v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1873 = 1599+118+156 (level 2) ... 
+1633.3 Mbytes of cons cells used (62%)
+6164.0 Mbytes of vectors used (51%)
+===== chr17_KI270729v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1874 = 1599+118+157 (level 2) ... 
+1633.3 Mbytes of cons cells used (62%)
+6164.1 Mbytes of vectors used (51%)
+===== chr17_KI270857v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1875 = 1599+118+158 (level 2) ... 
+1633.3 Mbytes of cons cells used (62%)
+6164.5 Mbytes of vectors used (51%)
+===== chr17_KI270860v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1876 = 1599+118+159 (level 2) ... 
+1633.5 Mbytes of cons cells used (62%)
+6164.4 Mbytes of vectors used (51%)
+===== chr17_KI270861v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1877 = 1599+118+160 (level 2) ... 
+1633.5 Mbytes of cons cells used (62%)
+6164.3 Mbytes of vectors used (51%)
+===== chr17_KI270862v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1878 = 1599+118+161 (level 2) ... 
+1633.5 Mbytes of cons cells used (62%)
+6164.3 Mbytes of vectors used (51%)
+===== chr17_KI270907v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1879 = 1599+118+162 (level 2) ... 
+1633.5 Mbytes of cons cells used (62%)
+6164.2 Mbytes of vectors used (51%)
+===== chr17_KI270908v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1880 = 1599+118+163 (level 2) ... 
+1633.5 Mbytes of cons cells used (62%)
+6164.6 Mbytes of vectors used (51%)
+===== chr17_KI270909v1_alt 
+[1] "1 of 8"
+[1] "2 of 8"
+[1] "3 of 8"
+[1] "4 of 8"
+[1] "5 of 8"
+[1] "6 of 8"
+[1] "7 of 8"
+[1] "8 of 8"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1881 = 1599+118+164 (level 2) ... 
+1633.6 Mbytes of cons cells used (62%)
+6164.4 Mbytes of vectors used (51%)
+===== chr18 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1883 = 1600+118+165 (level 2) ... 
+1633.6 Mbytes of cons cells used (62%)
+6209.3 Mbytes of vectors used (52%)
+===== chr18_GL383567v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1884 = 1600+118+166 (level 2) ... 
+1639.0 Mbytes of cons cells used (63%)
+6174.2 Mbytes of vectors used (51%)
+===== chr18_GL383568v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1885 = 1600+118+167 (level 2) ... 
+1639.0 Mbytes of cons cells used (63%)
+6170.7 Mbytes of vectors used (51%)
+===== chr18_GL383570v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1886 = 1600+118+168 (level 2) ... 
+1639.0 Mbytes of cons cells used (63%)
+6170.7 Mbytes of vectors used (51%)
+===== chr18_GL383571v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1887 = 1600+118+169 (level 2) ... 
+1639.0 Mbytes of cons cells used (63%)
+6170.7 Mbytes of vectors used (51%)
+===== chr18_KI270864v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1888 = 1600+118+170 (level 2) ... 
+1639.0 Mbytes of cons cells used (63%)
+6170.7 Mbytes of vectors used (51%)
+===== chr19 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1893 = 1603+119+171 (level 2) ... 
+1639.0 Mbytes of cons cells used (63%)
+6242.0 Mbytes of vectors used (52%)
+===== chr19_GL383573v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1894 = 1603+119+172 (level 2) ... 
+1652.9 Mbytes of cons cells used (63%)
+6196.2 Mbytes of vectors used (52%)
+===== chr19_GL383574v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1895 = 1603+119+173 (level 2) ... 
+1652.9 Mbytes of cons cells used (63%)
+6187.2 Mbytes of vectors used (51%)
+===== chr19_GL383576v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1896 = 1603+119+174 (level 2) ... 
+1652.9 Mbytes of cons cells used (63%)
+6187.2 Mbytes of vectors used (51%)
+===== chr19_GL949746v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1897 = 1603+119+175 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.2 Mbytes of vectors used (51%)
+===== chr19_GL949747v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1898 = 1603+119+176 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.2 Mbytes of vectors used (51%)
+===== chr19_GL949752v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1899 = 1603+119+177 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.2 Mbytes of vectors used (51%)
+===== chr19_KI270865v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1900 = 1603+119+178 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.2 Mbytes of vectors used (51%)
+===== chr19_KI270866v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1901 = 1603+119+179 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.2 Mbytes of vectors used (51%)
+===== chr19_KI270867v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1902 = 1603+119+180 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.3 Mbytes of vectors used (51%)
+===== chr19_KI270868v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1903 = 1603+119+181 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.3 Mbytes of vectors used (51%)
+===== chr1_KI270706v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1904 = 1603+119+182 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr1_KI270707v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1905 = 1603+119+183 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.3 Mbytes of vectors used (51%)
+===== chr1_KI270708v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1906 = 1603+119+184 (level 2) ... 
+1653.0 Mbytes of cons cells used (63%)
+6187.3 Mbytes of vectors used (51%)
+===== chr1_KI270709v1_random 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1907 = 1603+119+185 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.3 Mbytes of vectors used (51%)
+===== chr1_KI270711v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1908 = 1603+119+186 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.3 Mbytes of vectors used (51%)
+===== chr1_KI270712v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1909 = 1603+119+187 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr1_KI270713v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1910 = 1603+119+188 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr1_KI270714v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1911 = 1603+119+189 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr1_KI270759v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1912 = 1603+119+190 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr1_KI270763v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1913 = 1603+119+191 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr1_KI270765v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1914 = 1603+119+192 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr1_KI270766v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1915 = 1603+119+193 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6187.4 Mbytes of vectors used (51%)
+===== chr2 
+[1] "1 of 11"
+[1] "2 of 11"
+[1] "3 of 11"
+[1] "4 of 11"
+[1] "5 of 11"
+[1] "6 of 11"
+[1] "7 of 11"
+[1] "8 of 11"
+[1] "9 of 11"
+[1] "10 of 11"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1922 = 1607+120+195 (level 2) ... 
+1653.1 Mbytes of cons cells used (63%)
+6339.9 Mbytes of vectors used (44%)
+[1] "11 of 11"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+PID= 83152 
+
+Stopping cluster
+
+Garbage collection 1923 = 1607+120+196 (level 2) ... 
+1653.2 Mbytes of cons cells used (63%)
+6327.2 Mbytes of vectors used (44%)
+===== chr20 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1925 = 1608+120+197 (level 2) ... 
+1672.9 Mbytes of cons cells used (64%)
+6271.2 Mbytes of vectors used (43%)
+===== chr20_KI270869v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1926 = 1608+120+198 (level 2) ... 
+1679.9 Mbytes of cons cells used (64%)
+6223.5 Mbytes of vectors used (43%)
+===== chr20_KI270871v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1927 = 1608+120+199 (level 2) ... 
+1679.9 Mbytes of cons cells used (64%)
+6218.9 Mbytes of vectors used (43%)
+===== chr21 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1928 = 1608+120+200 (level 2) ... 
+1679.9 Mbytes of cons cells used (64%)
+6241.1 Mbytes of vectors used (43%)
+===== chr21_GL383578v2_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1929 = 1608+120+201 (level 2) ... 
+1683.0 Mbytes of cons cells used (64%)
+6224.5 Mbytes of vectors used (43%)
+===== chr21_GL383581v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1930 = 1608+120+202 (level 2) ... 
+1683.0 Mbytes of cons cells used (64%)
+6222.5 Mbytes of vectors used (43%)
+===== chr21_KI270872v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1931 = 1608+120+203 (level 2) ... 
+1683.0 Mbytes of cons cells used (64%)
+6222.5 Mbytes of vectors used (43%)
+===== chr22 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1932 = 1608+120+204 (level 2) ... 
+1683.0 Mbytes of cons cells used (64%)
+6259.6 Mbytes of vectors used (43%)
+===== chr22_GL383582v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1933 = 1608+120+205 (level 2) ... 
+1689.0 Mbytes of cons cells used (64%)
+6233.5 Mbytes of vectors used (43%)
+===== chr22_KB663609v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1934 = 1608+120+206 (level 2) ... 
+1689.0 Mbytes of cons cells used (64%)
+6229.6 Mbytes of vectors used (43%)
+===== chr22_KI270731v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1935 = 1608+120+207 (level 2) ... 
+1689.0 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270732v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1936 = 1608+120+208 (level 2) ... 
+1689.0 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270733v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1937 = 1608+120+209 (level 2) ... 
+1689.0 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270734v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1938 = 1608+120+210 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270735v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1939 = 1608+120+211 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270736v1_random 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1940 = 1608+120+212 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270737v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1941 = 1608+120+213 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270738v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1942 = 1608+120+214 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270739v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1943 = 1608+120+215 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270875v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1944 = 1608+120+216 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270876v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1945 = 1608+120+217 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270878v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1946 = 1608+120+218 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.7 Mbytes of vectors used (43%)
+===== chr22_KI270879v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1947 = 1608+120+219 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.8 Mbytes of vectors used (43%)
+===== chr22_KI270928v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1948 = 1608+120+220 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.8 Mbytes of vectors used (43%)
+===== chr2_GL383521v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1949 = 1608+120+221 (level 2) ... 
+1689.1 Mbytes of cons cells used (64%)
+6229.9 Mbytes of vectors used (43%)
+===== chr2_GL383522v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1950 = 1608+120+222 (level 2) ... 
+1689.2 Mbytes of cons cells used (64%)
+6229.8 Mbytes of vectors used (43%)
+===== chr2_KI270768v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1951 = 1608+120+223 (level 2) ... 
+1689.2 Mbytes of cons cells used (64%)
+6229.8 Mbytes of vectors used (43%)
+===== chr2_KI270769v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1952 = 1608+120+224 (level 2) ... 
+1689.2 Mbytes of cons cells used (64%)
+6229.8 Mbytes of vectors used (43%)
+===== chr2_KI270770v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1953 = 1608+120+225 (level 2) ... 
+1689.2 Mbytes of cons cells used (64%)
+6229.8 Mbytes of vectors used (43%)
+===== chr2_KI270772v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1954 = 1608+120+226 (level 2) ... 
+1689.2 Mbytes of cons cells used (64%)
+6229.9 Mbytes of vectors used (43%)
+===== chr2_KI270894v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1955 = 1608+120+227 (level 2) ... 
+1689.2 Mbytes of cons cells used (64%)
+6229.9 Mbytes of vectors used (43%)
+===== chr3 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1960 = 1612+120+228 (level 2) ... 
+1689.2 Mbytes of cons cells used (64%)
+6366.3 Mbytes of vectors used (44%)
+===== chr3_GL000221v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1961 = 1612+120+229 (level 2) ... 
+1706.5 Mbytes of cons cells used (65%)
+6261.5 Mbytes of vectors used (43%)
+===== chr3_JH636055v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1962 = 1612+120+230 (level 2) ... 
+1706.5 Mbytes of cons cells used (65%)
+6250.4 Mbytes of vectors used (43%)
+===== chr3_KI270777v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1963 = 1612+120+231 (level 2) ... 
+1706.6 Mbytes of cons cells used (65%)
+6250.5 Mbytes of vectors used (43%)
+===== chr3_KI270780v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1964 = 1612+120+232 (level 2) ... 
+1706.6 Mbytes of cons cells used (65%)
+6250.3 Mbytes of vectors used (43%)
+===== chr3_KI270781v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1965 = 1612+120+233 (level 2) ... 
+1706.6 Mbytes of cons cells used (65%)
+6250.4 Mbytes of vectors used (43%)
+===== chr3_KI270782v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1966 = 1612+120+234 (level 2) ... 
+1706.6 Mbytes of cons cells used (65%)
+6250.4 Mbytes of vectors used (43%)
+===== chr3_KI270784v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1967 = 1612+120+235 (level 2) ... 
+1706.6 Mbytes of cons cells used (65%)
+6250.5 Mbytes of vectors used (43%)
+===== chr3_KI270895v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1968 = 1612+120+236 (level 2) ... 
+1706.6 Mbytes of cons cells used (65%)
+6250.4 Mbytes of vectors used (43%)
+===== chr4 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1972 = 1614+121+237 (level 2) ... 
+1706.6 Mbytes of cons cells used (65%)
+6360.4 Mbytes of vectors used (44%)
+===== chr4_GL000008v2_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1973 = 1614+121+238 (level 2) ... 
+1720.1 Mbytes of cons cells used (66%)
+6274.9 Mbytes of vectors used (44%)
+===== chr4_GL000257v2_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1974 = 1614+121+239 (level 2) ... 
+1720.1 Mbytes of cons cells used (66%)
+6266.2 Mbytes of vectors used (43%)
+===== chr4_GL383527v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1975 = 1614+121+240 (level 2) ... 
+1720.1 Mbytes of cons cells used (66%)
+6266.2 Mbytes of vectors used (43%)
+===== chr4_KI270788v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1976 = 1614+121+241 (level 2) ... 
+1720.1 Mbytes of cons cells used (66%)
+6266.2 Mbytes of vectors used (43%)
+===== chr4_KI270896v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1977 = 1614+121+242 (level 2) ... 
+1720.1 Mbytes of cons cells used (66%)
+6266.2 Mbytes of vectors used (43%)
+===== chr5 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1981 = 1617+121+243 (level 2) ... 
+1720.1 Mbytes of cons cells used (66%)
+6377.2 Mbytes of vectors used (44%)
+===== chr5_GL000208v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1982 = 1617+121+244 (level 2) ... 
+1734.4 Mbytes of cons cells used (66%)
+6292.4 Mbytes of vectors used (44%)
+===== chr5_GL339449v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1983 = 1617+121+245 (level 2) ... 
+1734.4 Mbytes of cons cells used (66%)
+6283.5 Mbytes of vectors used (44%)
+===== chr5_GL383530v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1984 = 1617+121+246 (level 2) ... 
+1734.5 Mbytes of cons cells used (66%)
+6283.3 Mbytes of vectors used (44%)
+===== chr5_GL383531v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1985 = 1617+121+247 (level 2) ... 
+1734.5 Mbytes of cons cells used (66%)
+6283.3 Mbytes of vectors used (44%)
+===== chr5_KI270791v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1986 = 1617+121+248 (level 2) ... 
+1734.5 Mbytes of cons cells used (66%)
+6283.4 Mbytes of vectors used (44%)
+===== chr5_KI270792v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1987 = 1617+121+249 (level 2) ... 
+1734.5 Mbytes of cons cells used (66%)
+6283.3 Mbytes of vectors used (44%)
+===== chr5_KI270793v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1988 = 1617+121+250 (level 2) ... 
+1734.5 Mbytes of cons cells used (66%)
+6283.4 Mbytes of vectors used (44%)
+===== chr5_KI270795v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1989 = 1617+121+251 (level 2) ... 
+1734.6 Mbytes of cons cells used (66%)
+6283.3 Mbytes of vectors used (44%)
+===== chr5_KI270796v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1990 = 1617+121+252 (level 2) ... 
+1734.6 Mbytes of cons cells used (66%)
+6283.3 Mbytes of vectors used (44%)
+===== chr5_KI270897v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1991 = 1617+121+253 (level 2) ... 
+1734.6 Mbytes of cons cells used (66%)
+6283.5 Mbytes of vectors used (44%)
+===== chr6 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1995 = 1620+121+254 (level 2) ... 
+1734.6 Mbytes of cons cells used (66%)
+6400.0 Mbytes of vectors used (44%)
+===== chr6_GL000250v2_alt 
+[1] "1 of 8"
+[1] "2 of 8"
+[1] "3 of 8"
+[1] "4 of 8"
+[1] "5 of 8"
+[1] "6 of 8"
+[1] "7 of 8"
+[1] "8 of 8"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1996 = 1620+121+255 (level 2) ... 
+1750.5 Mbytes of cons cells used (67%)
+6312.3 Mbytes of vectors used (44%)
+===== chr6_GL000251v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1997 = 1620+121+256 (level 2) ... 
+1750.5 Mbytes of cons cells used (67%)
+6302.5 Mbytes of vectors used (44%)
+===== chr6_GL000252v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1998 = 1620+121+257 (level 2) ... 
+1750.6 Mbytes of cons cells used (67%)
+6302.5 Mbytes of vectors used (44%)
+===== chr6_GL000253v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 1999 = 1620+121+258 (level 2) ... 
+1750.7 Mbytes of cons cells used (67%)
+6302.6 Mbytes of vectors used (44%)
+===== chr6_GL000254v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2000 = 1620+121+259 (level 2) ... 
+1750.7 Mbytes of cons cells used (67%)
+6302.5 Mbytes of vectors used (44%)
+===== chr6_GL000255v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2001 = 1620+121+260 (level 2) ... 
+1750.8 Mbytes of cons cells used (67%)
+6302.7 Mbytes of vectors used (44%)
+===== chr6_GL000256v2_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2002 = 1620+121+261 (level 2) ... 
+1750.8 Mbytes of cons cells used (67%)
+6302.8 Mbytes of vectors used (44%)
+===== chr6_GL383533v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2003 = 1620+121+262 (level 2) ... 
+1750.9 Mbytes of cons cells used (67%)
+6302.7 Mbytes of vectors used (44%)
+===== chr6_KI270798v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2004 = 1620+121+263 (level 2) ... 
+1750.9 Mbytes of cons cells used (67%)
+6302.6 Mbytes of vectors used (44%)
+===== chr6_KI270799v1_alt 
+[1] "1 of 8"
+[1] "2 of 8"
+[1] "3 of 8"
+[1] "4 of 8"
+[1] "5 of 8"
+[1] "6 of 8"
+[1] "7 of 8"
+[1] "8 of 8"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2005 = 1620+121+264 (level 2) ... 
+1750.9 Mbytes of cons cells used (67%)
+6302.6 Mbytes of vectors used (44%)
+===== chr6_KI270802v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2006 = 1620+121+265 (level 2) ... 
+1750.9 Mbytes of cons cells used (67%)
+6302.6 Mbytes of vectors used (44%)
+===== chr7 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2010 = 1623+121+266 (level 2) ... 
+1750.9 Mbytes of cons cells used (67%)
+6415.1 Mbytes of vectors used (44%)
+===== chr7_GL383534v2_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2011 = 1623+121+267 (level 2) ... 
+1766.2 Mbytes of cons cells used (67%)
+6330.5 Mbytes of vectors used (44%)
+===== chr7_KI270803v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2012 = 1623+121+268 (level 2) ... 
+1766.2 Mbytes of cons cells used (67%)
+6320.7 Mbytes of vectors used (44%)
+===== chr7_KI270804v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2013 = 1623+121+269 (level 2) ... 
+1766.2 Mbytes of cons cells used (67%)
+6320.6 Mbytes of vectors used (44%)
+===== chr7_KI270805v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2014 = 1623+121+270 (level 2) ... 
+1766.2 Mbytes of cons cells used (67%)
+6320.7 Mbytes of vectors used (44%)
+===== chr7_KI270806v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2015 = 1623+121+271 (level 2) ... 
+1766.2 Mbytes of cons cells used (67%)
+6320.8 Mbytes of vectors used (44%)
+===== chr7_KI270808v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2016 = 1623+121+272 (level 2) ... 
+1766.2 Mbytes of cons cells used (67%)
+6320.7 Mbytes of vectors used (44%)
+===== chr7_KI270809v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2017 = 1623+121+273 (level 2) ... 
+1766.3 Mbytes of cons cells used (67%)
+6320.7 Mbytes of vectors used (44%)
+===== chr8 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2021 = 1626+121+274 (level 2) ... 
+1766.3 Mbytes of cons cells used (67%)
+6408.2 Mbytes of vectors used (44%)
+===== chr8_KI270810v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2022 = 1626+121+275 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6341.7 Mbytes of vectors used (44%)
+===== chr8_KI270813v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2023 = 1626+121+276 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6334.3 Mbytes of vectors used (44%)
+===== chr8_KI270815v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2024 = 1626+121+277 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6334.3 Mbytes of vectors used (44%)
+===== chr8_KI270816v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2025 = 1626+121+278 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6334.3 Mbytes of vectors used (44%)
+===== chr8_KI270817v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2026 = 1626+121+279 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6334.3 Mbytes of vectors used (44%)
+===== chr8_KI270819v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2027 = 1626+121+280 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6334.3 Mbytes of vectors used (44%)
+===== chr8_KI270821v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2028 = 1626+121+281 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6334.3 Mbytes of vectors used (44%)
+===== chr8_KI270822v1_alt 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2029 = 1626+121+282 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6334.3 Mbytes of vectors used (44%)
+===== chr9 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2033 = 1629+121+283 (level 2) ... 
+1777.8 Mbytes of cons cells used (68%)
+6421.0 Mbytes of vectors used (45%)
+===== chr9_GL383542v1_alt 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2034 = 1629+121+284 (level 2) ... 
+1790.0 Mbytes of cons cells used (68%)
+6356.5 Mbytes of vectors used (44%)
+===== chr9_KI270718v1_random 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2035 = 1629+121+285 (level 2) ... 
+1790.0 Mbytes of cons cells used (68%)
+6348.6 Mbytes of vectors used (44%)
+===== chr9_KI270719v1_random 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2036 = 1629+121+286 (level 2) ... 
+1790.0 Mbytes of cons cells used (68%)
+6348.8 Mbytes of vectors used (44%)
+===== chrM 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2037 = 1629+121+287 (level 2) ... 
+1790.0 Mbytes of cons cells used (68%)
+6348.7 Mbytes of vectors used (44%)
+===== chrUn_GL000195v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2038 = 1629+121+288 (level 2) ... 
+1790.0 Mbytes of cons cells used (68%)
+6349.0 Mbytes of vectors used (44%)
+===== chrUn_GL000213v1 
+[1] "1 of 7"
+[1] "2 of 7"
+[1] "3 of 7"
+[1] "4 of 7"
+[1] "5 of 7"
+[1] "6 of 7"
+[1] "7 of 7"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2039 = 1629+121+289 (level 2) ... 
+1790.1 Mbytes of cons cells used (68%)
+6348.8 Mbytes of vectors used (44%)
+===== chrUn_GL000214v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2040 = 1629+121+290 (level 2) ... 
+1790.1 Mbytes of cons cells used (68%)
+6348.9 Mbytes of vectors used (44%)
+===== chrUn_GL000216v2 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2041 = 1629+121+291 (level 2) ... 
+1790.1 Mbytes of cons cells used (68%)
+6348.9 Mbytes of vectors used (44%)
+===== chrUn_GL000218v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2042 = 1629+121+292 (level 2) ... 
+1790.1 Mbytes of cons cells used (68%)
+6348.9 Mbytes of vectors used (44%)
+===== chrUn_GL000219v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2043 = 1629+121+293 (level 2) ... 
+1790.1 Mbytes of cons cells used (68%)
+6349.0 Mbytes of vectors used (44%)
+===== chrUn_GL000220v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2044 = 1629+121+294 (level 2) ... 
+1790.2 Mbytes of cons cells used (68%)
+6348.9 Mbytes of vectors used (44%)
+===== chrUn_GL000224v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2045 = 1629+121+295 (level 2) ... 
+1790.2 Mbytes of cons cells used (68%)
+6349.0 Mbytes of vectors used (44%)
+===== chrUn_KI270435v1 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2046 = 1629+121+296 (level 2) ... 
+1790.2 Mbytes of cons cells used (68%)
+6348.9 Mbytes of vectors used (44%)
+===== chrUn_KI270438v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2047 = 1629+121+297 (level 2) ... 
+1790.2 Mbytes of cons cells used (68%)
+6348.9 Mbytes of vectors used (44%)
+===== chrUn_KI270442v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2048 = 1629+121+298 (level 2) ... 
+1790.2 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270512v1 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2049 = 1629+121+299 (level 2) ... 
+1790.3 Mbytes of cons cells used (68%)
+6349.0 Mbytes of vectors used (44%)
+===== chrUn_KI270519v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2050 = 1629+121+300 (level 2) ... 
+1790.3 Mbytes of cons cells used (68%)
+6349.0 Mbytes of vectors used (44%)
+===== chrUn_KI270538v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2051 = 1629+121+301 (level 2) ... 
+1790.3 Mbytes of cons cells used (68%)
+6349.0 Mbytes of vectors used (44%)
+===== chrUn_KI270742v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2052 = 1629+121+302 (level 2) ... 
+1790.3 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270743v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2053 = 1629+121+303 (level 2) ... 
+1790.3 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270744v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2054 = 1629+121+304 (level 2) ... 
+1790.3 Mbytes of cons cells used (68%)
+6349.2 Mbytes of vectors used (44%)
+===== chrUn_KI270745v1 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2055 = 1629+121+305 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270746v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2056 = 1629+121+306 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270749v1 
+[1] "1 of 9"
+[1] "2 of 9"
+[1] "3 of 9"
+[1] "4 of 9"
+[1] "5 of 9"
+[1] "6 of 9"
+[1] "7 of 9"
+[1] "8 of 9"
+[1] "9 of 9"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2057 = 1629+121+307 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270750v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2058 = 1629+121+308 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270751v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2059 = 1629+121+309 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6349.2 Mbytes of vectors used (44%)
+===== chrUn_KI270754v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2060 = 1629+121+310 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrUn_KI270757v1 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2061 = 1629+121+311 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6349.1 Mbytes of vectors used (44%)
+===== chrX 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2065 = 1632+121+312 (level 2) ... 
+1790.4 Mbytes of cons cells used (68%)
+6440.1 Mbytes of vectors used (45%)
+===== chrX_KI270880v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2066 = 1632+121+313 (level 2) ... 
+1802.8 Mbytes of cons cells used (69%)
+6371.8 Mbytes of vectors used (44%)
+===== chrX_KI270881v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2067 = 1632+121+314 (level 2) ... 
+1802.8 Mbytes of cons cells used (69%)
+6363.8 Mbytes of vectors used (44%)
+===== chrX_KI270913v1_alt 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2068 = 1632+121+315 (level 2) ... 
+1802.8 Mbytes of cons cells used (69%)
+6363.8 Mbytes of vectors used (44%)
+===== chrY 
+[1] "1 of 10"
+[1] "2 of 10"
+[1] "3 of 10"
+[1] "4 of 10"
+[1] "5 of 10"
+[1] "6 of 10"
+[1] "7 of 10"
+[1] "8 of 10"
+[1] "9 of 10"
+[1] "10 of 10"
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+Garbage collection 2069 = 1632+121+316 (level 2) ... 
+1802.9 Mbytes of cons cells used (69%)
+6369.5 Mbytes of vectors used (44%)
+min_score= 0.08839 
+         [,1]     [,2]     [,3]     [,4]     [,5]
+[1,] 0.005745 0.005578 0.005389 0.005143 0.004856
+[2,] 0.005578 0.005745 0.005578 0.005389 0.005143
+[3,] 0.005389 0.005578 0.005745 0.005578 0.005389
+[4,] 0.005143 0.005389 0.005578 0.005745 0.005578
+[5,] 0.004856 0.005143 0.005389 0.005578 0.005745
+block_number= 486 
+snowfall 1.84-6.1 initialized (using snow 0.4-3): parallel execution on 10 CPUs.
+
+
+Stopping cluster
+
+There were 50 or more warnings (use warnings() to see the first 50)
+4) -------- outputting result
+ZNF143_total.dREG.infp.bed.gz
+ZNF143_total.dREG.infp.bed.gz.tbi
+ZNF143_total.dREG.infp.bw
+ZNF143_total.dREG.log
+ZNF143_total.dREG.peak.full.bed.gz
+ZNF143_total.dREG.peak.full.bed.gz.tbi
+ZNF143_total.dREG.peak.prob.bed.gz
+ZNF143_total.dREG.peak.prob.bed.gz.tbi
+ZNF143_total.dREG.peak.prob.bw
+ZNF143_total.dREG.peak.score.bed.gz
+ZNF143_total.dREG.peak.score.bed.gz.tbi
+ZNF143_total.dREG.peak.score.bw
+ZNF143_total.dREG.raw.peak.bed.gz
+ZNF143_total.dREG.raw.peak.bed.gz.tbi
+Result: ZNF143_total.tar.gz 
+Done!
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   243  100   120  100   123   1643   1684 --:--:-- --:--:-- --:--:--  3328

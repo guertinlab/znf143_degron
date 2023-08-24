@@ -1,0 +1,12 @@
+
+[summary]
+Running time: 9814 806.8 21179 23.47 274.4 
+Informative loci: 33249518 
+Broad peaks: 214294 
+Threshold: 0.08839 
+Narrow peaks: 206565 
+Peaks(p<=0.05 ): 96000 
+Peaks(p<=0.05 with FDR correction): 84500 
+Peaks(p<=0.05 with Bonferroni correction): 45514 
+Peaks(width<50): 
+Peaks(width<50 and p<=0.05): 
