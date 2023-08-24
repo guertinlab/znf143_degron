@@ -1216,8 +1216,6 @@ ZNF143_summit_quantiles_all_cdf_Activated.pdf (to png)
 ```
 
 
-# Jinhong: to do
-
 ## Plot an MA plot for activated and repressed and unchanged
 
 Unchanged can be the combine matched genes (match a set for act and a
