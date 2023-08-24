@@ -1415,7 +1415,7 @@ plot_cdf(df.cdf, tf = "qmerge", cat = cat, col.lines = c(rep("grey60",19),colorC
 [image here, might change colors]
 qmerge_ZNF143_cumulative_cdf_Repressed.pdf
 
-The threshold is set at the trace for `qmerge6`, which corresponds to quantile 0.65 and above. Using this threshold, return to ChIP vignette for motif analysis.
+The threshold is set at the trace for `qmerge6`, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.
 
 
 
