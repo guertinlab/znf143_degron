@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-08-23" />
+<meta name="date" content="2023-08-24" />
 
 <title>ChIP-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">ChIP-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-08-23</h4>
+<h4 class="date">2023-08-24</h4>
 
 </div>
 
@@ -742,17 +742,18 @@ function toggle_visibility(id1) {
 <li><a href="#move-into-r-to-make-a-pswm-for-meme" id="toc-move-into-r-to-make-a-pswm-for-meme"><span class="toc-section-number">11.1</span> move into R to make a PSWM for <code>meme</code></a></li>
 <li><a href="#make-matrix-with-meme-suite" id="toc-make-matrix-with-meme-suite"><span class="toc-section-number">11.2</span> make matrix with <code>meme</code> suite</a></li>
 </ul></li>
-<li><a href="#jinhong-to-do" id="toc-jinhong-to-do"><span class="toc-section-number">12</span> Jinhong: To do</a>
+<li><a href="#make-cdf-plots-of-peaks-above-and-below-the-threshold-repressed-and-activated" id="toc-make-cdf-plots-of-peaks-above-and-below-the-threshold-repressed-and-activated"><span class="toc-section-number">12</span> Make CDF plots of peaks above and below the threshold, repressed and activated</a></li>
+<li><a href="#jinhong-to-do" id="toc-jinhong-to-do"><span class="toc-section-number">13</span> Jinhong: To do</a>
 <ul>
-<li><a href="#run-through-the-entire-vignette-and-add-context-paragraphs-and-include-figures" id="toc-run-through-the-entire-vignette-and-add-context-paragraphs-and-include-figures"><span class="toc-section-number">12.1</span> run through the entire vignette and add context paragraphs and include figures</a></li>
-<li><a href="#make-a-composite-pswm-of-motif-1-and-motif-2-from-the-functional-peaks-in-progress" id="toc-make-a-composite-pswm-of-motif-1-and-motif-2-from-the-functional-peaks-in-progress"><span class="toc-section-number">12.2</span> make a composite PSWM of motif 1 and motif 2 from the functional peaks [in progress]</a></li>
-<li><a href="#make-a-composite-fimo-motif-signal-at-peak-summits" id="toc-make-a-composite-fimo-motif-signal-at-peak-summits"><span class="toc-section-number">12.3</span> make a composite FIMO motif signal at peak summits</a></li>
-<li><a href="#de-novo-motif-analysis-on-other-non-functional-peaks" id="toc-de-novo-motif-analysis-on-other-non-functional-peaks"><span class="toc-section-number">12.4</span> de novo motif analysis on other (non-functional peaks)</a></li>
-<li><a href="#calculate-the-fraction-of-reads-in-peaks-frip-score-for" id="toc-calculate-the-fraction-of-reads-in-peaks-frip-score-for"><span class="toc-section-number">12.5</span> Calculate the fraction of reads in peaks (FRiP) score for:</a>
+<li><a href="#run-through-the-entire-vignette-and-add-context-paragraphs-and-include-figures" id="toc-run-through-the-entire-vignette-and-add-context-paragraphs-and-include-figures"><span class="toc-section-number">13.1</span> run through the entire vignette and add context paragraphs and include figures</a></li>
+<li><a href="#make-a-composite-pswm-of-motif-1-and-motif-2-from-the-functional-peaks-in-progress" id="toc-make-a-composite-pswm-of-motif-1-and-motif-2-from-the-functional-peaks-in-progress"><span class="toc-section-number">13.2</span> make a composite PSWM of motif 1 and motif 2 from the functional peaks [in progress]</a></li>
+<li><a href="#make-a-composite-fimo-motif-signal-at-peak-summits" id="toc-make-a-composite-fimo-motif-signal-at-peak-summits"><span class="toc-section-number">13.3</span> make a composite FIMO motif signal at peak summits</a></li>
+<li><a href="#de-novo-motif-analysis-on-other-non-functional-peaks" id="toc-de-novo-motif-analysis-on-other-non-functional-peaks"><span class="toc-section-number">13.4</span> de novo motif analysis on other (non-functional peaks)</a></li>
+<li><a href="#calculate-the-fraction-of-reads-in-peaks-frip-score-for" id="toc-calculate-the-fraction-of-reads-in-peaks-frip-score-for"><span class="toc-section-number">13.5</span> Calculate the fraction of reads in peaks (FRiP) score for:</a>
 <ul>
-<li><a href="#the-full-set-of-znf143-narrowpeaks" id="toc-the-full-set-of-znf143-narrowpeaks"><span class="toc-section-number">12.5.1</span> the full set of ZNF143 narrowPeaks</a></li>
-<li><a href="#functional-peaks-use-narrowpeaks-file" id="toc-functional-peaks-use-narrowpeaks-file"><span class="toc-section-number">12.5.2</span> functional peaks (use narrowPeaks file)</a></li>
-<li><a href="#other-non-func-peaks-use-narrowpeaks-file" id="toc-other-non-func-peaks-use-narrowpeaks-file"><span class="toc-section-number">12.5.3</span> other (non-func) peaks (use narrowPeaks file)</a></li>
+<li><a href="#the-full-set-of-znf143-narrowpeaks" id="toc-the-full-set-of-znf143-narrowpeaks"><span class="toc-section-number">13.5.1</span> the full set of ZNF143 narrowPeaks</a></li>
+<li><a href="#functional-peaks-use-narrowpeaks-file" id="toc-functional-peaks-use-narrowpeaks-file"><span class="toc-section-number">13.5.2</span> functional peaks (use narrowPeaks file)</a></li>
+<li><a href="#other-non-func-peaks-use-narrowpeaks-file" id="toc-other-non-func-peaks-use-narrowpeaks-file"><span class="toc-section-number">13.5.3</span> other (non-func) peaks (use narrowPeaks file)</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1540,6 +1541,159 @@ ceqlogo -i ZNF143.txt -m ZNF143 -o ZNF143_combined.eps</code></pre>
 Figure 1: <span class="caption-title">combined ZNF143 seqLogo</span><br>
 </p>
 </div>
+</div>
+</div>
+<div id="make-cdf-plots-of-peaks-above-and-below-the-threshold-repressed-and-activated" class="section level1" number="12">
+<h1><span class="header-section-number">12</span> Make CDF plots of peaks above and below the threshold, repressed and activated</h1>
+<pre class="r"><code>setwd(&quot;/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023&quot;)
+load(&quot;2023-08-20_cdfs_cont.Rdata&quot;)
+
+highQuantPeaks = read.table(file=&quot;./ChIP/ZNF143_functional_peaks.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
+lowQuantPeaks = read.table(file=&quot;./ChIP/ZNF143_other_peaks.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
+
+library(latticeExtra)
+library(DESeq2)
+library(lattice)
+library(dplyr)
+library(ggplot2)
+library(limma)
+library(bigWig)
+library(gplots)
+library(RColorBrewer)
+library(viridis)
+source(&#39;https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R&#39;)
+source(&#39;https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R&#39;)
+source(&#39;https://raw.githubusercontent.com/guertinlab/genex/main/ChIP_analysis/cdf_functions.R&#39;)
+
+# use these versions of cdf.deseq.df and bedTools.Closest
+cdf.deseq.df &lt;- function(genes = gene.file, chip.peaks = chip.peaks, cat = &quot;Repressed&quot;, opt.str=&quot;&quot;) {
+  bed.tss.activated = get.tss(genes[genes$V5 == cat,])
+  bed.tss.unchanged = get.tss(genes[genes$V5 == paste0(&quot;Matched to &quot;, cat),])
+  
+  # note &#39;functionstring&#39; in bedTools.closest
+  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;-D a&#39;)
+  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = &#39;-D a&#39;)
+
+  df.up.can = cbind(act.distance[,c(4, 10)], paste0(opt.str,cat))
+  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0(opt.str,&quot;Matched to &quot;, cat))
+
+  colnames(df.up.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
+  colnames(df.un.can) = c(colnames(df.up.can)[1:2], &#39;status&#39;)
+
+  df.all = rbind(df.up.can, df.un.can)
+  df.all$status = factor(df.all$status, levels = c(paste0(opt.str,cat), paste0(opt.str,&quot;Matched to &quot;, cat)))
+  return(df.all)
+}
+
+bedTools.closest &lt;- function(functionstring=&quot;/usr/local/bin/bedtools2-2.31.0/bin/closestBed&quot;,bed1,bed2,opt.string=&quot;&quot;) {
+  
+  options(scipen =99) # not to use scientific notation when writing out
+  
+  #write bed formatted dataframes to tempfile
+  write.table(bed1,file= &#39;a.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  write.table(bed2,file= &#39;b.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  
+  # create the command string and call the command using system()
+  command1=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;a.file.bed&#39;, &#39;&gt; a.file.sorted.bed&#39;)
+  cat(command1,&quot;\n&quot;)
+  try(system(command1))
+  command2=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;b.file.bed&#39;, &#39;&gt; b.file.sorted.bed&#39;)
+  cat(command2,&quot;\n&quot;)
+  try(system(command2))
+  
+  command=paste(functionstring,opt.string,&quot;-a&quot;,&#39;a.file.sorted.bed&#39;,&quot;-b&quot;,&#39;b.file.sorted.bed&#39;,&quot;&gt;&quot;,&#39;out.file.bed&#39;,sep=&quot; &quot;)
+  cat(command,&quot;\n&quot;)
+  try(system(command))
+  
+  res=read.table(&#39;out.file.bed&#39;,sep =&quot;\t&quot;, header=F, comment.char=&#39;&#39;)
+  
+  command3=paste(&#39;rm&#39;, &#39;a.file.bed&#39;, &#39;b.file.bed&#39;, &#39;a.file.sorted.bed&#39;, &#39;b.file.sorted.bed&#39;, &#39;out.file.bed&#39;)
+  cat(command3,&quot;\n&quot;)
+  try(system(command3))
+  
+  colnames(res) = c(colnames(bed1), colnames(bed2), &#39;dis&#39; )
+  return(res)
+}
+
+# the PEAKS data frames above are already summits (1bp length regions) so I don&#39;t need to adjust them.
+# opt.str you can change if you want to change the words in the resulting plot&#39;s key
+df.rep.high = cdf.deseq.df(genes = gene.file, chip.peaks=highQuantPeaks, cat = &quot;Repressed&quot;, opt.str = &quot;Over threshold &quot;)
+df.rep.low = cdf.deseq.df(genes = gene.file, chip.peaks=lowQuantPeaks, cat = &quot;Repressed&quot;, opt.str = &quot;Below threshold &quot;)
+
+plot_cdf &lt;- function(df.all, tf=&quot;quantile&quot;, cat = &quot;Repressed&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), line.type = c(1), cex = 1, abline=0) {
+pdf(paste0(tf, &quot;_CDF_&quot;, cat, &quot;.pdf&quot;), width=6.2, height=3.83) 
+         print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
+         auto.key = list(lines=TRUE, points=FALSE, cex = cex),
+         col = col.lines,
+         aspect = 1,
+                                        #xlim = c(0, 50000),
+         scales=list(relation=&quot;free&quot;,alternating=c(1,1,1,1)),
+         ylab = &#39;Cumulative Distribution Function&#39;,
+         xlab = expression(&#39;log&#39;[10]~&#39;ZNF143 Distance from TSS&#39;),
+                                        #index.cond = list(c(2,1)),
+         between=list(y=1.0),
+         type = &#39;a&#39;,
+         xlim = c(0,8),
+         lwd=2,
+         lty=line.type,
+         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col=&quot;grey85&quot;)),
+         panel = function(...) {
+             panel.abline(v= log(abline, base=10), lty =2) # variable line location
+             panel.ecdfplot(...)
+         }))
+    dev.off()
+}
+
+# CDF for repressed+matched, peaks above and below threshold
+df.rep.all = rbind(df.rep.high, df.rep.low)
+
+plot_cdf(df.rep.all, tf = &quot;ZNF143_repAll_above_below_thresh&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), cat = cat, line.type = c(1), cex = 0.75)
+
+# CDF for only those above threshold, but repressed and activated
+df.act = cdf.deseq.df(genes = gene.file, chip.peaks=highQuantPeaks, cat = &quot;Activated&quot;, opt.str = &quot;Over threshold &quot;)
+df.high.rep.act = rbind(df.rep.high,df.act)
+
+plot_cdf(df.high.rep.act, tf = &quot;ZNF143_aboveThresh_rep_act&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#f7461e&quot;,&quot;grey90&quot;), cat = &quot;Both&quot;, line.type = c(1), cex = 0.75)
+
+# Find point where repressed and matched CDF traces start being parallel 
+match = ecdf(abs(df.rep.high$dis)[df.rep.high$status == &#39;Over threshold Matched to Repressed&#39;])
+rep = ecdf(abs(df.rep.high$dis)[df.rep.high$status == &#39;Over threshold Repressed&#39;])
+match.y = seq(0, 20000, by=20) # like indices
+rep.y = seq(0, 20000, by=20)
+
+spl = smooth.spline(rep.y, rep(rep.y) - match(match.y))
+pred = predict(spl)
+pred1 = predict(spl, deriv=1)
+
+print(&#39;the distance that CDFs are parallel or converge&#39;)
+print(rep.y[min(which(pred1$y&lt;=0)) - 1])
+# 440 yup, unchanged
+
+pdf(&quot;empirical_distance_determination_ZNF143_latest.pdf&quot;, width=3.83, height=3.83) 
+plot(rep.y, rep(rep.y) - match(match.y),
+     xlim = c(0,2000),
+     cex=0.7,
+     xlab = &#39;ZNF143 distance from TSS (bp)&#39;,
+     ylab = &#39;Repressed Genes CDF - Matched genes CDF&#39;)
+     abline(v = rep.y[min(which(pred1$y&lt;=0)) - 1], col =2, lty =2)
+      lines(pred[[1]], pred[[2]], col = &#39;blue&#39;)
+dev.off()
+
+
+pdf(&quot;empirical_distance_determination_ZNF143_wide_latest.pdf&quot;, width=3.83, height=3.83) 
+plot(rep.y, rep(rep.y) - match(match.y),
+     xlim = c(0,10000),
+     cex=0.7,
+     xlab = &#39;ZNF143 distance from TSS (bp)&#39;,
+     ylab = &#39;Repressed Genes CDF - Matched genes CDF&#39;)
+     abline(v = rep.y[min(which(pred1$y&lt;=0)) - 1], col =2, lty =2)
+      lines(pred[[1]], pred[[2]], col = &#39;blue&#39;)
+dev.off()
+
+# Replot the two CDFs above, but add the line where repressed and matched CDF traces start being parallel
+plot_cdf(df.rep.all, tf = &quot;ZNF143_repAll_above_below_thresh&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), cat = cat, line.type = c(1), cex = 0.75, abline=440)
+
+plot_cdf(df.high.rep.act, tf = &quot;ZNF143_aboveThresh_rep_act&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#f7461e&quot;,&quot;grey90&quot;), cat = &quot;Both&quot;, line.type = c(1), cex = 0.75, abline=440)</code></pre>
 <!--
 # make a barchart for fraction of peaks with motifs 
 
@@ -1566,31 +1720,30 @@ done
 
 -->
 </div>
+<div id="jinhong-to-do" class="section level1" number="13">
+<h1><span class="header-section-number">13</span> Jinhong: To do</h1>
+<div id="run-through-the-entire-vignette-and-add-context-paragraphs-and-include-figures" class="section level2" number="13.1">
+<h2><span class="header-section-number">13.1</span> run through the entire vignette and add context paragraphs and include figures</h2>
 </div>
-<div id="jinhong-to-do" class="section level1" number="12">
-<h1><span class="header-section-number">12</span> Jinhong: To do</h1>
-<div id="run-through-the-entire-vignette-and-add-context-paragraphs-and-include-figures" class="section level2" number="12.1">
-<h2><span class="header-section-number">12.1</span> run through the entire vignette and add context paragraphs and include figures</h2>
+<div id="make-a-composite-pswm-of-motif-1-and-motif-2-from-the-functional-peaks-in-progress" class="section level2" number="13.2">
+<h2><span class="header-section-number">13.2</span> make a composite PSWM of motif 1 and motif 2 from the functional peaks [in progress]</h2>
 </div>
-<div id="make-a-composite-pswm-of-motif-1-and-motif-2-from-the-functional-peaks-in-progress" class="section level2" number="12.2">
-<h2><span class="header-section-number">12.2</span> make a composite PSWM of motif 1 and motif 2 from the functional peaks [in progress]</h2>
+<div id="make-a-composite-fimo-motif-signal-at-peak-summits" class="section level2" number="13.3">
+<h2><span class="header-section-number">13.3</span> make a composite FIMO motif signal at peak summits</h2>
 </div>
-<div id="make-a-composite-fimo-motif-signal-at-peak-summits" class="section level2" number="12.3">
-<h2><span class="header-section-number">12.3</span> make a composite FIMO motif signal at peak summits</h2>
+<div id="de-novo-motif-analysis-on-other-non-functional-peaks" class="section level2" number="13.4">
+<h2><span class="header-section-number">13.4</span> de novo motif analysis on other (non-functional peaks)</h2>
 </div>
-<div id="de-novo-motif-analysis-on-other-non-functional-peaks" class="section level2" number="12.4">
-<h2><span class="header-section-number">12.4</span> de novo motif analysis on other (non-functional peaks)</h2>
+<div id="calculate-the-fraction-of-reads-in-peaks-frip-score-for" class="section level2" number="13.5">
+<h2><span class="header-section-number">13.5</span> Calculate the fraction of reads in peaks (FRiP) score for:</h2>
+<div id="the-full-set-of-znf143-narrowpeaks" class="section level3" number="13.5.1">
+<h3><span class="header-section-number">13.5.1</span> the full set of ZNF143 narrowPeaks</h3>
 </div>
-<div id="calculate-the-fraction-of-reads-in-peaks-frip-score-for" class="section level2" number="12.5">
-<h2><span class="header-section-number">12.5</span> Calculate the fraction of reads in peaks (FRiP) score for:</h2>
-<div id="the-full-set-of-znf143-narrowpeaks" class="section level3" number="12.5.1">
-<h3><span class="header-section-number">12.5.1</span> the full set of ZNF143 narrowPeaks</h3>
+<div id="functional-peaks-use-narrowpeaks-file" class="section level3" number="13.5.2">
+<h3><span class="header-section-number">13.5.2</span> functional peaks (use narrowPeaks file)</h3>
 </div>
-<div id="functional-peaks-use-narrowpeaks-file" class="section level3" number="12.5.2">
-<h3><span class="header-section-number">12.5.2</span> functional peaks (use narrowPeaks file)</h3>
-</div>
-<div id="other-non-func-peaks-use-narrowpeaks-file" class="section level3" number="12.5.3">
-<h3><span class="header-section-number">12.5.3</span> other (non-func) peaks (use narrowPeaks file)</h3>
+<div id="other-non-func-peaks-use-narrowpeaks-file" class="section level3" number="13.5.3">
+<h3><span class="header-section-number">13.5.3</span> other (non-func) peaks (use narrowPeaks file)</h3>
 <!--
 
 
