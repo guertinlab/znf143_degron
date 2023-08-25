@@ -1505,6 +1505,8 @@ end = as.numeric(sapply(strsplit(rnge, &quot;-&quot;), &quot;[&quot;, 2)) - 200
 
 write.table(cbind(chr, start, end), file = &quot;ZNF143_functional_peaks.bed&quot;, quote = FALSE,
 col.names =FALSE, row.names=FALSE, sep = &quot;\t&quot;)
+write.table(cbind(chr, start, end, func.znf143.peaks), file = &quot;ZNF143_functional_intensity_peaks.bed&quot;, quote = FALSE,
+col.names =FALSE, row.names=FALSE, sep = &quot;\t&quot;)
 
 
 chr = sapply(strsplit(names(other.znf143.peaks), &quot;:&quot;), &quot;[&quot;, 1)
@@ -1513,6 +1515,8 @@ start = as.numeric(sapply(strsplit(rnge, &quot;-&quot;), &quot;[&quot;, 1)) + 20
 end = as.numeric(sapply(strsplit(rnge, &quot;-&quot;), &quot;[&quot;, 2)) - 200
 
 write.table(cbind(chr, start, end), file = &quot;ZNF143_other_peaks.bed&quot;, quote = FALSE,
+col.names =FALSE, row.names=FALSE, sep = &quot;\t&quot;)
+write.table(cbind(chr, start, end, other.znf143.peaks), file = &quot;ZNF143_other_intensity_peaks.bed&quot;, quote = FALSE,
 col.names =FALSE, row.names=FALSE, sep = &quot;\t&quot;)</code></pre>
 </div>
 <div id="deeptools-heatmap-of-znf143-functional-and-non-functional-peaks-not-done-yet" class="section level1" number="9">
