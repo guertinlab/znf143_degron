@@ -827,6 +827,8 @@ end = as.numeric(sapply(strsplit(rnge, "-"), "[", 2)) - 200
 
 write.table(cbind(chr, start, end), file = "ZNF143_functional_peaks.bed", quote = FALSE,
 col.names =FALSE, row.names=FALSE, sep = "\t")
+write.table(cbind(chr, start, end, func.znf143.peaks), file = "ZNF143_functional_intensity_peaks.bed", quote = FALSE,
+col.names =FALSE, row.names=FALSE, sep = "\t")
 
 
 chr = sapply(strsplit(names(other.znf143.peaks), ":"), "[", 1)
@@ -835,6 +837,8 @@ start =	as.numeric(sapply(strsplit(rnge, "-"), "[", 1)) + 200
 end = as.numeric(sapply(strsplit(rnge, "-"), "[", 2)) - 200
 
 write.table(cbind(chr, start, end), file = "ZNF143_other_peaks.bed", quote = FALSE,
+col.names =FALSE, row.names=FALSE, sep = "\t")
+write.table(cbind(chr, start, end, other.znf143.peaks), file = "ZNF143_other_intensity_peaks.bed", quote = FALSE,
 col.names =FALSE, row.names=FALSE, sep = "\t")
 
 ```
