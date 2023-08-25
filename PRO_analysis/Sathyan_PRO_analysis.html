@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-08-24" />
+<meta name="date" content="2023-08-25" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-08-24</h4>
+<h4 class="date">2023-08-25</h4>
 
 </div>
 
@@ -1886,7 +1886,7 @@ Figure 3: <span class="caption-title">Differential Expression after ZNF143 degra
 <p>Make cumulative bed files of the ChIP quantile peaks starting from the most intense and including each level in the next merged file.</p>
 <pre class="bash"><code>cd /labs/Guertin/ZNF143_ChIP/
 
-cat quantile1.bed quantile0.95.bed &gt; qmerge1.bed
+cat quantile1_summits.bed quantile0.95_summits.bed &gt; qmerge1.bed
 quants=($(seq 0.9 -0.05 0.05))
 newQ=()
 # remove trailing zeroes to match existing file names
@@ -1899,10 +1899,12 @@ done
 for i in {1..18}
 do
     k=${newQ[$((i-1))]} #bash arrays are 0-indexed
-    echo $i
-    echo $k
-    cat qmerge${i}.bed quantile${k}.bed &gt; qmerge$((i+1)).bed
-done</code></pre>
+    #echo $i
+    #echo $k
+    echo &quot;Now merging&quot; qmerge${i}.bed &quot;with&quot; quantile${k}_summits.bed &quot;to create&quot; qmerge$((i+1)).bed 
+    cat qmerge${i}.bed quantile${k}_summits.bed &gt; qmerge$((i+1)).bed
+    wc -l qmerge$((i+1)).bed
+done 2&gt;&amp;1 | tee merging_scheme.txt</code></pre>
 </div>
 <div id="plot-all-cumulative-quantiles-together" class="section level2" number="10.2">
 <h2><span class="header-section-number">10.2</span> Plot all cumulative quantiles together</h2>
@@ -1994,8 +1996,8 @@ for (chip.peak in Sys.glob(file.path(&quot;/labs/Guertin/ZNF143_ChIP/qmerge*bed&
     }
 
 # check that all plotting arguments are correct
-plot_cdf &lt;- function(df.all, tf=&quot;qmerge&quot;, cat = &quot;Repressed&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), line.type = c(1), cex = 1) {
-pdf(paste0(tf, &quot;_ZNF143_cumulative_cdf_&quot;, cat, &quot;.pdf&quot;), width=6.2, height=3.83) 
+function(df.all, tf=&quot;quantile&quot;, cat = &quot;Repressed&quot;, col.lines = c(&quot;#ce228e&quot;, &quot;grey60&quot;, &quot;#2290cf&quot;,&quot;grey90&quot;), line.type = c(1), cex = 1, abline=1) {
+pdf(paste0(tf, &quot;_CDF_&quot;, cat, &quot;.pdf&quot;), width=6.2, height=3.83) 
          print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
          auto.key = list(lines=TRUE, points=FALSE, cex = cex, space=&quot;right&quot;),
          col = col.lines,
@@ -2012,17 +2014,15 @@ pdf(paste0(tf, &quot;_ZNF143_cumulative_cdf_&quot;, cat, &quot;.pdf&quot;), widt
          lty=line.type,
          par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col=&quot;grey85&quot;)),
          panel = function(...) {
-             panel.abline(v= 200, lty =2)
+             panel.abline(v= log(abline, base=10), lty =2) # variable line location
              panel.ecdfplot(...)
          }))
     dev.off()
 }
 
-colorChunks=c(plasma(13)[1:11], brewer.pal(8,&quot;Spectral&quot;))
-
-plot_cdf(df.cdf, tf = &quot;qmerge&quot;, cat = cat, col.lines = c(rep(&quot;grey60&quot;,19),colorChunks), line.type = c(rep(2, 19), rep(1,19)), cex = 0.3)</code></pre>
-<p>[image here, might change colors]
-qmerge_ZNF143_cumulative_cdf_Repressed.pdf</p>
+# I&#39;m making the threshold line forest green to make it easier to see on the plot
+plot_cdf(df.cdf, tf = &quot;qmerge_cumulative&quot;, cat = cat, col.lines = c(rep.int(&quot;grey60&quot;,19), brewer.pal(8,&quot;Spectral&quot;), plasma(13)[1:7], &quot;#154a19&quot;, plasma(13)[9:11]), line.type = c(rep.int(2, 19), rep.int(1,19)), cex = 0.3)</code></pre>
+<p>qmerge_cumulative_CDF_Repressed.pdf</p>
 <p>The threshold is set at the trace for <code>qmerge6</code>, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.</p>
 </div>
 </div>
