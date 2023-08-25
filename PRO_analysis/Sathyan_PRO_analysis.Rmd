@@ -866,7 +866,11 @@ https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro
 # Code for inferring regulatory elements using bidirectional TXN
 
 https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh
+```{r engine='bash', eval=F, echo=TRUE}
 
+awk '{OFS="\t";} {print $1,$2,$6}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.minus.bed
+awk '{OFS="\t";} {print $1,$6,$3}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.plus.bed
+```
 
 
 Analysis:
