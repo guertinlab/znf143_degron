@@ -1264,7 +1264,7 @@ Make cumulative bed files of the ChIP quantile peaks starting from the most inte
 ```{r engine='bash', eval=F, echo=TRUE}
 cd /labs/Guertin/ZNF143_ChIP/
 
-cat quantile1.bed quantile0.95.bed > qmerge1.bed
+cat quantile1_summits.bed quantile0.95_summits.bed > qmerge1.bed
 quants=($(seq 0.9 -0.05 0.05))
 newQ=()
 # remove trailing zeroes to match existing file names
@@ -1277,10 +1277,12 @@ done
 for i in {1..18}
 do
     k=${newQ[$((i-1))]} #bash arrays are 0-indexed
-    echo $i
-    echo $k
-    cat qmerge${i}.bed quantile${k}.bed > qmerge$((i+1)).bed
-done
+    #echo $i
+    #echo $k
+    echo "Now merging" qmerge${i}.bed "with" quantile${k}_summits.bed "to create" qmerge$((i+1)).bed 
+    cat qmerge${i}.bed quantile${k}_summits.bed > qmerge$((i+1)).bed
+    wc -l qmerge$((i+1)).bed
+done 2>&1 | tee merging_scheme.txt
 ```
 
 ## Plot all cumulative quantiles together
@@ -1382,8 +1384,8 @@ for (chip.peak in Sys.glob(file.path("/labs/Guertin/ZNF143_ChIP/qmerge*bed"))) {
     }
 
 # check that all plotting arguments are correct
-plot_cdf <- function(df.all, tf="qmerge", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1) {
-pdf(paste0(tf, "_ZNF143_cumulative_cdf_", cat, ".pdf"), width=6.2, height=3.83) 
+function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1, abline=1) {
+pdf(paste0(tf, "_CDF_", cat, ".pdf"), width=6.2, height=3.83) 
          print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
          auto.key = list(lines=TRUE, points=FALSE, cex = cex, space="right"),
          col = col.lines,
@@ -1400,19 +1402,17 @@ pdf(paste0(tf, "_ZNF143_cumulative_cdf_", cat, ".pdf"), width=6.2, height=3.83)
          lty=line.type,
          par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
          panel = function(...) {
-             panel.abline(v= 200, lty =2)
+             panel.abline(v= log(abline, base=10), lty =2) # variable line location
              panel.ecdfplot(...)
          }))
     dev.off()
 }
 
-colorChunks=c(plasma(13)[1:11], brewer.pal(8,"Spectral"))
-
-plot_cdf(df.cdf, tf = "qmerge", cat = cat, col.lines = c(rep("grey60",19),colorChunks), line.type = c(rep(2, 19), rep(1,19)), cex = 0.3)
+# I'm making the threshold line forest green to make it easier to see on the plot
+plot_cdf(df.cdf, tf = "qmerge_cumulative", cat = cat, col.lines = c(rep.int("grey60",19), brewer.pal(8,"Spectral"), plasma(13)[1:7], "#154a19", plasma(13)[9:11]), line.type = c(rep.int(2, 19), rep.int(1,19)), cex = 0.3)
 ```
 
-[image here, might change colors]
-qmerge_ZNF143_cumulative_cdf_Repressed.pdf
+qmerge_cumulative_CDF_Repressed.pdf
 
 The threshold is set at the trace for `qmerge6`, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.
 
