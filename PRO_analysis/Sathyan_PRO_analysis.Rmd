@@ -1232,9 +1232,21 @@ unique(temp$treatment)
 temp[temp$treatment == "Matched to Activated",]$treatment = "Unchanged"
 temp[temp$treatment == "Matched to Repressed",]$treatment = "Unchanged"
 
+dim(res.deseq[is.na(res.deseq$padj),])
+# [1] 499   6
+otherGenes = res.deseq[!(rownames(res.deseq) %in% rownames(temp)) & !(is.na(res.deseq$padj)),]
+otherGenes$treatment = "Other"
+
+ma.df = rbind(temp,otherGenes)
+dim(ma.df)
+# [1] 12407     7
+
+levelsMA = c("Other","Unchanged","Activated","Repressed")
+ma.df$treatment = factor(ma.df$treatment, levels = levelsMA)
+
 # Adapting this plotting function from the genex course's ATAC-seq vignette
 ma.plot.lattice <- function(ma.df, filename = 'file.name', 
-         title.main = "Differential ATAC-seq Accessibility",
+         title.main = "Differential Expression",
          col = c("grey90",  "grey60", "#ce228e" , "#2290cf"))
   {
   pdf(paste("MA_plot_", filename, ".pdf", sep=''), 
@@ -1250,7 +1262,7 @@ ma.plot.lattice <- function(ma.df, filename = 'file.name',
   dev.off()
   }
 
-ma.plot.lattice(ma.df, filename='ZNF143_dTAG_PRO_v4', title.main="Differential Expression", col=c("#ce228e" ,"#2290cf", "grey90"))
+ma.plot.lattice(ma.df, filename='ZNF143_dTAG_PRO', col=c("grey90","grey30","#ce228e" ,"#2290cf"))
 ```
 
 ```{r  echo=F, fig.align = "center", fig.cap="Differential Expression after ZNF143 degradation"}
