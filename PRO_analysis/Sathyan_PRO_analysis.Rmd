@@ -688,10 +688,10 @@ hist(log(transcript.reads$counts), breaks=200, col="black",xlab="log read count"
 # plot saved as "read_density_count.pdf"
 ```
 
-```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts"}
+<!-- ```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts"}
 library(knitr)
 knitr::include_graphics("./read_count_density.png") 
-```
+``` -->
 
 ```{r engine='R', eval=F, echo=TRUE}
 # pick cut-offs for density and counts by looking at the plots 
@@ -714,10 +714,10 @@ abline(v=cnt.cut, col="red")
 # plot saved as "read_density_count_cutoff.pdf"
 ```
 
-```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts cutoff for defining expressed genes"}
+<!-- ```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts cutoff for defining expressed genes"}
 #library(knitr)
 knitr::include_graphics("./read_density_count_cutoff.png") 
-```
+``` -->
 
 ```{r engine='R', eval=F, echo=TRUE}
 # remove genes below cutoffs ("unexpressed")
@@ -1312,10 +1312,10 @@ ma.plot.lattice <- function(ma.df, filename = 'file.name',
 ma.plot.lattice(ma.df, filename='ZNF143_dTAG_PRO_230913', col=c("grey90","grey30","grey30", "#ce228e" ,"#2290cf"))
 ```
 
-```{r  echo=F, fig.align = "center", fig.cap="Differential Expression after ZNF143 degradation"}
+<!-- ```{r  echo=F, fig.align = "center", fig.cap="Differential Expression after ZNF143 degradation"}
 #library(knitr) # only need to do this for the first image in the vignette
 knitr::include_graphics("./MA_plot_ZNF143_dTAG_PRO.png") 
-```
+``` -->
 
 Create a BED of all genes from DESeq categorized according to activated, matched to activated, repressed, matched to repressed, and other:
 ```{r engine='R', eval=F, echo=TRUE}
