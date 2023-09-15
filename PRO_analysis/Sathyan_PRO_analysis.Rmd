@@ -574,13 +574,48 @@ library(bigWig)
 source("TSSinference.R")
 # prepare annotation file
 gene.exon1 = parse.bed.exon1("gencode.hg38.v42.basic.firstExon.latest.filtered.bed")
+
 # assign bigWig variables
+# IMPORTANT: because these are PE2, switch the plus and minus bigWigs!
 # These two are the ones with control + experimental merged
 bw.plus='HEK_CloneZD29_30min_plus_PE2_scaled.bigWig'
 bw.minus='HEK_CloneZD29_30min_minus_PE2_scaled.bigWig'
 
-# run TSSinference for primary TSSs with filtering by up/downstream density (reports one TSS per gene)
-potential.tss2 = TSSinference(gene.exon1, bw.plus, bw.minus, densityFilter=TRUE)
+# run TSSinference and select primary TSSs based on height (read count)
+potential.tss2 = TSSinference(gene.exon1, bw.minus, bw.plus, densityFilter=FALSE)
+flipTSS = potential.tss2[!is.na(potential.tss2$height),]
+flipTSS.sort = flipTSS[order(flipTSS$chrom, flipTSS$start),]
+flipTSS.sort = flipTSS.sort[!(flipTSS.sort$chrom == "chrM"),]
+flipTSSmaxH = do.call(rbind, lapply( split(flipTSS.sort, as.factor(flipTSS.sort$gene)), function(x) {return(x[which.max(x$height),])}))
+
+write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = "flipTSSmaxH.bed", quote = FALSE, sep ='\t', row.names = FALSE, col.names = FALSE)
+```
+
+After checking TSS locations on the genome browser, ABCB1's assigned TSS turned out to be a pileup of adapters that slipped through the previous adapter removal processes, possibly due to part of the sequence being improperly called during the sequencing process.
+
+Reassigning the "problem TSS":
+These coordinates were chosen manually by selecting the read peak closest to the annotated version of ABCB1 in the genome browser that had an appreciable peak. 
+
+```{r engine='R', eval=F, echo=TRUE}
+# to identify the problem row
+flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]
+#       chrom    start      end  gene  misc strand   height         up     down
+# ABCB1  chr7 87628641 87628642 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
+
+flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]$start = 87600883
+flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]$end = 87600884
+# the height and up/down densities are wrong but the position is the important thing here
+
+#check
+flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]
+#       chrom    start      end  gene  misc strand   height         up     down
+# ABCB1  chr7 87600883 87600884 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
+
+# new as of 09-13-23
+save(flipTSSmaxH, file="flipTSSmaxH.Rdata")
+
+write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = "flipTSSmaxH.bed", quote = FALSE, sep ='\t', row.names = FALSE, col.names = FALSE)
+
 ```
 
 
@@ -736,7 +771,7 @@ inferred.coords = get.TTS(bed=bed.for.tts.eval, tss=  filtered.id.overlaps,
 
 final.coords = inferred.coords$bed		
 
-write.table(final.coords, file = "HEK_ZNF143_gene_annotations.bed",
+write.table(final.coords, file = "HEK_ZNF143_gene_annotations_new_infCoords.bed",
 sep = "\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 ```
 
@@ -875,7 +910,7 @@ awk '{OFS="\t";} {print $1,$6,$3}' ZNF143_total.dREG.peak.full.bed > ZNF143_tota
 
 Analysis:
 ```{r engine='R', eval=F, echo=TRUE}
-inferred.coords=read.table('HEK_ZNF143_gene_annotations.bed', sep="\t", header =FALSE)
+inferred.coords=read.table('HEK_ZNF143_gene_annotations_new_infCoords.bed', sep="\t", header =FALSE)
 
 # use unnormalized bigWigs
 counts.df = abs(get.raw.counts.interval(inferred.coords, "/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/seqOutBias_bw", file.prefix = "H"))
@@ -945,11 +980,9 @@ for (i in levels(sample.conditions)[-1]) {
   df.x = rbind(df.x, unchanged)
   df.x = rbind(df.x, repressed)
 }
-
-
 ```
 
-Create CDFs (reference code from genex course)
+## Create CDFs (reference code from genex course)
 
 Set up functions and packages:
 ```{r engine='R', eval=F, echo=TRUE}
@@ -1013,28 +1046,27 @@ source('https://raw.githubusercontent.com/guertinlab/genex/main/ChIP_analysis/cd
 #   return(z)
 # }
 
-# version of cdf.deseq.df used:
-cdf.deseq.df <- function(genes = gene.file, chip.peaks = chip.peaks, cat = "Repressed") {
+# makes input dataframe for plotting function
+cdf.deseq.df <- function(genes = gene.file, chip.peaks = chip.peaks, cat = "Repressed", opt.str="") {
   bed.tss.activated = get.tss(genes[genes$V5 == cat,])
   bed.tss.unchanged = get.tss(genes[genes$V5 == paste0("Matched to ", cat),])
-  # I used the long way to call closestBed because of how I installed bedtools
-  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = 'closest -D a')
-  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = 'closest -D a')
+  
+  # note 'functionstring' in bedTools.closest
+  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
+  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
 
-  df.up.can = cbind(act.distance[,c(4, 10)], cat)
-  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0("Matched to ", cat))
+  df.up.can = cbind(act.distance[,c(4, 10)], paste0(opt.str,cat))
+  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0(opt.str,"Matched to ", cat))
 
   colnames(df.up.can) = c(colnames(df.up.can)[1:2], 'status')
   colnames(df.un.can) = c(colnames(df.up.can)[1:2], 'status')
 
   df.all = rbind(df.up.can, df.un.can)
-  df.all$status = factor(df.all$status, levels = c(cat, paste0("Matched to ", cat)))
+  df.all$status = factor(df.all$status, levels = c(paste0(opt.str,cat), paste0(opt.str,"Matched to ", cat)))
   return(df.all)
 }
 
-col.lines = c("#FF0000", "grey60")
-
-bedTools.closest <- function(functionstring="/home/FCAM/jdong/software/bedtools",bed1,bed2,opt.string="") {
+bedTools.closest <- function(functionstring="/usr/local/bin/bedtools2-2.31.0/bin/closestBed",bed1,bed2,opt.string="") {
   
   options(scipen =99) # not to use scientific notation when writing out
   
@@ -1050,7 +1082,8 @@ bedTools.closest <- function(functionstring="/home/FCAM/jdong/software/bedtools"
   cat(command2,"\n")
   try(system(command2))
   
-  command=paste(functionstring, opt.string,"-a",'a.file.sorted.bed',"-b",'b.file.sorted.bed',">",'out.file.bed',sep=" ")
+  # use opt.string argument to add options for closestBed
+  command=paste(functionstring,opt.string,"-a",'a.file.sorted.bed',"-b",'b.file.sorted.bed',">",'out.file.bed',sep=" ")
   cat(command,"\n")
   try(system(command))
   
@@ -1064,17 +1097,17 @@ bedTools.closest <- function(functionstring="/home/FCAM/jdong/software/bedtools"
   return(res)
 }
 
-# I also adjusted plot_cdf to reposition the key
-plot_cdf <- function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1, abline=0) {
-pdf(paste0(tf, "_cdf_", cat, ".pdf"), width=6.2, height=3.83) 
+# plotting function
+plot_cdf <- function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1, abline=1) {
+pdf(paste0(tf, "_CDF_", cat, ".pdf"), width=6.2, height=3.83) 
          print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
-         auto.key = list(lines=TRUE, points=FALSE, cex = cex, space="right"),
+         auto.key = list(lines=TRUE, points=FALSE, cex = cex),
          col = col.lines,
          aspect = 1,
                                         #xlim = c(0, 50000),
          scales=list(relation="free",alternating=c(1,1,1,1)),
          ylab = 'Cumulative Distribution Function',
-         xlab = expression('log'[10]~'ZNF143 Distance from TSS'),
+         xlab = expression('log'[10]~'ZNF143 inferred binding site distance from TSS'),
                                         #index.cond = list(c(2,1)),
          between=list(y=1.0),
          type = 'a',
@@ -1090,78 +1123,92 @@ pdf(paste0(tf, "_cdf_", cat, ".pdf"), width=6.2, height=3.83)
 }
 ```
 
-Create CDF for repressed genes
+One last important setup step!! Concatenate the `treated*bed` files into one file. This will be how you get the TSSs, according to each category.
 
-```{r engine='R', eval=F, echo=TRUE}
-gene.file=read.table(file = "HEK_ZNF143_gene_annotations.bed", sep="\t", header=FALSE)
-cat = "Repressed"
-
-# make a CDF plot for each quantile
-for (chip.peak in Sys.glob(file.path("/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/ChIP/quantile*summits.bed"))) {
-    print(chip.peak)
-    quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-    print(quantile.name)
-    df.all = cdf.deseq.df(genes = gene.file, chip.peaks=read.table(chip.peak, header=FALSE), cat = cat)
-    plot_cdf(df.all, tf = quantile.name, cat = cat)
-    }
-
-df.cdf.quant.summits.rep = data.frame(matrix(nrow = 0, ncol = 3))   
-colnames(df.cdf.quant.summits.rep) = c("V4", "dis", "status")
-
-for (chip.peak in Sys.glob(file.path("/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/ChIP/quantile*summits.bed"))) {
-    print(chip.peak)
-    quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-    print(quantile.name)
-    df.all = cdf.deseq.df(genes = gene.file,
-        chip.peaks=read.table(chip.peak, header=FALSE),
-        cat = "Repressed")
-    x = paste(as.character(df.all[,3]), quantile.name)
-    df.all[,3] = x
-    df.cdf.quant.summits.rep = rbind(df.cdf.quant.summits.rep, df.all)
-    }
-
-# had to use "rep.int" instead of "rep" because "rep" got overwritten by one of the sourced functions
-plot_cdf(df.cdf.quant.summits.rep, tf = "ZNF143_summit_quantiles_all", cat = "Repressed", col.lines = c(rep.int("grey60",20),colorRampPalette(c("red","pink"))(13),colorRampPalette(c("blue", "light blue"))(7)), line.type = c(rep.int(2, 20), rep.int(1,20)), cex = 0.25)
+```{r engine='bash', eval=F, echo=TRUE}
+# in ./ZNF143dTAG_diffExp/
+cat treated* > HEK_ZNF143dTag_merged_treated_diffExp.bed
 ```
 
-ZNF143_summit_quantiles_all_cdf_Repressed.pdf (to png)
-
-Create CDF for activated genes
-
+Create a CDF of activated, repressed, and matched genes:
 ```{r engine='R', eval=F, echo=TRUE}
-cat = "Activated"
+# Get bed with diff exp labeling, gene names, and gene coordinates
+gene.file=read.table(file = "./ZNF143dTAG_diffExp/HEK_ZNF143dTag_merged_treated_diffExp.bed", sep="\t", header=FALSE)
+dim(gene.file)
+# [1] 1080    6
+unique(gene.file$V5)
+# [1] "Activated"            "Matched to Activated" "Repressed"            "Matched to Repressed"
 
-for (chip.peak in Sys.glob(file.path("/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/ChIP/quantile*summits.bed"))) {
-    print(chip.peak)
-    quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-    print(quantile.name)
-    df.all = cdf.deseq.df(genes = gene.file, chip.peaks=read.table(chip.peak, header=FALSE), cat = cat)
-    plot_cdf(df.all, tf = quantile.name, cat = cat)
-    }
+# Get bed of binding sites
+znf143binding = read.table(file = "./ChIP/ZNF143_inferred_binding_final.bed", sep="\t", header=FALSE)
+dim(znf143binding)
+# [1] 2182    7
+head(znf143binding) # V4 is peak intensity, V5 is p(?)-value from MAST
+#     V1      V2      V3      V4       V5 V6 V7
+# 1 chr1  959263  959292 2722.53 2.11e-09  -  1
+# 2 chr1 1116181 1116210 3190.65 2.52e-11  -  1
+# 3 chr1 1375404 1375433 2394.84 2.68e-08  -  1
+# 4 chr1 1399504 1399533 1645.84 2.75e-06  -  1
+# 5 chr1 1407340 1407369 2004.74 3.57e-07  -  1
+# 6 chr1 1615805 1615834 3892.84 9.67e-16  +  1
+unique(znf143binding$V3-znf143binding$V2)
+# [1] 29
 
-df.cdf.quant.summits = data.frame(matrix(nrow = 0, ncol = 3))   
-colnames(df.cdf.quant.summits) = c("V4", "dis", "status")
+# make plottable df for repressed and matches
+rep.df = cdf.deseq.df(genes=gene.file, chip.peaks= znf143binding, cat="Repressed")
+dim(rep.df)
+# [1] 714   3 # correct number because we have 714/2=357 repressed genes
+head(rep.df)
+#       V4  dis    status
+# 1  CENPS -103 Repressed
+# 2   EMC1 -191 Repressed
+# 3  HMGCL    0 Repressed
+# 4  SRRM1    0 Repressed
+# 5  TXLNA  -79 Repressed
+# 6 ZBTB8B -160 Repressed
+unique(rep.df$status)
+# [1] Repressed            Matched to Repressed
+# Levels: Repressed Matched to Repressed
 
-for (chip.peak in Sys.glob(file.path("/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/ChIP/quantile*summits.bed"))) {
-    print(chip.peak)
-    quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-    print(quantile.name)
-    df.all = cdf.deseq.df(genes = gene.file,
-        chip.peaks=read.table(chip.peak, header=FALSE),
-        cat = "Activated")
-    x = paste(as.character(df.all[,3]), quantile.name)
-    df.all[,3] = x
-    df.cdf.quant.summits = rbind(df.cdf.quant.summits, df.all)
-    }
+# make plottable df for activated and matches
+act.df = cdf.deseq.df(genes=gene.file, chip.peaks= znf143binding, cat="Activated")
+dim(act.df)
+# [1] 366   3 # we have 366/2=183 activated genes
+head(act.df)
+#        V4     dis    status
+# 1     ID3 -132234 Activated
+# 2 ATP5IF1   23173 Activated
+# 3  TRIM62 -156544 Activated
+# 4    PPCS  389891 Activated
+# 5    TOE1     258 Activated
+# 6     IPP   63428 Activated
+unique(act.df$status)
+# [1] Activated            Matched to Activated
+# Levels: Activated Matched to Activated
 
-levels = levels(factor(df.cdf.quant.summits$status))
-levels = c(levels[grepl("Matched", levels)], levels[!grepl("Matched", levels)])
-df.cdf.quant.summits$status = factor(df.cdf.quant.summits$status, levels = levels)
+# merge rep/act and plot
+plot.df = rbind(rep.df, act.df)
 
-# had to use "rep.int" instead of "rep" because "rep" got overwritten by one of the sourced functions
-plot_cdf(df.cdf.quant.summits, tf = "ZNF143_summit_quantiles_all", cat = "Activated", col.lines = c(rep.int("grey60",20),colorRampPalette(c("red","pink"))(20)), line.type = c(rep.int(2, 20), rep.int(1,20)), cex = 0.25)
+length(unique(plot.df$V4))
+[1] 1001
+> dim(plot.df)
+[1] 1080    3
+length(unique(rep.df$V4))
+[1] 714
+> length(unique(act.df$V4))
+[1] 366
+# This suggests that there are some matched genes that are matches for both repressed and activated genes?
+
+plot_cdf(plot.df, tf = "ZNF143_binding_vs_TSS", col.lines = c("#2290cf", "grey60", "#ce228e","grey90"), cat = "diffExp", line.type = c(1), cex = 0.75)
+
+#now with a line to separate genes that are "far" vs "near" 
+plot_cdf(plot.df, tf = "ZNF143_binding_vs_TSS", col.lines = c("#2290cf", "grey60", "#ce228e","grey90"), cat = "diffExp_440", line.type = c(1), cex = 0.75, abline=440)
+
+# save items for easier replotting later
+save(rep.df, file="rep.df.Rdata")
+save(act.df, file="act.df.Rdata")
+save(plot.df, file="ZNF143_diffExp_binding_distance_TSS.Rdata")
 ```
-ZNF143_summit_quantiles_all_cdf_Activated.pdf (to png)
 
 ```{r engine='R', eval=F, echo=TRUE}
 # old stuff:
@@ -1229,20 +1276,20 @@ set for repressed).
 # use df.x from DESeq above
 temp = df.x
 unique(temp$treatment)
-temp[temp$treatment == "Matched to Activated",]$treatment = "Unchanged"
-temp[temp$treatment == "Matched to Repressed",]$treatment = "Unchanged"
 
 dim(res.deseq[is.na(res.deseq$padj),])
-# [1] 499   6
+# [1] 240   6
 otherGenes = res.deseq[!(rownames(res.deseq) %in% rownames(temp)) & !(is.na(res.deseq$padj)),]
 otherGenes$treatment = "Other"
 
 ma.df = rbind(temp,otherGenes)
 dim(ma.df)
-# [1] 12407     7
+# [1] 12172     7
 
-levelsMA = c("Other","Unchanged","Activated","Repressed")
+levelsMA = c("Other","Matched to Activated", "Matched to Repressed","Activated","Repressed")
 ma.df$treatment = factor(ma.df$treatment, levels = levelsMA)
+
+save(ma.df,file="ZNF143dTag_PRO_DESeq_genes_categorized.Rdata",header=TRUE)
 
 # Adapting this plotting function from the genex course's ATAC-seq vignette
 ma.plot.lattice <- function(ma.df, filename = 'file.name', 
@@ -1262,12 +1309,25 @@ ma.plot.lattice <- function(ma.df, filename = 'file.name',
   dev.off()
   }
 
-ma.plot.lattice(ma.df, filename='ZNF143_dTAG_PRO', col=c("grey90","grey30","#ce228e" ,"#2290cf"))
+ma.plot.lattice(ma.df, filename='ZNF143_dTAG_PRO_230913', col=c("grey90","grey30","grey30", "#ce228e" ,"#2290cf"))
 ```
 
 ```{r  echo=F, fig.align = "center", fig.cap="Differential Expression after ZNF143 degradation"}
 #library(knitr) # only need to do this for the first image in the vignette
 knitr::include_graphics("./MA_plot_ZNF143_dTAG_PRO.png") 
+```
+
+Create a BED of all genes from DESeq categorized according to activated, matched to activated, repressed, matched to repressed, and other:
+```{r engine='R', eval=F, echo=TRUE}
+deseqGenes = tighten_summit_window(ma.df)
+dim(deseqGenes)
+# [1] 12172     4
+
+deseqGenesInfo = cbind(deseqGenes, ma.df)
+dim(deseqGenesInfo)
+# [1] 12172    11
+
+write.table(deseqGenesInfo,file="ZNF143dTag_PRO_DESeq_genes_categorized.bed",quote = FALSE, sep ='\t', row.names = FALSE, col.names = TRUE)
 ```
 
 # Determining threshold for "functional" ChIP peaks
@@ -1432,14 +1492,143 @@ qmerge_cumulative_CDF_Repressed.pdf
 
 The threshold is set at the trace for `qmerge6`, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.
 
+# Features of Repressed Genes
+
+How many repressed genes are "far" i.e. >440 distance from a ZNF143 binding site?
+```{r engine='R', eval=F, echo=TRUE}
+repFar = rep.df[(abs(rep.df$dis) > 440) & (rep.df$status == "Repressed"), ]
+dim(repFar)
+[1] 42  3
+42/357 = 0.12 # 12% 
+```
+
+What are the features of these genes? (from DESeq)
+```{r engine='R', eval=F, echo=TRUE}
+# massive DESeq results table: deseqGenesInfo, aka "ZNF143dTag_PRO_DESeq_genes_categorized.bed"
+
+repFarInfo = deseqGenesInfo[deseqGenesInfo$gene %in% repFar$V4,]
+dim(repFarInfo)
+# [1] 42 11
+unique(repFarInfo$treatment)
+# [1] Repressed
+
+# The gene order is different so before cbinding I need to sort them somehow
+identical(repFar[order(repFar$V4),"V4"], repFarInfo[order(repFarInfo$gene),"gene"])
+# [1] TRUE
+repFar = repFar[order(repFar$V4),]
+repFarInfo = repFarInfo[order(repFarInfo$gene),]
+identical(repFar$V4,repFarInfo$gene)
+# [1] TRUE
+
+# Add distance to deseq table
+repFarInfo$dis = repFar$dis
+
+# Get stats: gene length, mean expression, log fold change
+repFarInfo$geneLength = repFarInfo$end - repFarInfo$start
+mean(repFarInfo$geneLength)
+# [1] 63715.67
+range(repFarInfo$geneLength)
+# [1]   6209 546739
+
+mean(repFarInfo$baseMean)
+# [1] 1260.029
+range(repFarInfo$baseMean)
+# [1]  126.8172 8766.4077
+
+mean(repFarInfo$log2FoldChange)
+# [1] -0.3695827
+range(repFarInfo$log2FoldChange)
+# [1] -1.7049706 -0.1391026
+
+save(repFarInfo, file="repFarInfo.Rdata")
+```
+
+Do the same for the genes "near" ZNF143 binding sites:
+How many are there?
+```{r engine='R', eval=F, echo=TRUE}
+repNear = rep.df[(abs(rep.df$dis) <= 440) & (rep.df$status == "Repressed"), ]
+dim(repNear)
+#[1] 315   3 
+315/357 = 0.88 # 88% are considered "near" 
+```
+
+What are their features?
+```{r engine='R', eval=F, echo=TRUE}
+repNearInfo = deseqGenesInfo[deseqGenesInfo$gene %in% repNear$V4,]
+dim(repNearInfo)
+# [1] 315  11
+unique(repNearInfo$treatment)
+# [1] Repressed
+
+# Again sort by gene name before combining distance to ZNF143 binding site to rest of DESeq results
+identical(repNear[order(repNear$V4),"V4"], repNearInfo[order(repNearInfo$gene),"gene"])
+# [1] TRUE
+repNear = repNear[order(repNear$V4),]
+repNearInfo = repNearInfo[order(repNearInfo$gene),]
+identical(repNear$V4,repNearInfo$gene)
+# [1] TRUE
+
+# Add distance to deseq table
+repNearInfo$dis = repNear$dis
+
+# Get stats: gene length, mean expression, log fold change
+repNearInfo$geneLength = repNearInfo$end - repNearInfo$start
+mean(repNearInfo$geneLength)
+# [1] 50206.47
+range(repNearInfo$geneLength)
+# [1]   5124 333659
+
+mean(repNearInfo$baseMean)
+# [1] 1322.995 
+range(repNearInfo$baseMean)
+# [1]    74.26092 11485.49980
+
+mean(repNearInfo$log2FoldChange)
+# [1] -0.3408784
+range(repNearInfo$log2FoldChange)
+# [1] -1.2069426 -0.1181158
+
+save(repNearInfo, file="repNearInfo.Rdata")
+```
+
+[make barchart of results]
 
 
+# Picking SP ChIP antibodies
 
+Which SP transcription factors are expressed in our HEK cells?
 
+```{r engine='R', eval=F, echo=TRUE}
+hek.sp = counts.df[grepl("_SP[0-9]$",rownames(counts.df)),]
+# 6 SPs: 1,2,3,4,8,9
+save(hek.sp,file="HEK_ZD29_SP_counts.Rdata")
+```
 
+Manually calculate FPKM for one SP from one sample:
+```{r engine='R', eval=F, echo=TRUE}
+# total counts per sample
+sum(counts.df$HEK_CloneZD29_30min_control_rep1)
+# [1] 14779516
+sum(counts.df$HEK_CloneZD29_30min_control_rep2)
+# [1] 14500393
+sum(counts.df$HEK_CloneZD29_30min_control_rep3)
+# [1] 14053817
+sum(counts.df$HEK_CloneZD29_30min_control_rep4)
+# [1] 14735850
 
+# FPKM for SP1 in first control replicate
+14779516/1000000 # divide total reads by 1 mill (scaling factor)
+# [1] 14.77952
+1285/14.77952 # divide counts for SP1 by scale factor
+# [1] 86.94464 # this is FPM: fragments per million
+53380187-53420344 # gene length
+# [1] -40157
+86.94464/40 # divide FPM by gene length in kilobases
+# [1] 2.173616 
 
+```
 
+[] Confirm total read counts
 
 
 
