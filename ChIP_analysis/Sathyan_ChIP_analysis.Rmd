@@ -1009,7 +1009,7 @@ source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/se
 library(ggseqlogo)
 
 pswm.func.2 <- function(x.ligation, out = 'outfilename') {
-  col.matrix <- matrix(unlist(strsplit(as.character(x.ligation), '')), ncol = 42, byrow = TRUE)
+  col.matrix <- matrix(unlist(strsplit(as.character(x.ligation), '')), ncol = 29, byrow = TRUE)
   
   a.nuc <- colSums(col.matrix == "A")
   t.nuc <- colSums(col.matrix == "T")
@@ -1031,7 +1031,7 @@ pswm.func.2 <- function(x.ligation, out = 'outfilename') {
     "A 0.30000 C 0.20000 G 0.20000 T 0.30000", 
     paste("MOTIF", out), 
     " ", 
-    "letter-probability matrix: alength= 4 w= 42"
+    "letter-probability matrix: alength= 4 w= 29"
   ), outfile)
   
   write.table(pswm, file = paste0(out, '.txt'), append = TRUE, quote = FALSE, row.names = FALSE, col.names = FALSE)
