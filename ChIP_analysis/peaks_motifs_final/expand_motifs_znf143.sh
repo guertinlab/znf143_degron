@@ -75,3 +75,19 @@ without_motifs_12345.bed
 slopBed -b 100 -i without_motifs_12345.bed -g $sizes > without_motifs_12345_300wide.bed
 
 # next make the composite and query back
+cat expanded_mast_ZNF143_motif_in_peaks_round1.bed expanded_mast_ZNF143_motif_in_peaks_round2_RC.bed expanded_mast_ZNF143_PSWM_in_peaks_round3.bed expanded_mast_ZNF143_PSWM_in_peaks_round4.bed expanded_mast_ZNF143_PSWM_in_peaks_round5.bed > inferred_mast_ZNF143_PSWM_in_peaks_29mer.bed
+
+fastaFromBed -s -fi $genome -bed inferred_mast_ZNF143_PSWM_in_peaks_29mer.bed > inferred_mast_ZNF143_PSWM_in_peaks_29mer.fasta
+
+#go to R and HTML vignette
+slopBed -b 100 -i over40peakIntens_ZNF143peaksChIP_101window.bed -g $sizes > over40peakIntens_ZNF143peaksChIP_301window.bed
+fastaFromBed -s -fi $genome -bed over40peakIntens_ZNF143peaksChIP_301window.bed > over40peakIntens_ZNF143peaksChIP_301window.fasta
+
+mast -mt 0.1 -hit_list -best ZNF143.txt over40peakIntens_ZNF143peaksChIP_301window.fasta > inferred_ZNF143peaks_301window.txt
+Rscript /Users/guertinlab/rscripts/parse_mast_to_coordinates.R inferred_ZNF143peaks_301window.txt
+
+
+#back from R
+intersectBed -wa -wb -a over40peakIntens_ZNF143peaksChIP_301window.bed -b inferred_ZNF143peaks_301window.bed > peaks_motifs_final.txt
+
+
