@@ -13,7 +13,6 @@ intersectBed -v -a over40peakIntens_ZNF143peaksChIP_101window.bed -b motifs_in_r
 
 fastaFromBed -fi $genome -bed without_motifs_12.bed -fo without_motifs_12.fasta
 
-
 meme -oc ZNF143_no_12.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 10 -maxw 20 -revcomp -dna -markov_order 3 -maxsize 100000000 without_motifs_12.fasta
 tomtom -no-ssc -oc motif3.tomtom_output -verbosity 1 -min-overlap 5 -dist ed -evalue -eps -thresh 5.0 ZNF143_no_12.meme_output/meme.txt ZNF143_final_PSWM.txt
 
@@ -43,41 +42,35 @@ awk '{OFS="\t";} {if($6 == "+") print $1,$2-15,$3,$4,$5,$6; else print $1,$2-1,$
 fastaFromBed -s -fi $genome -bed expanded_mast_ZNF143_PSWM_in_peaks_round4.bed > expanded_mast_ZNF143_PSWM_in_peaks_round4.fasta
 
 #round 5
-intersectBed -v -a without_motifs_123.bed -b expanded_mast_ZNF143_PSWM_in_peaks_round4.bed > without_motifs_1234.bed
-slopBed -b 70 -i without_motifs_1234.bed -g $sizes > without_motifs_1234_wide.bed
-fastaFromBed -fi $genome -bed without_motifs_1234_wide.bed -fo without_motifs_1234_wide.fasta
-#meme -oc ZNF143_no_1234.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 5 -maxw 20 -revcomp -dna -markov_order 3 -maxsize 100000000 without_motifs_1234_wide.fasta
+intersectBed -wa -a without_motifs_123_wide.bed -b expanded_mast_ZNF143_PSWM_in_peaks_round4.bed > peaks_with_motif4.bed
+intersectBed -v -a without_motifs_123.bed -b peaks_with_motif4.bed > without_motifs_1234.bed
 
-streme -oc ZNF143_no_1234.streme_output --nmotifs 1 --p without_motifs_1234_wide.fasta
-mast -mt 0.0005 -hit_list -best ZNF143_no_1234.streme_output/streme.txt without_motifs_1234_wide.fasta > mast_ZNF143_PSWM_in_peaks_round5.txt
+slopBed -b 100 -i without_motifs_1234.bed -g $sizes > without_motifs_1234_wide.bed
+fastaFromBed -fi $genome -bed without_motifs_1234_wide.bed -fo without_motifs_1234_wide.fasta
+
+#this replaces the central 70 bases with 50 Ns. the number of N is not important, as long as it is greater than the max motif width
+awk '!/^>/ { mid = int(length($0) / 2); $0 = substr($0, 1, mid - 35) "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" substr($0, mid + 36); } 1' without_motifs_1234_wide.fasta > without_motifs_1234_wide_NNN.fasta
+meme -oc ZNF143_no_1234.meme_output -nmotifs 1 -objfun classic -csites 20000 -searchsize 0 -minw 5 -maxw 20 -revcomp -dna -markov_order 3 -maxsize 100000000 without_motifs_1234_wide_NNN.fasta
+meme-get-motif -id CRRDGCATTVTGGGWA ZNF143_no_1234.meme_output/meme.txt > motif5_pswm.txt
+ceqlogo -i motif5_pswm.txt -m CRRDGCATTVTGGGWA -o round5_motif.eps
+mast -mt 0.0005 -hit_list -best motif5_pswm.txt without_motifs_1234_wide.fasta > mast_ZNF143_PSWM_in_peaks_round5.txt
 Rscript /Users/guertinlab/rscripts/parse_mast_to_coordinates.R mast_ZNF143_PSWM_in_peaks_round5.txt
-tr '+-' '-+' < mast_ZNF143_PSWM_in_peaks_round5.bed > mast_ZNF143_PSWM_in_peaks_round5_rc.bed
-fastaFromBed -s -fi $genome -bed mast_ZNF143_PSWM_in_peaks_round5_rc.bed -fo mast_ZNF143_PSWM_in_peaks_round5.fasta
-awk '{OFS="\t";} {if($6 == "+") print $1,$2-9,$3+10,$4,$5,$6; else print $1,$2-11,$3+8,$4,$5,$6}' mast_ZNF143_PSWM_in_peaks_round5_rc.bed > expanded_mast_ZNF143_PSWM_in_peaks_round5_rc.bed
-fastaFromBed -s -fi $genome -bed expanded_mast_ZNF143_PSWM_in_peaks_round5_rc.bed > expanded_mast_ZNF143_PSWM_in_peaks_round5_rc.fasta
+fastaFromBed -s -fi $genome -bed mast_ZNF143_PSWM_in_peaks_round5.bed -fo mast_ZNF143_PSWM_in_peaks_round5.fasta
+awk '{OFS="\t";} {if($6 == "+") print $1,$2-5,$3+9,$4,$5,$6; else print $1,$2-10,$3+4,$4,$5,$6}' mast_ZNF143_PSWM_in_peaks_round5.bed  > expanded_mast_ZNF143_PSWM_in_peaks_round5.bed
+fastaFromBed -s -fi $genome -bed expanded_mast_ZNF143_PSWM_in_peaks_round5.bed > expanded_mast_ZNF143_PSWM_in_peaks_round5.fasta
 
 #round 6
-intersectBed -v -a without_motifs_1234.bed -b expanded_mast_ZNF143_PSWM_in_peaks_round5_rc.bed > without_motifs_12345.bed
-#slopBed -b -30 -i without_motifs_12345.bed -g $sizes > without_motifs_12345_narrow.bed
-fastaFromBed -fi $genome -bed without_motifs_12345.bed -fo without_motifs_12345.fasta
-streme -oc ZNF143_no_12345.streme_output --nmotifs 2 --p without_motifs_12345.fasta
-meme-get-motif -id 2-CACTTCCGGGG -rc ZNF143_no_12345.streme_output/streme.txt > motif6_pswm.txt
-ceqlogo -i motif6_pswm.txt -m  2-CACTTCCGGGG -o round6_motif.eps
-tomtom -no-ssc -oc motif6.tomtom_output -verbosity 1 -min-overlap 5 -dist ed -evalue -eps -thresh 1.0 motif6_pswm.txt ZNF143_final_PSWM.txt
-mast -mt 0.0005 -hit_list -best motif6_pswm.txt without_motifs_12345.fasta > mast_ZNF143_PSWM_in_peaks_round6.txt
-Rscript /Users/guertinlab/rscripts/parse_mast_to_coordinates.R mast_ZNF143_PSWM_in_peaks_round6.txt
-fastaFromBed -s -fi $genome -bed mast_ZNF143_PSWM_in_peaks_round6.bed -fo mast_ZNF143_PSWM_in_peaks_round6.fasta
-awk '{OFS="\t";} {if($6 == "+") print $1,$2-13,$3+6,$4,$5,$6; else print $1,$2-7,$3+12,$4,$5,$6}' mast_ZNF143_PSWM_in_peaks_round6.bed  > expanded_mast_ZNF143_PSWM_in_peaks_round6.bed
-fastaFromBed -s -fi $genome -bed expanded_mast_ZNF143_PSWM_in_peaks_round6.bed > expanded_mast_ZNF143_PSWM_in_peaks_round6.fasta
+intersectBed -wa -a without_motifs_1234_wide.bed -b expanded_mast_ZNF143_PSWM_in_peaks_round5.bed > peaks_with_motif5.bed
+intersectBed -v -a without_motifs_1234.bed -b peaks_with_motif5.bed > without_motifs_12345.bed
 
-#round 7
-intersectBed -v -a without_motifs_12345.bed -b expanded_mast_ZNF143_PSWM_in_peaks_round6.bed > without_motifs_123456.bed
-slopBed -b 100 -i without_motifs_123456.bed -g $sizes > without_motifs_123456_wide.bed
-fastaFromBed -fi $genome -bed without_motifs_123456_wide.bed -fo without_motifs_123456_wide.fasta
-streme -oc ZNF143_no_123456.streme_output --maxw 29 --nmotifs 5 --p without_motifs_123456_wide.fasta
-tomtom -no-ssc -oc motif7.tomtom_output -verbosity 1 -min-overlap 5 -dist ed -evalue -eps -thresh 1.0 ZNF143_no_123456.streme_output/streme.txt ZNF143_final_PSWM.txt
+slopBed -b 50 -i without_motifs_12345.bed -g $sizes > without_motifs_12345_wide.bed
+fastaFromBed -fi $genome -bed without_motifs_12345_wide.bed -fo without_motifs_12345_wide.fasta
+awk '!/^>/ { mid = int(length($0) / 2); $0 = substr($0, 1, mid - 25) "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" substr($0, mid + 26); } 1' without_motifs_12345_wide.fasta > without_motifs_12345_wide_NNN.fasta
+meme -oc ZNF143_no_12345.meme_output -nmotifs 4 -objfun classic -csites 20000 -searchsize 0 -minw 5 -maxw 20 -revcomp -dna -markov_order 3 -maxsize 100000000 without_motifs_12345_wide_NNN.fasta
+streme -oc ZNF143_no_12345.streme_output --maxw 29 --nmotifs 10 --p without_motifs_12345_wide_NNN.fasta
 
-meme-get-motif -id 4-RACTACAHTTCCCAGMAKSCHH -rc ZNF143_no_123456.streme_output/streme.txt > motif7_pswm.txt
-ceqlogo -i motif7_pswm.txt -m 4-RACTACAHTTCCCAGMAKSCHH -o round7_motif.eps
-mast -mt 0.0005 -hit_list -best motif7_pswm.txt without_motifs_123456_wide.fasta > mast_ZNF143_PSWM_in_peaks_round7.txt
-Rscript /Users/guertinlab/rscripts/parse_mast_to_coordinates.R mast_ZNF143_PSWM_in_peaks_round7.txt
+
+#make note of who these are and we want to see if the queried composite motif scores are also really low or not central:
+without_motifs_12345.bed
+
+
