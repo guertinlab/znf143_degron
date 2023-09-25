@@ -814,6 +814,124 @@ ZNF143_repAll_above_below_thresh_CDF_Repressed.pdf
 
 ZNF143_aboveThresh_rep_act_CDF_Both.pdf
 
+## correct cdf code
+
+```{r, engine='R', eval=F, echo=T}
+bedTools.closest <- function(functionstring="/usr/local/bin/bedtools2-2.31.0/bin/closestBed",bed1,bed2,opt.string="") {
+  
+  options(scipen =99) # not to use scientific notation when writing out
+  
+  #write bed formatted dataframes to tempfile
+  write.table(bed1,file= 'a.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
+  write.table(bed2,file= 'b.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
+  
+  # create the command string and call the command using system()
+  command1=paste('sort -k1,1 -k2,2n', 'a.file.bed', '> a.file.sorted.bed')
+  cat(command1,"\n")
+  try(system(command1))
+  command2=paste('sort -k1,1 -k2,2n', 'b.file.bed', '> b.file.sorted.bed')
+  cat(command2,"\n")
+  try(system(command2))
+  
+  # use opt.string argument to add options for closestBed
+  command=paste(functionstring,opt.string,"-a",'a.file.sorted.bed',"-b",'b.file.sorted.bed',">",'out.file.bed',sep=" ")
+  cat(command,"\n")
+  try(system(command))
+  
+  res=read.table('out.file.bed',sep ="\t", header=F, comment.char='')
+  
+  command3=paste('rm', 'a.file.bed', 'b.file.bed', 'a.file.sorted.bed', 'b.file.sorted.bed', 'out.file.bed')
+  cat(command3,"\n")
+  try(system(command3))
+  
+  colnames(res) = c(colnames(bed1), colnames(bed2), 'dis' )
+  return(res)
+}
+
+# makes input dataframe for plotting function
+cdf.deseq.df <- function(genes = gene.file, chip.peaks = chip.peaks, cat = "Repressed", opt.str="") {
+  bed.tss.activated = get.tss(genes[genes$V5 == cat,])
+  bed.tss.unchanged = get.tss(genes[genes$V5 == paste0("Matched to ", cat),])
+  
+  # note 'functionstring' in bedTools.closest
+  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
+  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
+
+  df.up.can = cbind(act.distance[,c(4, 10)], paste0(opt.str,cat))
+  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0(opt.str,"Matched to ", cat))
+
+  colnames(df.up.can) = c(colnames(df.up.can)[1:2], 'status')
+  colnames(df.un.can) = c(colnames(df.up.can)[1:2], 'status')
+
+  df.all = rbind(df.up.can, df.un.can)
+  df.all$status = factor(df.all$status, levels = c(paste0(opt.str,cat), paste0(opt.str,"Matched to ", cat)))
+  return(df.all)
+}
+
+# plotting function
+plot_cdf <- function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1, abline=1) {
+pdf(paste0(tf, "_CDF_", cat, ".pdf"), width=6.2, height=3.83) 
+         print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
+         auto.key = list(lines=TRUE, points=FALSE, cex = cex),
+         col = col.lines,
+         aspect = 1,
+                                        #xlim = c(0, 50000),
+         scales=list(relation="free",alternating=c(1,1,1,1)),
+         ylab = 'Cumulative Distribution Function',
+         xlab = expression('log'[10]~'ZNF143 inferred binding site distance from TSS'),
+                                        #index.cond = list(c(2,1)),
+         between=list(y=1.0),
+         type = 'a',
+         xlim = c(0,8),
+         lwd=2,
+         lty=line.type,
+         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
+         panel = function(...) {
+             panel.abline(v= log(abline, base=10), lty =2) # variable line location
+             panel.ecdfplot(...)
+         }))
+    dev.off()
+}
+
+gene.file=read.table(file = "./ZNF143dTAG_diffExp/treated_and_matched_genes_merged.bed", sep="\t", header=FALSE)
+
+znf143binding = read.table(file = "/Users/jinhongdong/znf143_degron/ChIP_analysis/peaks_motifs_final/inferred_ZNF143_motifs_w_chip_intensity.bed", sep="\t", header=FALSE)
+
+dim(znf143binding)
+[1] 3772    6
+head(znf143binding)
+    V1       V2       V3               V4       V5 V6
+1 chr1  1116268  1116296 0.00000000000746 3437.724  +
+2 chr1  6613620  6613648 0.00000000000130 2676.739  -
+3 chr1 10472584 10472612 0.00000000048900 2219.421  +
+4 chr1 25998220 25998248 0.00000000612000 3401.978  -
+5 chr1 33472617 33472645 0.00000000026400 3064.417  -
+
+unique(znf143binding$V3-znf143binding$V2)
+# 28
+
+rep.df = cdf.deseq.df(genes=gene.file, chip.peaks= znf143binding, cat="Repressed")
+act.df = cdf.deseq.df(genes=gene.file, chip.peaks= znf143binding, cat="Activated")
+plot.df = rbind(rep.df, act.df)
+
+# Get distance when number of repressed genes increases at same rate as matched genes
+match = ecdf(abs(plot.df$dis)[plot.df$status == 'Matched to Repressed'])
+rep = ecdf(abs(plot.df$dis)[plot.df$status == 'Repressed'])
+match.y = seq(0, 20000, by=20) # creating indices
+rep.y = seq(0, 20000, by=20)
+
+spl = smooth.spline(rep.y, rep(rep.y) - match(match.y))
+pred = predict(spl)
+pred1 = predict(spl, deriv=1)
+
+print('the distance that CDFs are parallel or converge')
+print(rep.y[min(which(pred1$y<=0)) - 1])
+[1] 440 
+
+# add abline at 440 distance (technically log10 of) and plot CDF 
+plot_cdf(plot.df, tf = "ZNF143_binding_vs_TSS", col.lines = c("#2290cf", "grey60", "#ce228e","grey90"), cat = "diffExp", line.type = c(1), cex = 0.75, abline=440)
+```
+
 
 # Motif analysis of other and functional ZNF143 peaks
 
