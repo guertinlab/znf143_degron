@@ -1171,10 +1171,10 @@ ceqlogo -i ZNF143.txt -m ZNF143 -o ZNF143_combined.eps
 
 ```{r  out.width = "50%", out.height = "50%", echo=F, fig.align = "center", fig.cap="combined ZNF143 seqLogo"}
 library(knitr)
-knitr::include_graphics("ZNF143_combined.png") 
+knitr::include_graphics("ZNF143_combined_final.png") 
 ```
 
-ZNF143_combined_2023-08-24.png
+ZNF143_combined_final.png
 
 ## Trimming PSWM
 
