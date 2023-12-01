@@ -1259,9 +1259,6 @@ do
 done
 ```
 
-```{r engine='bash', eval=F, echo=TRUE}
-
-```
 
 Remove adapters.
 
@@ -1365,6 +1362,47 @@ do
 done
 ```
 
+seqOutBias preparation: since this is a new read size (40) compared to what 
+I analyzed before, re-run seqOutBias seqtable to create the necessary files for running 
+seqOutBias in parallel. I ran tallymer on its own first, but running seqtable directly
+will also include tallymer if it wasn't run yet.
+
+
+```{r engine='bash', eval=F, echo=TRUE}
+#! /usr/bin/bash
+
+#SBATCH --job-name=sOB_seqtable_40     # name for job
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 2                  
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=40G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+export TMPDIR=/scratch/jhdtemp/tmp
+cd /scratch/jhdtemp/sOB_tallymer
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
+genome=/home/FCAM/jdong/human38/hg38.fa
+read_size=40
+tallymerFile=/scratch/jhdtemp/sOB_tallymer/hg38.tal_${read_size}.gtTxt.gz
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+
+seqOutBias seqtable $genome --tallymer=$tallymerFile --read-size=40
+```
+
+
+```{r engine='bash', eval=F, echo=TRUE}
+
+```
 
 
 <!--
