@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-12-01" />
+<meta name="date" content="2024-01-09" />
 
 <title>ChIP-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">ChIP-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-12-01</h4>
+<h4 class="date">2024-01-09</h4>
 
 </div>
 
@@ -758,7 +758,12 @@ function toggle_visibility(id1) {
 <li><a href="#other-non-func-peaks-use-narrowpeaks-file" id="toc-other-non-func-peaks-use-narrowpeaks-file"><span class="toc-section-number">12.5.3</span> other (non-func) peaks (use narrowPeaks file)</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#sp1-chip-to-look-for-redistribution-of-sp1-peaks-after-znf143-degradation" id="toc-sp1-chip-to-look-for-redistribution-of-sp1-peaks-after-znf143-degradation"><span class="toc-section-number">13</span> SP1 ChIP to look for redistribution of SP1 peaks after ZNF143 degradation</a></li>
+<li><a href="#sp1-chip-to-look-for-redistribution-of-sp1-peaks-after-znf143-degradation" id="toc-sp1-chip-to-look-for-redistribution-of-sp1-peaks-after-znf143-degradation"><span class="toc-section-number">13</span> SP1 ChIP to look for redistribution of SP1 peaks after ZNF143 degradation</a>
+<ul>
+<li><a href="#adapter-removal-and-alignment-to-hg38" id="toc-adapter-removal-and-alignment-to-hg38"><span class="toc-section-number">13.1</span> Adapter removal and alignment to hg38</a></li>
+<li><a href="#bigwig-normalization" id="toc-bigwig-normalization"><span class="toc-section-number">13.2</span> bigWig Normalization</a></li>
+<li><a href="#call-peaks-from-all-bam-files" id="toc-call-peaks-from-all-bam-files"><span class="toc-section-number">13.3</span> Call peaks from all BAM files</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -1912,7 +1917,8 @@ do
     cat ${name}*L00*_R1*gz &gt; ${name}_PE1.fastq.gz
     cat ${name}*L00*_R2*gz &gt; ${name}_PE2.fastq.gz    
 done</code></pre>
-<p>Remove adapters.</p>
+<div id="adapter-removal-and-alignment-to-hg38" class="section level2" number="13.1">
+<h2><span class="header-section-number">13.1</span> Adapter removal and alignment to hg38</h2>
 <pre class="bash"><code>#! /usr/bin/bash
 
 #SBATCH --job-name=ZdSP1chip_cutadapt
@@ -2034,7 +2040,164 @@ module load ucsc_genome/2012.05.22
 module load rust
 
 seqOutBias seqtable $genome --tallymer=$tallymerFile --read-size=40</code></pre>
-<pre class="bash"><code></code></pre>
+<p>Now we generate unscaled bigWigs using seqOutBias.</p>
+<p>Template script for seqOutBias step (SP1ChIP_seqOB_template.sh):</p>
+<pre class="bash"><code>#! /usr/bin/bash
+
+#SBATCH --job-name=SP1chIP_seqOB2_XXXXXXX     # name for job
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 1                  
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=24G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+export TMPDIR=/scratch/jhdtemp/tmp
+echo &quot;Current wd:&quot; $(pwd)
+echo &quot;Current node:&quot; $(hostname)
+
+name=XXXXXXX
+read_size=40
+seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
+tallymerFile=/scratch/jhdtemp/sOB_tallymer/hg38.tal_${read_size}.gtTxt.gz
+tableFile=/scratch/jhdtemp/sOB_tallymer/hg38_${read_size}.4.2.2.tbl
+module load samtools/1.16.1
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+module load bowtie2
+module load bedtools
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+genome=/home/FCAM/jdong/human38/hg38.fa
+
+echo &quot;Begin seqOutBias&quot;
+seqOutBias scale ${tableFile} ${name}.hg38.bam --tallymer=$tallymerFile --table=$tableFile --shift-counts --no-scale --bw=${name}.seqOut.bigWig --read-size=${read_size} 2&gt;&amp;1 | tee ${name}_seqOutBias.log
+echo &quot;End seqOutBias&quot;</code></pre>
+<p>Create individual scripts and submit:</p>
+<pre class="bash"><code>file=SP1chIP_seqOB_template.sh
+
+for i in *_PE1.fastq 
+do
+    nm=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_PE1.fastq&quot; &#39;{print $1}&#39;)
+    echo $nm
+    sed -e &quot;s/XXXXXXX/${nm}/g&quot; &quot;$file&quot; &gt; SP1chIP_seqOB_${nm}.sh
+    sleep 1
+done
+
+# manually check if substitutions worked, then submit all
+for i in SP1chIP_seqOB_*rep*.sh
+do
+    echo $i
+    sbatch $i
+done</code></pre>
+</div>
+<div id="bigwig-normalization" class="section level2" number="13.2">
+<h2><span class="header-section-number">13.2</span> bigWig Normalization</h2>
+<p>We normalize each replicate on its own using a scale factor determined by the read depth, and then merge all the replicates for a condition together and divide by the number of replicates to obtain a final normalized bigWig for viewing on the UCSC Genome Browser.</p>
+<p>Template script for individual replicate normalization:</p>
+<pre class="bash"><code>#! /usr/bin/bash
+
+#SBATCH --job-name=normByRep_XXXXXXX.sh
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 8               
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=12G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.err
+
+export TMPDIR=/scratch/jhdtemp/tmp
+echo &quot;Current wd:&quot; $(pwd)
+echo &quot;Current node:&quot; $(hostname)
+
+name=XXXXXXX
+read_size=40
+module load samtools/1.16.1
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+module load bowtie2
+module load bedtools
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+genome=/home/FCAM/jdong/human38/hg38.fa
+genome_index=/home/FCAM/jdong/human38/hg38
+ncore=8
+
+samtools sort -@ $ncore -n -o ${name}.sorted.bam ${name}.hg38.bam
+bedtools bamtobed -i ${name}.sorted.bam -bedpe &gt; ${name}_bed12.bed
+awk &#39;$1==$4 {print $0}&#39; ${name}_bed12.bed | awk &#39;{OFS=&quot;\t&quot;;} {print $1, $2, $6}&#39; | awk &#39;$1!=&quot;.&quot; &amp;&amp; $3&gt;$2 &amp;&amp; (($3 - $2)&lt;2000) {print $0}&#39; | sort -k1,1 -k2,2n &gt; ${name}_read_span.bed
+genomeCoverageBed -bg -i ${name}_read_span.bed -g $sizes &gt; ${name}.bedGraph
+
+echo &quot;Generate normalized bedGraphs and bigWigs&quot;
+depth=`awk -F&#39;\t&#39; &#39;{sum+=$5;}END{print sum;}&#39; ${name}.hg38_not_scaled.bed` # this bed file is from seqOutBias 
+scaled=$(bc &lt;&lt;&lt; &quot;scale=3 ; 10000000 / $depth&quot;) #scale: number of decimal points in result
+echo $scaled
+awk -v scaled=&quot;$scaled&quot; &#39;{OFS=&quot;\t&quot;;} {print $1, $2, $3, $4*scaled}&#39; ${name}.bedGraph &gt; ${name}_normalized.bedGraph
+wigToBigWig -clip ${name}_normalized.bedGraph $sizes ${name}_normalized.bigWig</code></pre>
+<p>Generate individual scripts and submit:</p>
+<pre class="bash"><code>file=normByRep_template.sh
+
+for i in *_PE1.fastq 
+do
+    nm=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_PE1.fastq&quot; &#39;{print $1}&#39;)
+    echo $nm
+    sed -e &quot;s/XXXXXXX/${nm}/g&quot; &quot;$file&quot; &gt; normByRep_${nm}.sh
+    sleep 1
+done
+
+# manually check if substitutions worked, then submit all
+for i in normByRep_*rep*.sh
+do
+    echo $i
+    sbatch $i
+done</code></pre>
+<p>Merged (one per condition) SP1 ChIP bigWigs can be viewed at this browser session: <a href="https://genome.ucsc.edu/s/jhdong/ZNF688_SPredist">https://genome.ucsc.edu/s/jhdong/ZNF688_SPredist</a>. The tracks are also included in the Guertin lab track hub for ZNF143, which can be connected to any UCSC browser session via this url:
+<a href="http://guertinlab.cam.uchc.edu/znf143_hub/hub.txt">http://guertinlab.cam.uchc.edu/znf143_hub/hub.txt</a>.</p>
+</div>
+<div id="call-peaks-from-all-bam-files" class="section level2" number="13.3">
+<h2><span class="header-section-number">13.3</span> Call peaks from all BAM files</h2>
+<p>We are using both the control and ZNF143-dTAG samples of the SP1 ChIP to call peaks, and using the mock IP samples as background reference.</p>
+<pre class="bash"><code>#! /usr/bin/bash
+
+#SBATCH --job-name=SP1_peakCall
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 1                  
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=24G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+export TMPDIR=/scratch/jhdtemp/tmp
+echo &quot;Current wd:&quot; $(pwd)
+echo &quot;Current node:&quot; $(hostname)
+
+module load macs3
+
+mkdir temp_macs
+macs3 callpeak --call-summits -t antiSP1*hg38.bam -c mock*hg38.bam -n antiSP1_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs</code></pre>
+<p>Remove peaks that align to contigs or mitochondrial DNA.</p>
+<pre class="bash"><code>module load bedtools
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+
+i=antiSP1_ChIP_summits.bed
+name=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_summits.bed&quot; &#39;{print $1}&#39;)
+echo $name
+grep -v &quot;random&quot; ${name}_summits.bed | grep -v &quot;chrUn&quot; | grep -v &quot;chrEBV&quot; | grep -v &quot;chrM&quot; | grep -v &quot;alt&quot; &gt; ${name}_summits_final.bed
+slopBed -b 50 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n &gt; ${name}_summit_100window.bed
+slopBed -b 200 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n &gt; ${name}_summit_400window.bed
+</code></pre>
+<p>SP1:
+- 128050 peaks before
+- 126275 peaks after (1775 peaks removed)</p>
 <!--
 
 
@@ -2594,6 +2757,7 @@ all.SF[19:21] = norm.degronpeaks.SF[4:6]
 names(all.SF) = colnames(all.regions)
 
 -->
+</div>
 </div>
 
 
