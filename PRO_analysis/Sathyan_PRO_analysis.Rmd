@@ -572,7 +572,7 @@ grep 'transcript_type "protein_coding"' gencode.v42.basic.annotation.gtf | \
 
 ```
 
-# Re-annotating transcription units after manual curation
+## Re-annotating transcription units after manual curation
 
 After an initial round of transcription unit (TU) calling with TSSinference and primaryTranscriptAnnotation, we identified differentially expressed genes with DESeq2 (same methods as below) and looked at TU calls for all of the down genes in the UCSC genome browser to verify that all TSSs had been identified for each gene. We noticed some gene annotations were missing true TSSs, so they were adjusted to match the data. These are the gene annotations that were adjusted, along with accompanying browser sessions:
 
@@ -653,54 +653,85 @@ The following code represents what was done with the latest gene annotations aft
 
 # TSSInference
 
+## Control-called TSSs 
+
+For differential gene expresion analysis, call TSSs from the control data only.
+
 ```{r engine='R', eval=F, echo=TRUE}
 library(bigWig)
 # source TSSinference functions
 source("TSSinference.R")
-# prepare annotation file
-gene.exon1 = parse.bed.exon1("gencode.hg38.v42.basic.firstExon.latest.filtered.bed")
+# load gene annotation file
+gene.exon1 = parse.bed.exon1("gencode_exon1_parsed_updated.bed")
 
 # assign bigWig variables
 # IMPORTANT: because these are PE2, switch the plus and minus bigWigs!
 # These two are the ones with control + experimental merged
-bw.plus='HEK_CloneZD29_30min_plus_PE2_scaled.bigWig'
-bw.minus='HEK_CloneZD29_30min_minus_PE2_scaled.bigWig'
+bw.plus='HEK_CloneZD29_30min_control_minus_PE2_scaled.bigWig'
+bw.minus='HEK_CloneZD29_30min_control_plus_PE2_scaled.bigWig'
 
-# run TSSinference and select primary TSSs based on height (read count)
-potential.tss2 = TSSinference(gene.exon1, bw.minus, bw.plus, densityFilter=FALSE)
-flipTSS = potential.tss2[!is.na(potential.tss2$height),]
-flipTSS.sort = flipTSS[order(flipTSS$chrom, flipTSS$start),]
-flipTSS.sort = flipTSS.sort[!(flipTSS.sort$chrom == "chrM"),]
-flipTSSmaxH = do.call(rbind, lapply( split(flipTSS.sort, as.factor(flipTSS.sort$gene)), function(x) {return(x[which.max(x$height),])}))
+colnames(gene.exon1) = c("chrom","start","end","gene","misc","strand")
+controlTSSall = TSSinference(gene.exon1, bw.plus, bw.minus,low.limit.tss.factor = 1, densityFilter = FALSE)
 
-write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = "flipTSSmaxH.bed", quote = FALSE, sep ='\t', row.names = FALSE, col.names = FALSE)
+# get maximum TSSs for all genes
+temp = controlTSSall[!is.na(controlTSSall$height),]
+temp2 = temp[!(temp$chrom == "chrM"),]
+controlTSSmaxH = do.call(rbind, lapply(split(temp2, as.factor(temp2$gene)), function(x) {return(x[which.max(x$height),])}))
+dim(controlTSSmaxH) # 15586 genes
 ```
 
 After checking TSS locations on the genome browser, ABCB1's assigned TSS turned out to be a pileup of adapters that slipped through the previous adapter removal processes, possibly due to part of the sequence being improperly called during the sequencing process.
 
 Reassigning the "problem TSS":
-These coordinates were chosen manually by selecting the read peak closest to the annotated version of ABCB1 in the genome browser that had an appreciable peak. 
+These coordinates were chosen manually by selecting the read peak closest to the annotated version of ABCB1 in the genome browser that had an appreciable peak.
 
 ```{r engine='R', eval=F, echo=TRUE}
+controlTSSmaxH[grepl("ABCB1",controlTSSmaxH$gene) & grepl("chr7",controlTSSmaxH$chrom),]$start = 87600883
+controlTSSmaxH[grepl("ABCB1",controlTSSmaxH$gene) & grepl("chr7",controlTSSmaxH$chrom),]$end = 87600884
+
+# run TSSinference and select primary TSSs based on height (read count)
+# potential.tss2 = TSSinference(gene.exon1, bw.minus, bw.plus, densityFilter=FALSE)
+# flipTSS = potential.tss2[!is.na(potential.tss2$height),]
+# flipTSS.sort = flipTSS[order(flipTSS$chrom, flipTSS$start),]
+# flipTSS.sort = flipTSS.sort[!(flipTSS.sort$chrom == "chrM"),]
+# flipTSSmaxH = do.call(rbind, lapply( split(flipTSS.sort, as.factor(flipTSS.sort$gene)), function(x) {return(x[which.max(x$height),])}))
+
+# write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = "flipTSSmaxH.bed", quote = FALSE, sep ='\t', row.names = FALSE, col.names = FALSE)
+
 # to identify the problem row
-flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]
-#       chrom    start      end  gene  misc strand   height         up     down
-# ABCB1  chr7 87628641 87628642 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
+# flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]
+# #       chrom    start      end  gene  misc strand   height         up     down
+# # ABCB1  chr7 87628641 87628642 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
 
-flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]$start = 87600883
-flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]$end = 87600884
-# the height and up/down densities are wrong but the position is the important thing here
+# flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]$start = 87600883
+# flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]$end = 87600884
+# # the height and up/down densities are wrong but the position is the important thing here
 
-#check
-flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]
-#       chrom    start      end  gene  misc strand   height         up     down
-# ABCB1  chr7 87600883 87600884 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
+# #check
+# flipTSSmaxH[grepl("ABCB1",flipTSSmaxH$gene) & grepl("chr7",flipTSSmaxH$chrom),]
+# #       chrom    start      end  gene  misc strand   height         up     down
+# # ABCB1  chr7 87600883 87600884 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
 
-# new as of 09-13-23
-save(flipTSSmaxH, file="flipTSSmaxH.Rdata")
+# # new as of 09-13-23
+# save(flipTSSmaxH, file="flipTSSmaxH.Rdata")
 
-write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = "flipTSSmaxH.bed", quote = FALSE, sep ='\t', row.names = FALSE, col.names = FALSE)
+# write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = "flipTSSmaxH.bed", quote = FALSE, sep ='\t', row.names = FALSE, col.names = FALSE)
 
+```
+
+## dTAG-called TSSs 
+
+For later analysis, also call TSSs from the ZNF143-dTAG-only data.
+
+```{r engine='R', eval=F, echo=TRUE}
+bw.minus='HEK_CloneZD29_30min_dTAGV1_plus_PE2_scaled.bigWig'
+bw.plus='HEK_CloneZD29_30min_dTAGV1_minus_PE2_scaled.bigWig'
+
+dTAGtssAll = TSSinference(gene.exon1, bw.plus, bw.minus, low.limit.tss.factor = 1,densityFilter=FALSE)
+temp = dTAGtssAll[!is.na(dTAGtssAll$height),]
+temp2 = temp[!(temp$chrom == "chrM"),]
+dTAGtssAllmaxH = do.call(rbind, lapply( split(temp2, as.factor(temp2$gene)), function(x) {return(x[which.max(x$height),])}))
+dim(dTAGtssAllmaxH) # [1] 15609     9
 ```
 
 
@@ -731,12 +762,6 @@ source("/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnn
 ```
 
 ```{r engine='R', eval=F, echo=TRUE}
-# set up annotations and variables
-fname = "gencode.v42.firstExon.bed"
-dat0 = read.table(fname,header=F,stringsAsFactors=F) 
-names(dat0) = c('chr', 'start', 'end', 'gene', 'xy', 'strand') 
-dat0 = unique(dat0)
-gencode.firstExon = dat0
 # import data for all transcripts, annotate, and remove duplicate transcripts
 fname = "gencode.v42.transcript.bed"
 dat0 = read.table(fname,header=F,stringsAsFactors=F) 
@@ -748,10 +773,10 @@ chrom.sizes = read.table("/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes",s
 names(chrom.sizes) = c("chr","size")
 
 # load in normalized bigWigs
-plus.file = "HEK_CloneZD29_30min_plus_PE1_scaled.bigWig" 
-minus.file = "HEK_CloneZD29_30min_minus_PE1_scaled.bigWig" 
-bw.plus = load.bigWig(plus.file)
-bw.minus = load.bigWig(minus.file)
+plus.file.pe1 = "HEK_CloneZD29_30min_control_plus_PE1_scaled.bigWig" 
+minus.file.pe1 = "HEK_CloneZD29_30min_control_minus_PE1_scaled.bigWig" 
+bw.plus.pe1 = load.bigWig(plus.file.pe1) 
+bw.minus.pe1 = load.bigWig(minus.file.pe1)
 
 # necessary libraries
 library(NMF)
@@ -763,8 +788,10 @@ library(primaryTranscriptAnnotation)
 
 # for each gene: get largest interval and read counts for annotated transcripts
 largest.interval.bed = get.largest.interval(bed=gencode.transcript)
-transcript.reads = read.count.transcript(bed=gencode.transcript, bw.plus=bw.plus, bw.minus=bw.minus)
+transcript.reads = read.count.transcript(bed=gencode.transcript, bw.plus=bw.plus.pe1, bw.minus=bw.minus.pe1)
+```
 
+```{r engine='R', eval=F, echo=TRUE}
 # set up a graphical space with 1 row and 2 columns
 par(mfrow=c(1,2)) 
 # make plots of the distribution of the logs of read density and read counts across the genes
