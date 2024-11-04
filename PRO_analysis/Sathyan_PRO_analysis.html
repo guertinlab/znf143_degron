@@ -720,27 +720,28 @@ function toggle_visibility(id1) {
 <ul>
 <li><a href="#run-the-previous-chunk-in-parallel-fig-s1" id="toc-run-the-previous-chunk-in-parallel-fig-s1"><span class="toc-section-number">3.1</span> Run the previous chunk in parallel (Fig S1)</a></li>
 </ul></li>
-<li><a href="#input-for-pta" id="toc-input-for-pta"><span class="toc-section-number">4</span> Input for pTA</a></li>
-<li><a href="#input-for-tssinference" id="toc-input-for-tssinference"><span class="toc-section-number">5</span> Input for TSSinference</a>
+<li><a href="#prepare-input-for-pta" id="toc-prepare-input-for-pta"><span class="toc-section-number">4</span> Prepare input for pTA</a></li>
+<li><a href="#prepare-input-for-tssinference" id="toc-prepare-input-for-tssinference"><span class="toc-section-number">5</span> Prepare input for TSSinference</a>
 <ul>
-<li><a href="#annotations" id="toc-annotations"><span class="toc-section-number">5.1</span> Annotations</a></li>
+<li><a href="#get-gene-annotations" id="toc-get-gene-annotations"><span class="toc-section-number">5.1</span> Get gene annotations</a></li>
 </ul></li>
-<li><a href="#tssinference" id="toc-tssinference"><span class="toc-section-number">6</span> TSSInference</a></li>
-<li><a href="#primarytranscriptannotation" id="toc-primarytranscriptannotation"><span class="toc-section-number">7</span> primaryTranscriptAnnotation</a></li>
-<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">8</span> Differential expression analysis</a></li>
-<li><a href="#code-for-making-integrated-ucsc-tracks" id="toc-code-for-making-integrated-ucsc-tracks"><span class="toc-section-number">9</span> Code for making integrated UCSC tracks</a></li>
-<li><a href="#code-for-inferring-regulatory-elements-using-bidirectional-txn" id="toc-code-for-inferring-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</a>
+<li><a href="#re-annotating-transcription-units-after-manual-curation" id="toc-re-annotating-transcription-units-after-manual-curation"><span class="toc-section-number">6</span> Re-annotating transcription units after manual curation</a></li>
+<li><a href="#tssinference" id="toc-tssinference"><span class="toc-section-number">7</span> TSSInference</a></li>
+<li><a href="#primarytranscriptannotation" id="toc-primarytranscriptannotation"><span class="toc-section-number">8</span> primaryTranscriptAnnotation</a></li>
+<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">9</span> Differential expression analysis</a></li>
+<li><a href="#code-for-making-integrated-ucsc-tracks" id="toc-code-for-making-integrated-ucsc-tracks"><span class="toc-section-number">10</span> Code for making integrated UCSC tracks</a></li>
+<li><a href="#code-for-inferring-regulatory-elements-using-bidirectional-txn" id="toc-code-for-inferring-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">11</span> Code for inferring regulatory elements using bidirectional TXN</a>
 <ul>
-<li><a href="#create-cdfs-reference-code-from-genex-course" id="toc-create-cdfs-reference-code-from-genex-course"><span class="toc-section-number">10.1</span> Create CDFs (reference code from genex course)</a></li>
-<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">10.2</span> Plot an MA plot for activated and repressed and unchanged</a></li>
+<li><a href="#create-cdfs-reference-code-from-genex-course" id="toc-create-cdfs-reference-code-from-genex-course"><span class="toc-section-number">11.1</span> Create CDFs (reference code from genex course)</a></li>
+<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">11.2</span> Plot an MA plot for activated and repressed and unchanged</a></li>
 </ul></li>
-<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">11</span> Determining threshold for “functional” ChIP peaks</a>
+<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">12</span> Determining threshold for “functional” ChIP peaks</a>
 <ul>
-<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">11.1</span> Merge quantile beds</a></li>
-<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">11.2</span> Plot all cumulative quantiles together</a></li>
+<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">12.1</span> Merge quantile beds</a></li>
+<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">12.2</span> Plot all cumulative quantiles together</a></li>
 </ul></li>
-<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">12</span> Features of Repressed Genes</a></li>
-<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">13</span> Picking SP ChIP antibodies</a></li>
+<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">13</span> Features of Repressed Genes</a></li>
+<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">14</span> Picking SP ChIP antibodies</a></li>
 </ul>
 </div>
 
@@ -1175,8 +1176,8 @@ plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
 <p>This plot is saved as <code>ZNF143_pro_metrics_depth_final.pdf</code> (Figure S1).</p>
 </div>
 </div>
-<div id="input-for-pta" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Input for pTA</h1>
+<div id="prepare-input-for-pta" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Prepare input for pTA</h1>
 <p>Normalize bigWigs from seqOutBias:</p>
 <pre class="bash"><code>PRO_normalization -c hg38.chrom.sizes</code></pre>
 <p>Then merge bigWigs based on strand (control and experimental conditions together):</p>
@@ -1204,8 +1205,8 @@ rm ${name}_minus${pair}_scaled_sorted.bg
 rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg</code></pre>
 </div>
-<div id="input-for-tssinference" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Input for TSSinference</h1>
+<div id="prepare-input-for-tssinference" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Prepare input for TSSinference</h1>
 <p>This is basically the same as the above, but for PE2 reads instead of PE1.</p>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE2&quot;
@@ -1230,8 +1231,8 @@ rm ${name}_plus${pair}_scaled_sorted.bg
 rm ${name}_minus${pair}_scaled_sorted.bg
 rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg</code></pre>
-<div id="annotations" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Annotations</h2>
+<div id="get-gene-annotations" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Get gene annotations</h2>
 <p>The starting file for filtering these annotations was obtained from the gencode website here: <a href="https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz">https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz</a>, specifically the version of basic annotation which contained reference chromosomes only.</p>
 <pre class="r"><code>gunzip gencode.v42.basic.annotation.gtf.gz
 
@@ -1247,8 +1248,81 @@ grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.anno
     grep -v &quot;\tENSG&quot; &gt; gencode.hg38.v42.basic.firstExon.latest.filtered.bed</code></pre>
 </div>
 </div>
-<div id="tssinference" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> TSSInference</h1>
+<div id="re-annotating-transcription-units-after-manual-curation" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Re-annotating transcription units after manual curation</h1>
+<p>After an initial round of transcription unit (TU) calling with TSSinference and primaryTranscriptAnnotation, we identified differentially expressed genes with DESeq2 (same methods as below) and looked at TU calls for all of the down genes in the UCSC genome browser to verify that all TSSs had been identified for each gene. We noticed some gene annotations were missing true TSSs, so they were adjusted to match the data. These are the gene annotations that were adjusted, along with accompanying browser sessions:</p>
+<p>Plus strand genes:
+- <em>MATR3</em>: TSS should be more upstream because exon1 window missed annotations with more upstream exons. (<a href="https://genome.ucsc.edu/s/jhdong/MATR3_TU" class="uri">https://genome.ucsc.edu/s/jhdong/MATR3_TU</a>)
+- new exon1 start: chr5:139274101
+- delete <em>SRRM</em>: ZNF576 completely overlaps this gene and it’s impossible to tell who’s who (<a href="https://genome.ucsc.edu/s/jhdong/SRRM5_TU" class="uri">https://genome.ucsc.edu/s/jhdong/SRRM5_TU</a>)
+- <em>ZNF382</em>: The TTS looks fine, but most prominent TSS was missed by ~400bp. Update the TSS to the one in the annotation with bidir txn (<a href="https://genome.ucsc.edu/s/jhdong/ZNF382_TSS" class="uri">https://genome.ucsc.edu/s/jhdong/ZNF382_TSS</a>)
+- new exon1 start: chr19:36605313</p>
+<p>Minus strand genes:
+- <em>ATXN7L3</em>: a more prominent TSS is ~224bp upstream, make sure it has bidir txn (<a href="https://genome.ucsc.edu/s/jhdong/ATXN7L3_TU" class="uri">https://genome.ucsc.edu/s/jhdong/ATXN7L3_TU</a>)
+- manually setting exon1 boundary: chr17:44200100
+- delete <em>DQX1</em>: not much bidirectional transcription at current TSS (<a href="https://genome.ucsc.edu/s/jhdong/DQX1_TU" class="uri">https://genome.ucsc.edu/s/jhdong/DQX1_TU</a>)
+- delete <em>NPFF</em>: messy overlapping genes; unsure of where to call TSS or TTS. Doesn’t look like it has a proper transcription unit (<a href="https://genome.ucsc.edu/s/jhdong/NPFF_TU" class="uri">https://genome.ucsc.edu/s/jhdong/NPFF_TU</a>)</p>
+<pre class="r"><code># import original exon1 table
+oldExon1 = read.table(&quot;gencode.hg38.v42.basic.firstExon.latest.filtered.bed&quot;, sep=&quot;\t&quot;, header =FALSE)
+dim(oldExon1)
+# [1] 18930     6
+colnames(oldExon1) = c(&quot;chr&quot;,&quot;start&quot;,&quot;end&quot;,&quot;gene&quot;, &quot;misc&quot;,&quot;strand&quot;)
+
+# import original transcription unit calls 
+oldCoords = read.table(&#39;HEK_ZNF143_infcoords_control_only.bed&#39;, sep=&quot;\t&quot;, header =FALSE)
+dim(oldCoords)
+#[1] 11818     6
+colnames(oldCoords) = c(&quot;chr&quot;,&quot;start&quot;,&quot;end&quot;,&quot;gene&quot;,&quot;misc&quot;,&quot;strand&quot;)
+
+# move MATR3 exon1 start upstream
+oldCoords[grepl(&quot;MATR3&quot;,oldCoords$gene),]
+#       chr     start       end  gene  misc strand
+# 2770 chr5 139293742 139341807 MATR3 89870      +
+oldExon1[grepl(&quot;MATR3&quot;,oldExon1$gene),]
+#       chr     start       end  gene misc strand
+# 9188 chr5 139293722 139293778 MATR3    1      +
+oldExon1[9188,&quot;start&quot;] = 139274101
+oldExon1[grepl(&quot;MATR3&quot;,oldExon1$gene),]
+#       chr     start       end  gene misc strand
+# 9188 chr5 139274101 139293778 MATR3    1      +
+
+# delete SRRM5 and DQX1
+oldExon1[(oldExon1$gene %in% c(&quot;SRRM5&quot;,&quot;DQX1&quot;)),]
+#         chr    start      end  gene misc strand
+# 4469   chr2 74526191 74526231  DQX1    1      -
+# 15528 chr19 43596617 43612088 SRRM5    1      +
+oldExon1 = oldExon1[!(oldExon1$gene %in% c(&quot;SRRM5&quot;,&quot;DQX1&quot;)),]
+
+# move ZNF382 exon1 more upstream to cut off the TSS without bidir txn
+oldExon1[oldExon1$gene == c(&quot;ZNF382&quot;),]
+#         chr    start      end   gene misc strand
+# 18517 chr19 36604817 36608420 ZNF382    1      +
+oldExon1[oldExon1$gene == c(&quot;ZNF382&quot;),&quot;start&quot;] = 36605313
+oldExon1[oldExon1$gene == c(&quot;ZNF382&quot;),]
+#         chr    start      end   gene misc strand
+# 18517 chr19 36605313 36608420 ZNF382    1      +
+
+# move ATXN7L3 TSS to the upstream one with bidir txn
+oldExon1[oldExon1$gene == c(&quot;ATXN7L3&quot;),]
+#        chr    start      end    gene misc strand
+# 1312 chr17 44198070 44199884 ATXN7L3    1      -
+oldExon1[oldExon1$gene == c(&quot;ATXN7L3&quot;),&quot;end&quot;] = 44200100
+oldExon1[oldExon1$gene == c(&quot;ATXN7L3&quot;),]
+#        chr    start      end    gene misc strand
+# 1312 chr17 44198070 44200100 ATXN7L3    1      -
+
+# delete NPFF
+oldExon1[oldExon1$gene == c(&quot;NPFF&quot;),]
+#         chr    start      end gene misc strand
+# 10590 chr12 53507483 53507484 NPFF    1      -
+oldExon1 = oldExon1[!(oldExon1$gene == c(&quot;NPFF&quot;)),]
+
+# export updated exon1 table
+write.table(oldExon1, file=&quot;gencode_exon1_parsed_updated.bed&quot;,sep=&quot;\t&quot;,quote=FALSE,row.names=FALSE,col.names=FALSE)</code></pre>
+<p>The following code represents what was done with the latest gene annotations after the manual curation.</p>
+</div>
+<div id="tssinference" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> TSSInference</h1>
 <pre class="r"><code>library(bigWig)
 # source TSSinference functions
 source(&quot;TSSinference.R&quot;)
@@ -1291,8 +1365,8 @@ save(flipTSSmaxH, file=&quot;flipTSSmaxH.Rdata&quot;)
 
 write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = &quot;flipTSSmaxH.bed&quot;, quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = FALSE)</code></pre>
 </div>
-<div id="primarytranscriptannotation" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> primaryTranscriptAnnotation</h1>
+<div id="primarytranscriptannotation" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> primaryTranscriptAnnotation</h1>
 <p>Prepare specific annotations:</p>
 <pre class="bash"><code>grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
    awk &#39;{if($3==&quot;exon&quot;){print $0}}&#39; | \
@@ -1430,8 +1504,8 @@ final.coords = inferred.coords$bed
 write.table(final.coords, file = &quot;HEK_ZNF143_gene_annotations_new_infCoords.bed&quot;,
 sep = &quot;\t&quot;, row.names=FALSE, col.names=FALSE, quote=FALSE)</code></pre>
 </div>
-<div id="differential-expression-analysis" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> Differential expression analysis</h1>
+<div id="differential-expression-analysis" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Differential expression analysis</h1>
 <p>Setup and get functions:</p>
 <pre class="r"><code>library(bigWig)
 library(lattice)
@@ -1544,13 +1618,13 @@ tighten_summit_window &lt;- function(res.deseq) {
   return(df)
 }</code></pre>
 </div>
-<div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
-<h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
+<div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Code for making integrated UCSC tracks</h1>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh</a>
 <a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh</a></p>
 </div>
-<div id="code-for-inferring-regulatory-elements-using-bidirectional-txn" class="section level1" number="10">
-<h1><span class="header-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</h1>
+<div id="code-for-inferring-regulatory-elements-using-bidirectional-txn" class="section level1" number="11">
+<h1><span class="header-section-number">11</span> Code for inferring regulatory elements using bidirectional TXN</h1>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh</a></p>
 <pre class="bash"><code>
 awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$6}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.minus.bed
@@ -1626,8 +1700,8 @@ for (i in levels(sample.conditions)[-1]) {
   df.x = rbind(df.x, unchanged)
   df.x = rbind(df.x, repressed)
 }</code></pre>
-<div id="create-cdfs-reference-code-from-genex-course" class="section level2" number="10.1">
-<h2><span class="header-section-number">10.1</span> Create CDFs (reference code from genex course)</h2>
+<div id="create-cdfs-reference-code-from-genex-course" class="section level2" number="11.1">
+<h2><span class="header-section-number">11.1</span> Create CDFs (reference code from genex course)</h2>
 <p>Set up functions and packages:</p>
 <pre class="r"><code>library(latticeExtra)
 library(DESeq2)
@@ -1898,8 +1972,8 @@ save(plot.df, file=&quot;ZNF143_diffExp_binding_distance_TSS.Rdata&quot;)</code>
 #   }
 # plot_cdf(df.cdf, tf = &quot;ZNF143&quot;, col.lines = c(rep(&quot;grey60&quot;,20),colorRampPalette(c(&quot;red&quot;,&quot;pink&quot;))(13),colorRampPalette(c(&quot;blue&quot;, &quot;light blue&quot;))(7)), line.type = c(rep(2, 20), rep(1,20)))</code></pre>
 </div>
-<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="10.2">
-<h2><span class="header-section-number">10.2</span> Plot an MA plot for activated and repressed and unchanged</h2>
+<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="11.2">
+<h2><span class="header-section-number">11.2</span> Plot an MA plot for activated and repressed and unchanged</h2>
 <p>Unchanged can be the combine matched genes (match a set for act and a
 set for repressed).</p>
 <pre class="r"><code># use df.x from DESeq above
@@ -1955,10 +2029,10 @@ dim(deseqGenesInfo)
 write.table(deseqGenesInfo,file=&quot;ZNF143dTag_PRO_DESeq_genes_categorized.bed&quot;,quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = TRUE)</code></pre>
 </div>
 </div>
-<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="11">
-<h1><span class="header-section-number">11</span> Determining threshold for “functional” ChIP peaks</h1>
-<div id="merge-quantile-beds" class="section level2" number="11.1">
-<h2><span class="header-section-number">11.1</span> Merge quantile beds</h2>
+<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="12">
+<h1><span class="header-section-number">12</span> Determining threshold for “functional” ChIP peaks</h1>
+<div id="merge-quantile-beds" class="section level2" number="12.1">
+<h2><span class="header-section-number">12.1</span> Merge quantile beds</h2>
 <p>Make cumulative bed files of the ChIP quantile peaks starting from the most intense and including each level in the next merged file.</p>
 <pre class="bash"><code>cd /labs/Guertin/ZNF143_ChIP/
 
@@ -1982,8 +2056,8 @@ do
     wc -l qmerge$((i+1)).bed
 done 2&gt;&amp;1 | tee merging_scheme.txt</code></pre>
 </div>
-<div id="plot-all-cumulative-quantiles-together" class="section level2" number="11.2">
-<h2><span class="header-section-number">11.2</span> Plot all cumulative quantiles together</h2>
+<div id="plot-all-cumulative-quantiles-together" class="section level2" number="12.2">
+<h2><span class="header-section-number">12.2</span> Plot all cumulative quantiles together</h2>
 <p>Note: this takes place in a different directory than the immediately preceding code chunk.</p>
 <pre class="bash"><code>srun --partition=general --qos=general --pty --mem=16G -c 2 bash
 cd /labs/Guertin/ZNF143_PRO
@@ -2102,8 +2176,8 @@ plot_cdf(df.cdf, tf = &quot;qmerge_cumulative&quot;, cat = cat, col.lines = c(re
 <p>The threshold is set at the trace for <code>qmerge6</code>, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.</p>
 </div>
 </div>
-<div id="features-of-repressed-genes" class="section level1" number="12">
-<h1><span class="header-section-number">12</span> Features of Repressed Genes</h1>
+<div id="features-of-repressed-genes" class="section level1" number="13">
+<h1><span class="header-section-number">13</span> Features of Repressed Genes</h1>
 <p>How many repressed genes are “far” i.e. &gt;440 distance from a ZNF143 binding site?</p>
 <pre class="r"><code>repFar = rep.df[(abs(rep.df$dis) &gt; 440) &amp; (rep.df$status == &quot;Repressed&quot;), ]
 dim(repFar)
@@ -2191,8 +2265,8 @@ range(repNearInfo$log2FoldChange)
 save(repNearInfo, file=&quot;repNearInfo.Rdata&quot;)</code></pre>
 <p>[make barchart of results]</p>
 </div>
-<div id="picking-sp-chip-antibodies" class="section level1" number="13">
-<h1><span class="header-section-number">13</span> Picking SP ChIP antibodies</h1>
+<div id="picking-sp-chip-antibodies" class="section level1" number="14">
+<h1><span class="header-section-number">14</span> Picking SP ChIP antibodies</h1>
 <p>Which SP transcription factors are expressed in our HEK cells?</p>
 <pre class="r"><code>hek.sp = counts.df[grepl(&quot;_SP[0-9]$&quot;,rownames(counts.df)),]
 # 6 SPs: 1,2,3,4,8,9
