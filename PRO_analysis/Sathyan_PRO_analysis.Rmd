@@ -655,7 +655,7 @@ The following code represents what was done with the latest gene annotations aft
 
 ## Control-called TSSs 
 
-For differential gene expresion analysis, call TSSs from the control data only.
+For differential gene expression analysis, call TSSs from the control data only.
 
 ```{r engine='R', eval=F, echo=TRUE}
 library(bigWig)
@@ -760,6 +760,8 @@ Download the pTA repository from https://github.com/WarrenDavidAnderson/genomics
 source("/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/gene_ann.R")
 source("/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/map_tu.R")
 ```
+
+Prepare annotation files and data:
 
 ```{r engine='R', eval=F, echo=TRUE}
 # import data for all transcripts, annotate, and remove duplicate transcripts
