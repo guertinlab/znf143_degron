@@ -889,6 +889,10 @@ library(data.table)
 source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R')
 source('https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R')
 
+# Required functions in addition to sourced functions from above:
+
+# Overwrite get.raw.counts.interval in ZNF143_functions.R (just changes the hard-coded file suffixes)
+
 get.raw.counts.interval <- function(df, path.to.bigWig, file.prefix = 'M') {
     vec.names = c()
     inten.df=data.frame(matrix(ncol = 0, nrow = nrow(df)))
@@ -908,6 +912,28 @@ get.raw.counts.interval <- function(df, path.to.bigWig, file.prefix = 'M') {
     r.names = paste(df[,1], ':', df[,2], '-', df[,3],'_', df[,4], sep='')
     row.names(inten.df) = r.names
     return(inten.df)
+}
+
+# run.deseq.list.dds: new function
+run.deseq.list.dds <- function(mat) {
+  sample.conditions = factor(c("untreated","untreated","untreated","untreated","treated","treated","treated","treated"), levels=c("untreated","treated"))        
+  deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
+  colData(deseq.counts.table)$condition<-factor(colData(deseq.counts.table)$sample.conditions, levels=c('untreated','treated'));
+  dds = DESeq(deseq.counts.table);
+  #res = results(dds);
+  #res = res[order(res$padj),];
+  return(dds)
+}
+
+# tighten_summit_window: new function. Needed for categorizing genes
+tighten_summit_window <- function(res.deseq) {
+  chr = sapply(strsplit(rownames(res.deseq), ':'), '[', 1)
+  start = as.numeric(sapply(strsplit(sapply(strsplit(rownames(res.deseq), ':'), '[', 2), "-"), "[", 1))
+  x=sapply(strsplit(sapply(strsplit(rownames(res.deseq), ':'), '[', 2), "-"), "[", 2)
+  end = as.numeric(sapply(strsplit(x, "_"), "[", 1))
+  gene = sapply(strsplit(rownames(res.deseq), "_"), "[", 2)
+  df = cbind.data.frame(chr, start, end, gene)
+  return(df)
 }
 
 plotPCAlattice <- function(df, file = 'PCA_lattice.pdf') {  
@@ -956,61 +982,10 @@ plotPCAlattice <- function(df, file = 'PCA_lattice.pdf') {
                col = colpal))
   dev.off()
 }
-
-
-
-run.deseq.list <- function(mat, untreated = 4, treated=4) {
-  sample.conditions = factor(c(rep("untreated",untreated), rep("treated", treated)), levels=c("untreated","treated")) 
-  deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
-  colData(deseq.counts.table)$condition<-factor(colData(deseq.counts.table)$sample.conditions, levels=c('untreated','treated'));
-  dds = DESeq(deseq.counts.table);
-  res = results(dds);
-  #res = res[order(res$padj),];
-  return(res)
-}
-
-
-run.deseq.list.dds <- function(mat) {
-  sample.conditions = factor(c("untreated","untreated","untreated","untreated","treated","treated","treated","treated"), levels=c("untreated","treated"))        
-  deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
-  colData(deseq.counts.table)$condition<-factor(colData(deseq.counts.table)$sample.conditions, levels=c('untreated','treated'));
-  dds = DESeq(deseq.counts.table);
-  #res = results(dds);
-  #res = res[order(res$padj),];
-  return(dds)
-}
-
-
-tighten_summit_window <- function(res.deseq) {
-  chr = sapply(strsplit(rownames(res.deseq), ':'), '[', 1)
-  start = as.numeric(sapply(strsplit(sapply(strsplit(rownames(res.deseq), ':'), '[', 2), "-"), "[", 1))
-  x=sapply(strsplit(sapply(strsplit(rownames(res.deseq), ':'), '[', 2), "-"), "[", 2)
-  end = as.numeric(sapply(strsplit(x, "_"), "[", 1))
-  gene = sapply(strsplit(rownames(res.deseq), "_"), "[", 2)
-  df = cbind.data.frame(chr, start, end, gene)
-  return(df)
-}
 ```
 
-# Code for making integrated UCSC tracks
+DESeq2 analysis: [START HERE]
 
-https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh
-https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh
-
-
-
-
-# Code for inferring regulatory elements using bidirectional TXN
-
-https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh
-```{r engine='bash', eval=F, echo=TRUE}
-
-awk '{OFS="\t";} {print $1,$2,$6}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.minus.bed
-awk '{OFS="\t";} {print $1,$6,$3}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.plus.bed
-```
-
-
-Analysis:
 ```{r engine='R', eval=F, echo=TRUE}
 inferred.coords=read.table('HEK_ZNF143_gene_annotations_new_infCoords.bed', sep="\t", header =FALSE)
 
@@ -1083,6 +1058,24 @@ for (i in levels(sample.conditions)[-1]) {
   df.x = rbind(df.x, repressed)
 }
 ```
+
+
+# Code for making integrated UCSC tracks
+
+https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh
+https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh
+
+
+# Code for inferring regulatory elements using bidirectional TXN
+
+https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh
+```{r engine='bash', eval=F, echo=TRUE}
+
+awk '{OFS="\t";} {print $1,$2,$6}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.minus.bed
+awk '{OFS="\t";} {print $1,$6,$3}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.plus.bed
+```
+
+
 
 ## Create CDFs (reference code from genex course)
 
@@ -1232,6 +1225,7 @@ One last important setup step!! Concatenate the `treated*bed` files into one fil
 cat treated* > HEK_ZNF143dTag_merged_treated_diffExp.bed
 ```
 
+# CDF [move this section later]
 Create a CDF of activated, repressed, and matched genes:
 ```{r engine='R', eval=F, echo=TRUE}
 # Get bed with diff exp labeling, gene names, and gene coordinates
@@ -1433,7 +1427,7 @@ write.table(deseqGenesInfo,file="ZNF143dTag_PRO_DESeq_genes_categorized.bed",quo
 ```
 
 # Determining threshold for "functional" ChIP peaks
-
+[this has majorly changed]
 
 ## Merge quantile beds
 
