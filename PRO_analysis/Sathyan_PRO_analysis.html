@@ -880,7 +880,7 @@ subtractBed -s -a Homo_sapiens.GRCh38.${release}.bed -b Homo_sapiens.GRCh38.${re
 <div id="confirming-umi-length" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Confirming UMI length</h2>
 <p>This is important for removing adapter steps later. Even if you know this number from your experimental protocol it doesn’t hurt to confirm it in your data. Before doing any tests, subset some reads from any one of your FASTQs so these tests don’t take forever to run. Make sure you are subsetting from a PE1 file!</p>
-<pre class="bash"><code># grab 4 million reads
+<pre class="bash"><code># get 4 million reads
 zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 &gt; Z143_UMI_test.fastq
 
 # do this in an interactive node
@@ -888,7 +888,6 @@ srun --partition=general --qos=general --mem=36G -N 1 -n 1 -c 12 --pty bash</cod
 <p><strong>Interpreting cutadapt output</strong></p>
 <pre class="bash"><code>module load cutadapt
 
-# i think the adapter sequences are the same as last time
 # cutadapt arguments:
 # -m : minimum length
 # -O : [capital letter o] minimum overlap length between adapter and read
@@ -908,7 +907,7 @@ tail Z143_UMI_test_cutadapt.txt
 # 45  37035 0.0 2 34420 2048 567
 # 46  43034 0.0 2 40439 2117 478
 # 47  45296 0.0 2 41996 2565 735</code></pre>
-<p>Counting how many sequences follow the spike in counts (at length 39): UMI length = 8.</p>
+<p>Counting how many sequences follow the spike in counts (at length 39, last column): UMI length = 8.</p>
 <p><strong>Trim and Align</strong></p>
 <p>Another method to confirm UMI length is to trim the PE1 reads from the 5’ end, one base at a time, and see when a spike in alignment rate to the human genome takes place.</p>
 <pre class="bash"><code>module load fastx
@@ -975,10 +974,10 @@ for x in Z143_UMI_test_clipped*.fastq
 </div>
 <div id="pro-alignment-and-parallelization" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> PRO alignment and parallelization:</h1>
-<p>“pro_processing.sh”</p>
+<p>The following code chunk was run as “pro_processing.sh” and generally follows the PEPPRO method (<a href="https://doi.org/10.1186/s13059-021-02349-4" class="uri">https://doi.org/10.1186/s13059-021-02349-4</a>) for PRO-seq processing and quality control assessment.</p>
 <pre class="bash"><code>#! /usr/bin/bash
 
-#SBATCH --job-name=pro_processing_XXXXXXX.sh     # name for job
+#SBATCH --job-name=pro_processing_XXXXXXX.sh
 #SBATCH -N 1                  
 #SBATCH -n 1                 
 #SBATCH -c 24                  
@@ -1173,6 +1172,7 @@ gzip *_PE2_final.fastq</code></pre>
 <pre class="bash"><code>cat *_QC_metrics.txt | awk &#39;!x[$0]++&#39; &gt; project_QC_metrics.txt 
 
 plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
+<p>This plot is saved as <code>ZNF143_pro_metrics_depth_final.pdf</code>.</p>
 </div>
 </div>
 <div id="input-for-pta" class="section level1" number="4">
