@@ -1329,7 +1329,7 @@ write.table(oldExon1, file=&quot;gencode_exon1_parsed_updated.bed&quot;,sep=&quo
 <h1><span class="header-section-number">6</span> TSSInference</h1>
 <div id="control-called-tsss" class="section level2" number="6.1">
 <h2><span class="header-section-number">6.1</span> Control-called TSSs</h2>
-<p>For differential gene expresion analysis, call TSSs from the control data only.</p>
+<p>For differential gene expression analysis, call TSSs from the control data only.</p>
 <pre class="r"><code>library(bigWig)
 # source TSSinference functions
 source(&quot;TSSinference.R&quot;)
@@ -1416,6 +1416,7 @@ grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.anno
 <p>Download the pTA repository from <a href="https://github.com/WarrenDavidAnderson/genomicsRpackage/tree/master" class="uri">https://github.com/WarrenDavidAnderson/genomicsRpackage/tree/master</a> and load pTA functions from source:</p>
 <pre class="bash"><code>source(&quot;/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/gene_ann.R&quot;)
 source(&quot;/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/map_tu.R&quot;)</code></pre>
+<p>Prepare annotation files and data:</p>
 <pre class="r"><code># import data for all transcripts, annotate, and remove duplicate transcripts
 fname = &quot;gencode.v42.transcript.bed&quot;
 dat0 = read.table(fname,header=F,stringsAsFactors=F) 
