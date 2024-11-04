@@ -718,7 +718,7 @@ function toggle_visibility(id1) {
 </ul></li>
 <li><a href="#pro-alignment-and-parallelization" id="toc-pro-alignment-and-parallelization"><span class="toc-section-number">3</span> PRO alignment and parallelization:</a>
 <ul>
-<li><a href="#run-the-previous-chunk-in-parallel" id="toc-run-the-previous-chunk-in-parallel"><span class="toc-section-number">3.1</span> Run the previous chunk in parallel</a></li>
+<li><a href="#run-the-previous-chunk-in-parallel-fig-s1" id="toc-run-the-previous-chunk-in-parallel-fig-s1"><span class="toc-section-number">3.1</span> Run the previous chunk in parallel (Fig S1)</a></li>
 </ul></li>
 <li><a href="#input-for-pta" id="toc-input-for-pta"><span class="toc-section-number">4</span> Input for pTA</a></li>
 <li><a href="#input-for-tssinference" id="toc-input-for-tssinference"><span class="toc-section-number">5</span> Input for TSSinference</a>
@@ -1150,8 +1150,8 @@ rm ${name}.notCombined_1.fastq.gz
 rm ${name}.notCombined_2.fastq.gz
 
 echo &#39;script complete&#39;</code></pre>
-<div id="run-the-previous-chunk-in-parallel" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Run the previous chunk in parallel</h2>
+<div id="run-the-previous-chunk-in-parallel-fig-s1" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Run the previous chunk in parallel (Fig S1)</h2>
 <pre class="bash"><code>
 file=pro_processing.sh
 
@@ -1172,7 +1172,7 @@ gzip *_PE2_final.fastq</code></pre>
 <pre class="bash"><code>cat *_QC_metrics.txt | awk &#39;!x[$0]++&#39; &gt; project_QC_metrics.txt 
 
 plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
-<p>This plot is saved as <code>ZNF143_pro_metrics_depth_final.pdf</code>.</p>
+<p>This plot is saved as <code>ZNF143_pro_metrics_depth_final.pdf</code> (Figure S1).</p>
 </div>
 </div>
 <div id="input-for-pta" class="section level1" number="4">
