@@ -451,7 +451,7 @@ rm ${name}.notCombined_2.fastq.gz
 echo 'script complete'
 ```
 
-## Run the previous chunk in parallel 
+## Run the previous chunk in parallel (Fig S1)
 
 ```{r engine='bash', eval=F, echo=TRUE}
 
@@ -483,7 +483,7 @@ cat *_QC_metrics.txt | awk '!x[$0]++' > project_QC_metrics.txt
 plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO
 ```
 
-This plot is saved as `ZNF143_pro_metrics_depth_final.pdf`.
+This plot is saved as `ZNF143_pro_metrics_depth_final.pdf` (Figure S1).
 
 
 # Input for pTA
