@@ -15,7 +15,13 @@ fontsize: 14pt
 geometry: margin=1in
 ---
 
+# Introduction
+
+This is a vignette accompanying the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.
+
 # PRO-seq analysis
+
+Combine FASTQs for ZNF143-dTAG PRO-seq data from two different sequencing runs:
 ```{r engine='bash', eval=F, echo=TRUE}
 cd /labs/Guertin/ZNF143_PRO
 
@@ -32,6 +38,7 @@ do
 done 
 ```
 
+ Load modules, pre-run seqOutBias, and parse the hg38 annotation file:
 
 ```{r engine='bash', eval=F, echo=TRUE}
 module load bowtie2/2.5.0
