@@ -737,15 +737,18 @@ function toggle_visibility(id1) {
 <li><a href="#code-for-inferring-regulatory-elements-using-bidirectional-txn" id="toc-code-for-inferring-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</a>
 <ul>
 <li><a href="#create-cdfs-reference-code-from-genex-course" id="toc-create-cdfs-reference-code-from-genex-course"><span class="toc-section-number">10.1</span> Create CDFs (reference code from genex course)</a></li>
-<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">10.2</span> Plot an MA plot for activated and repressed and unchanged</a></li>
 </ul></li>
-<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">11</span> Determining threshold for “functional” ChIP peaks</a>
+<li><a href="#cdf-move-this-section-later" id="toc-cdf-move-this-section-later"><span class="toc-section-number">11</span> CDF [move this section later]</a>
 <ul>
-<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">11.1</span> Merge quantile beds</a></li>
-<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">11.2</span> Plot all cumulative quantiles together</a></li>
+<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">11.1</span> Plot an MA plot for activated and repressed and unchanged</a></li>
 </ul></li>
-<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">12</span> Features of Repressed Genes</a></li>
-<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">13</span> Picking SP ChIP antibodies</a></li>
+<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">12</span> Determining threshold for “functional” ChIP peaks</a>
+<ul>
+<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">12.1</span> Merge quantile beds</a></li>
+<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">12.2</span> Plot all cumulative quantiles together</a></li>
+</ul></li>
+<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">13</span> Features of Repressed Genes</a></li>
+<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">14</span> Picking SP ChIP antibodies</a></li>
 </ul>
 </div>
 
@@ -1530,6 +1533,10 @@ library(data.table)
 source(&#39;https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R&#39;)
 source(&#39;https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R&#39;)
 
+# Required functions in addition to sourced functions from above:
+
+# Overwrite get.raw.counts.interval in ZNF143_functions.R (just changes the hard-coded file suffixes)
+
 get.raw.counts.interval &lt;- function(df, path.to.bigWig, file.prefix = &#39;M&#39;) {
     vec.names = c()
     inten.df=data.frame(matrix(ncol = 0, nrow = nrow(df)))
@@ -1549,6 +1556,28 @@ get.raw.counts.interval &lt;- function(df, path.to.bigWig, file.prefix = &#39;M&
     r.names = paste(df[,1], &#39;:&#39;, df[,2], &#39;-&#39;, df[,3],&#39;_&#39;, df[,4], sep=&#39;&#39;)
     row.names(inten.df) = r.names
     return(inten.df)
+}
+
+# run.deseq.list.dds: new function
+run.deseq.list.dds &lt;- function(mat) {
+  sample.conditions = factor(c(&quot;untreated&quot;,&quot;untreated&quot;,&quot;untreated&quot;,&quot;untreated&quot;,&quot;treated&quot;,&quot;treated&quot;,&quot;treated&quot;,&quot;treated&quot;), levels=c(&quot;untreated&quot;,&quot;treated&quot;))        
+  deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
+  colData(deseq.counts.table)$condition&lt;-factor(colData(deseq.counts.table)$sample.conditions, levels=c(&#39;untreated&#39;,&#39;treated&#39;));
+  dds = DESeq(deseq.counts.table);
+  #res = results(dds);
+  #res = res[order(res$padj),];
+  return(dds)
+}
+
+# tighten_summit_window: new function. Needed for categorizing genes
+tighten_summit_window &lt;- function(res.deseq) {
+  chr = sapply(strsplit(rownames(res.deseq), &#39;:&#39;), &#39;[&#39;, 1)
+  start = as.numeric(sapply(strsplit(sapply(strsplit(rownames(res.deseq), &#39;:&#39;), &#39;[&#39;, 2), &quot;-&quot;), &quot;[&quot;, 1))
+  x=sapply(strsplit(sapply(strsplit(rownames(res.deseq), &#39;:&#39;), &#39;[&#39;, 2), &quot;-&quot;), &quot;[&quot;, 2)
+  end = as.numeric(sapply(strsplit(x, &quot;_&quot;), &quot;[&quot;, 1))
+  gene = sapply(strsplit(rownames(res.deseq), &quot;_&quot;), &quot;[&quot;, 2)
+  df = cbind.data.frame(chr, start, end, gene)
+  return(df)
 }
 
 plotPCAlattice &lt;- function(df, file = &#39;PCA_lattice.pdf&#39;) {  
@@ -1596,54 +1625,8 @@ plotPCAlattice &lt;- function(df, file = &#39;PCA_lattice.pdf&#39;) {
                auto.key = TRUE,
                col = colpal))
   dev.off()
-}
-
-
-
-run.deseq.list &lt;- function(mat, untreated = 4, treated=4) {
-  sample.conditions = factor(c(rep(&quot;untreated&quot;,untreated), rep(&quot;treated&quot;, treated)), levels=c(&quot;untreated&quot;,&quot;treated&quot;)) 
-  deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
-  colData(deseq.counts.table)$condition&lt;-factor(colData(deseq.counts.table)$sample.conditions, levels=c(&#39;untreated&#39;,&#39;treated&#39;));
-  dds = DESeq(deseq.counts.table);
-  res = results(dds);
-  #res = res[order(res$padj),];
-  return(res)
-}
-
-
-run.deseq.list.dds &lt;- function(mat) {
-  sample.conditions = factor(c(&quot;untreated&quot;,&quot;untreated&quot;,&quot;untreated&quot;,&quot;untreated&quot;,&quot;treated&quot;,&quot;treated&quot;,&quot;treated&quot;,&quot;treated&quot;), levels=c(&quot;untreated&quot;,&quot;treated&quot;))        
-  deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
-  colData(deseq.counts.table)$condition&lt;-factor(colData(deseq.counts.table)$sample.conditions, levels=c(&#39;untreated&#39;,&#39;treated&#39;));
-  dds = DESeq(deseq.counts.table);
-  #res = results(dds);
-  #res = res[order(res$padj),];
-  return(dds)
-}
-
-
-tighten_summit_window &lt;- function(res.deseq) {
-  chr = sapply(strsplit(rownames(res.deseq), &#39;:&#39;), &#39;[&#39;, 1)
-  start = as.numeric(sapply(strsplit(sapply(strsplit(rownames(res.deseq), &#39;:&#39;), &#39;[&#39;, 2), &quot;-&quot;), &quot;[&quot;, 1))
-  x=sapply(strsplit(sapply(strsplit(rownames(res.deseq), &#39;:&#39;), &#39;[&#39;, 2), &quot;-&quot;), &quot;[&quot;, 2)
-  end = as.numeric(sapply(strsplit(x, &quot;_&quot;), &quot;[&quot;, 1))
-  gene = sapply(strsplit(rownames(res.deseq), &quot;_&quot;), &quot;[&quot;, 2)
-  df = cbind.data.frame(chr, start, end, gene)
-  return(df)
 }</code></pre>
-</div>
-<div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
-<h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
-<p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh</a>
-<a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh</a></p>
-</div>
-<div id="code-for-inferring-regulatory-elements-using-bidirectional-txn" class="section level1" number="10">
-<h1><span class="header-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</h1>
-<p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh</a></p>
-<pre class="bash"><code>
-awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$6}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.minus.bed
-awk &#39;{OFS=&quot;\t&quot;;} {print $1,$6,$3}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.plus.bed</code></pre>
-<p>Analysis:</p>
+<p>DESeq2 analysis: [START HERE]</p>
 <pre class="r"><code>inferred.coords=read.table(&#39;HEK_ZNF143_gene_annotations_new_infCoords.bed&#39;, sep=&quot;\t&quot;, header =FALSE)
 
 # use unnormalized bigWigs
@@ -1714,6 +1697,18 @@ for (i in levels(sample.conditions)[-1]) {
   df.x = rbind(df.x, unchanged)
   df.x = rbind(df.x, repressed)
 }</code></pre>
+</div>
+<div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
+<p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh</a>
+<a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh</a></p>
+</div>
+<div id="code-for-inferring-regulatory-elements-using-bidirectional-txn" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</h1>
+<p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh</a></p>
+<pre class="bash"><code>
+awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$6}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.minus.bed
+awk &#39;{OFS=&quot;\t&quot;;} {print $1,$6,$3}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.plus.bed</code></pre>
 <div id="create-cdfs-reference-code-from-genex-course" class="section level2" number="10.1">
 <h2><span class="header-section-number">10.1</span> Create CDFs (reference code from genex course)</h2>
 <p>Set up functions and packages:</p>
@@ -1855,6 +1850,10 @@ pdf(paste0(tf, &quot;_CDF_&quot;, cat, &quot;.pdf&quot;), width=6.2, height=3.83
 <p>One last important setup step!! Concatenate the <code>treated*bed</code> files into one file. This will be how you get the TSSs, according to each category.</p>
 <pre class="bash"><code># in ./ZNF143dTAG_diffExp/
 cat treated* &gt; HEK_ZNF143dTag_merged_treated_diffExp.bed</code></pre>
+</div>
+</div>
+<div id="cdf-move-this-section-later" class="section level1" number="11">
+<h1><span class="header-section-number">11</span> CDF [move this section later]</h1>
 <p>Create a CDF of activated, repressed, and matched genes:</p>
 <pre class="r"><code># Get bed with diff exp labeling, gene names, and gene coordinates
 gene.file=read.table(file = &quot;./ZNF143dTAG_diffExp/HEK_ZNF143dTag_merged_treated_diffExp.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
@@ -1985,9 +1984,8 @@ save(plot.df, file=&quot;ZNF143_diffExp_binding_distance_TSS.Rdata&quot;)</code>
     
 #   }
 # plot_cdf(df.cdf, tf = &quot;ZNF143&quot;, col.lines = c(rep(&quot;grey60&quot;,20),colorRampPalette(c(&quot;red&quot;,&quot;pink&quot;))(13),colorRampPalette(c(&quot;blue&quot;, &quot;light blue&quot;))(7)), line.type = c(rep(2, 20), rep(1,20)))</code></pre>
-</div>
-<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="10.2">
-<h2><span class="header-section-number">10.2</span> Plot an MA plot for activated and repressed and unchanged</h2>
+<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="11.1">
+<h2><span class="header-section-number">11.1</span> Plot an MA plot for activated and repressed and unchanged</h2>
 <p>Unchanged can be the combine matched genes (match a set for act and a
 set for repressed).</p>
 <pre class="r"><code># use df.x from DESeq above
@@ -2043,10 +2041,11 @@ dim(deseqGenesInfo)
 write.table(deseqGenesInfo,file=&quot;ZNF143dTag_PRO_DESeq_genes_categorized.bed&quot;,quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = TRUE)</code></pre>
 </div>
 </div>
-<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="11">
-<h1><span class="header-section-number">11</span> Determining threshold for “functional” ChIP peaks</h1>
-<div id="merge-quantile-beds" class="section level2" number="11.1">
-<h2><span class="header-section-number">11.1</span> Merge quantile beds</h2>
+<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="12">
+<h1><span class="header-section-number">12</span> Determining threshold for “functional” ChIP peaks</h1>
+<p>[this has majorly changed]</p>
+<div id="merge-quantile-beds" class="section level2" number="12.1">
+<h2><span class="header-section-number">12.1</span> Merge quantile beds</h2>
 <p>Make cumulative bed files of the ChIP quantile peaks starting from the most intense and including each level in the next merged file.</p>
 <pre class="bash"><code>cd /labs/Guertin/ZNF143_ChIP/
 
@@ -2070,8 +2069,8 @@ do
     wc -l qmerge$((i+1)).bed
 done 2&gt;&amp;1 | tee merging_scheme.txt</code></pre>
 </div>
-<div id="plot-all-cumulative-quantiles-together" class="section level2" number="11.2">
-<h2><span class="header-section-number">11.2</span> Plot all cumulative quantiles together</h2>
+<div id="plot-all-cumulative-quantiles-together" class="section level2" number="12.2">
+<h2><span class="header-section-number">12.2</span> Plot all cumulative quantiles together</h2>
 <p>Note: this takes place in a different directory than the immediately preceding code chunk.</p>
 <pre class="bash"><code>srun --partition=general --qos=general --pty --mem=16G -c 2 bash
 cd /labs/Guertin/ZNF143_PRO
@@ -2190,8 +2189,8 @@ plot_cdf(df.cdf, tf = &quot;qmerge_cumulative&quot;, cat = cat, col.lines = c(re
 <p>The threshold is set at the trace for <code>qmerge6</code>, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.</p>
 </div>
 </div>
-<div id="features-of-repressed-genes" class="section level1" number="12">
-<h1><span class="header-section-number">12</span> Features of Repressed Genes</h1>
+<div id="features-of-repressed-genes" class="section level1" number="13">
+<h1><span class="header-section-number">13</span> Features of Repressed Genes</h1>
 <p>How many repressed genes are “far” i.e. &gt;440 distance from a ZNF143 binding site?</p>
 <pre class="r"><code>repFar = rep.df[(abs(rep.df$dis) &gt; 440) &amp; (rep.df$status == &quot;Repressed&quot;), ]
 dim(repFar)
@@ -2279,8 +2278,8 @@ range(repNearInfo$log2FoldChange)
 save(repNearInfo, file=&quot;repNearInfo.Rdata&quot;)</code></pre>
 <p>[make barchart of results]</p>
 </div>
-<div id="picking-sp-chip-antibodies" class="section level1" number="13">
-<h1><span class="header-section-number">13</span> Picking SP ChIP antibodies</h1>
+<div id="picking-sp-chip-antibodies" class="section level1" number="14">
+<h1><span class="header-section-number">14</span> Picking SP ChIP antibodies</h1>
 <p>Which SP transcription factors are expressed in our HEK cells?</p>
 <pre class="r"><code>hek.sp = counts.df[grepl(&quot;_SP[0-9]$&quot;,rownames(counts.df)),]
 # 6 SPs: 1,2,3,4,8,9
