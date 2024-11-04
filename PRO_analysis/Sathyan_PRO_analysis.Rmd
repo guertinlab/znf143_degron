@@ -486,7 +486,7 @@ plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO
 This plot is saved as `ZNF143_pro_metrics_depth_final.pdf` (Figure S1).
 
 
-# Input for pTA
+# Prepare input for pTA
 
 Normalize bigWigs from seqOutBias:
 ```{r engine='bash', eval=F, echo=TRUE}
@@ -522,7 +522,7 @@ rm tmpMinus${pair}.bg
 
 
 
-# Input for TSSinference
+# Prepare input for TSSinference
 
 This is basically the same as the above, but for PE2 reads instead of PE1.
 
@@ -552,7 +552,7 @@ rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg
 ```
 
-## Annotations
+## Get gene annotations
 
 The starting file for filtering these annotations was obtained from the gencode website here: [https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz), specifically the version of basic annotation which contained reference chromosomes only. 
 
@@ -572,7 +572,84 @@ grep 'transcript_type "protein_coding"' gencode.v42.basic.annotation.gtf | \
 
 ```
 
+# Re-annotating transcription units after manual curation
 
+After an initial round of transcription unit (TU) calling with TSSinference and primaryTranscriptAnnotation, we identified differentially expressed genes with DESeq2 (same methods as below) and looked at TU calls for all of the down genes in the UCSC genome browser to verify that all TSSs had been identified for each gene. We noticed some gene annotations were missing true TSSs, so they were adjusted to match the data. These are the gene annotations that were adjusted, along with accompanying browser sessions:
+
+Plus strand genes:
+- *MATR3*: TSS should be more upstream because exon1 window missed annotations with more upstream exons. (https://genome.ucsc.edu/s/jhdong/MATR3_TU)
+    - new exon1 start: chr5:139274101
+- delete *SRRM*: ZNF576 completely overlaps this gene and it's impossible to tell who's who (https://genome.ucsc.edu/s/jhdong/SRRM5_TU)
+- *ZNF382*: The TTS looks fine, but most prominent TSS was missed by ~400bp. Update the TSS to the one in the annotation with bidir txn (https://genome.ucsc.edu/s/jhdong/ZNF382_TSS)
+    - new exon1 start: chr19:36605313
+
+Minus strand genes:
+- *ATXN7L3*: a more prominent TSS is ~224bp upstream, make sure it has bidir txn (https://genome.ucsc.edu/s/jhdong/ATXN7L3_TU) 
+    - manually setting exon1 boundary: chr17:44200100
+- delete *DQX1*: not much bidirectional transcription at current TSS (https://genome.ucsc.edu/s/jhdong/DQX1_TU) 
+- delete *NPFF*: messy overlapping genes; unsure of where to call TSS or TTS. Doesn't look like it has a proper transcription unit (https://genome.ucsc.edu/s/jhdong/NPFF_TU)
+
+```{r engine='R', eval=F, echo=TRUE}
+# import original exon1 table
+oldExon1 = read.table("gencode.hg38.v42.basic.firstExon.latest.filtered.bed", sep="\t", header =FALSE)
+dim(oldExon1)
+# [1] 18930     6
+colnames(oldExon1) = c("chr","start","end","gene", "misc","strand")
+
+# import original transcription unit calls 
+oldCoords = read.table('HEK_ZNF143_infcoords_control_only.bed', sep="\t", header =FALSE)
+dim(oldCoords)
+#[1] 11818     6
+colnames(oldCoords) = c("chr","start","end","gene","misc","strand")
+
+# move MATR3 exon1 start upstream
+oldCoords[grepl("MATR3",oldCoords$gene),]
+#       chr     start       end  gene  misc strand
+# 2770 chr5 139293742 139341807 MATR3 89870      +
+oldExon1[grepl("MATR3",oldExon1$gene),]
+#       chr     start       end  gene misc strand
+# 9188 chr5 139293722 139293778 MATR3    1      +
+oldExon1[9188,"start"] = 139274101
+oldExon1[grepl("MATR3",oldExon1$gene),]
+#       chr     start       end  gene misc strand
+# 9188 chr5 139274101 139293778 MATR3    1      +
+
+# delete SRRM5 and DQX1
+oldExon1[(oldExon1$gene %in% c("SRRM5","DQX1")),]
+#         chr    start      end  gene misc strand
+# 4469   chr2 74526191 74526231  DQX1    1      -
+# 15528 chr19 43596617 43612088 SRRM5    1      +
+oldExon1 = oldExon1[!(oldExon1$gene %in% c("SRRM5","DQX1")),]
+
+# move ZNF382 exon1 more upstream to cut off the TSS without bidir txn
+oldExon1[oldExon1$gene == c("ZNF382"),]
+#         chr    start      end   gene misc strand
+# 18517 chr19 36604817 36608420 ZNF382    1      +
+oldExon1[oldExon1$gene == c("ZNF382"),"start"] = 36605313
+oldExon1[oldExon1$gene == c("ZNF382"),]
+#         chr    start      end   gene misc strand
+# 18517 chr19 36605313 36608420 ZNF382    1      +
+
+# move ATXN7L3 TSS to the upstream one with bidir txn
+oldExon1[oldExon1$gene == c("ATXN7L3"),]
+#        chr    start      end    gene misc strand
+# 1312 chr17 44198070 44199884 ATXN7L3    1      -
+oldExon1[oldExon1$gene == c("ATXN7L3"),"end"] = 44200100
+oldExon1[oldExon1$gene == c("ATXN7L3"),]
+#        chr    start      end    gene misc strand
+# 1312 chr17 44198070 44200100 ATXN7L3    1      -
+
+# delete NPFF
+oldExon1[oldExon1$gene == c("NPFF"),]
+#         chr    start      end gene misc strand
+# 10590 chr12 53507483 53507484 NPFF    1      -
+oldExon1 = oldExon1[!(oldExon1$gene == c("NPFF")),]
+
+# export updated exon1 table
+write.table(oldExon1, file="gencode_exon1_parsed_updated.bed",sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE)
+```
+
+The following code represents what was done with the latest gene annotations after the manual curation. 
 
 # TSSInference
 
@@ -905,6 +982,9 @@ tighten_summit_window <- function(res.deseq) {
 
 https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh
 https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh
+
+
+
 
 # Code for inferring regulatory elements using bidirectional TXN
 
