@@ -1444,57 +1444,45 @@ library(primaryTranscriptAnnotation)
 # for each gene: get largest interval and read counts for annotated transcripts
 largest.interval.bed = get.largest.interval(bed=gencode.transcript)
 transcript.reads = read.count.transcript(bed=gencode.transcript, bw.plus=bw.plus.pe1, bw.minus=bw.minus.pe1)</code></pre>
-<pre class="r"><code># set up a graphical space with 1 row and 2 columns
+<p>Decide cutoffs for “unexpressed” genes:</p>
+<pre class="r"><code>pdf(&quot;read_density_count.pdf&quot;, useDingbats = FALSE, width=4.2, height=4)
 par(mfrow=c(1,2)) 
-# make plots of the distribution of the logs of read density and read counts across the genes
-hist(log(transcript.reads$density), breaks=200, col=&quot;black&quot;,xlab=&quot;log read density&quot;,main=&quot;&quot;) 
-hist(log(transcript.reads$counts), breaks=200, col=&quot;black&quot;,xlab=&quot;log read count&quot;,main=&quot;&quot;)
-# plot saved as &quot;read_density_count.pdf&quot;</code></pre>
-<!-- ```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts"}
-library(knitr)
-knitr::include_graphics("./read_count_density.png") 
-``` -->
-<pre class="r"><code># pick cut-offs for density and counts by looking at the plots 
 den.cut = -8
 cnt.cut = 1
-
-ind.cut.den = which(log(transcript.reads$density) &lt; den.cut) 
-ind.cut.cnt = which(log(transcript.reads$counts) &lt; cnt.cut) 
-# get indices for which transcripts fall below both cutoffs
-ind.cut = union(ind.cut.den, ind.cut.cnt)
-
-# remake the prevous plot but include locations of cutoffs
-par(mfrow=c(1,2))
 hist(log(transcript.reads$density), breaks=200,
-col=&quot;black&quot;,xlab=&quot;log read density&quot;,main=&quot;&quot;) 
+col=&quot;black&quot;,xlab=&quot;ln(read density)&quot;,main=&quot;&quot;) 
 abline(v=den.cut, col=&quot;red&quot;) 
-hist(log(transcript.reads$counts), breaks=200,
-col=&quot;black&quot;,xlab=&quot;log read count&quot;,main=&quot;&quot;) 
+hist(log(transcript.reads$counts), breaks=200, col=&quot;black&quot;,xlab=&quot;ln(read count)&quot;,main=&quot;&quot;) 
 abline(v=cnt.cut, col=&quot;red&quot;)
-# plot saved as &quot;read_density_count_cutoff.pdf&quot;</code></pre>
-<!-- ```{r  echo=F, fig.align = "left", fig.cap="Log read density and counts cutoff for defining expressed genes"}
-#library(knitr)
-knitr::include_graphics("./read_density_count_cutoff.png") 
-``` -->
-<pre class="r"><code># remove genes below cutoffs (&quot;unexpressed&quot;)
+dev.off()</code></pre>
+<p>Cutoffs for natural log of read density (-8) and counts (1) were determined by visual inspection of the plots. Run primaryTranscriptAnnotation to call transcription termination sites and get coordinates for each gene’s transcription unit:</p>
+<pre class="r"><code>ind.cut.den = which(log(transcript.reads$density) &lt; den.cut) 
+ind.cut.cnt = which(log(transcript.reads$counts) &lt; cnt.cut) 
+ind.cut = union(ind.cut.den, ind.cut.cnt) 
+
+# remove genes below cutoffs (&quot;unexpressed&quot;)
 unexp = names(transcript.reads$counts)[ind.cut]
 largest.interval.expr.bed = largest.interval.bed[!(largest.interval.bed$gene %in% unexp),]
 
 # get TSSs for each gene (from TSSinf)
-tss.interval.bed = merge(potential.tss2, largest.interval.expr.bed, by.x=&quot;gene&quot;, by.y=&quot;gene&quot;)
+tss.interval.bed = merge(controlTSSmaxH, largest.interval.expr.bed, by.x=&quot;gene&quot;, by.y=&quot;gene&quot;)
 tss.interval.bed$end.x[tss.interval.bed$strand.x == &quot;+&quot;] &lt;- tss.interval.bed$end.y[tss.interval.bed$strand.x == &quot;+&quot;]
 tss.interval.bed$start.x[tss.interval.bed$strand.x == &quot;-&quot;] &lt;- tss.interval.bed$start.y[tss.interval.bed$strand.x == &quot;-&quot;]
-tss.interval.bed= tss.interval.bed[,c(2:5, 7, 6)]
+tss.interval.bed= tss.interval.bed[,c(2:4,1,5,6)]
 colnames(tss.interval.bed) = c(&#39;chr&#39;, &#39;start&#39;, &#39;end&#39;, &#39;gene&#39;, &#39;xy&#39;, &#39;strand&#39;)
 tss.interval.bed$xy &lt;- 0
 
 #remove gene overlaps
 overlap.data = gene.overlaps( bed = tss.interval.bed ) 
+# dim(overlap.data$has.start.inside) # to look inside overlap.data
+# dim(overlap.data$is.a.start.inside)
+# dim(overlap.data$cases)
+
 filtered.id.overlaps = remove.overlaps(bed=tss.interval.bed,
                             overlaps=overlap.data$cases, 
                             transcripts=gencode.transcript, 
-                            bw.plus=bw.plus, 
-                            bw.minus=bw.minus, 
+                            bw.plus=bw.plus.pe1, 
+                            bw.minus=bw.minus.pe1, 
                             by=&quot;den&quot;)
 
 # Get TTS (transcription termination site)
@@ -1505,6 +1493,7 @@ bed.for.tts.eval = get.end.intervals(bed=filtered.id.overlaps,
                                      add.to.end=add.to.end,
                                      fraction.end=fraction.end,
                                      dist.from.start=dist.from.start)
+
 add.to.end = max(bed.for.tts.eval$xy) 
 knot.div = 40
 pk.thresh = 0.05
@@ -1516,19 +1505,18 @@ tau.dist = 50000
 frac.max = 1
 frac.min = 0.3
 
-inferred.coords = get.TTS(bed=bed.for.tts.eval, tss=  filtered.id.overlaps,
-                          bw.plus=bw.plus, bw.minus=bw.minus,
-                          bp.bin=bp.bin, add.to.end=add.to.end,
-                          pk.thresh=pk.thresh, knot.thresh=knot.thresh,
-                          cnt.thresh=cnt.thresh, tau.dist=tau.dist,
-                          frac.max=frac.max, frac.min=frac.min,
-                          knot.div=knot.div)
-                          
+inferred.coords = get.TTS(bed=bed.for.tts.eval, tss= filtered.id.overlaps,
+    bw.plus=bw.plus.pe1, bw.minus=bw.minus.pe1,
+    bp.bin=bp.bin, add.to.end=add.to.end,
+    pk.thresh=pk.thresh, knot.thresh=knot.thresh,
+    cnt.thresh=cnt.thresh, tau.dist=tau.dist,
+    frac.max=frac.max, frac.min=frac.min,
+    knot.div=knot.div)
 
-final.coords = inferred.coords$bed      
+final.coords = inferred.coords$bed
+dim(final.coords) # [1] 13276     6
 
-write.table(final.coords, file = &quot;HEK_ZNF143_gene_annotations_new_infCoords.bed&quot;,
-sep = &quot;\t&quot;, row.names=FALSE, col.names=FALSE, quote=FALSE)</code></pre>
+write.table(final.coords, file=&quot;HEK_ZNF143_infcoords_contrTU_20240219.bed&quot;, sep=&quot;\t&quot;, row.names=FALSE, col.names=FALSE, quote=FALSE)</code></pre>
 </div>
 <div id="differential-expression-analysis" class="section level1" number="8">
 <h1><span class="header-section-number">8</span> Differential expression analysis</h1>
