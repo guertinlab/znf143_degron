@@ -160,7 +160,7 @@ subtractBed -s -a Homo_sapiens.GRCh38.${release}.bed -b Homo_sapiens.GRCh38.${re
 This is important for removing adapter steps later. Even if you know this number from your experimental protocol it doesn't hurt to confirm it in your data. Before doing any tests, subset some reads from any one of your FASTQs so these tests don't take forever to run. Make sure you are subsetting from a PE1 file!
 
 ```{r engine='bash', eval=F, echo=TRUE}
-# grab 4 million reads
+# get 4 million reads
 zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 > Z143_UMI_test.fastq
 
 # do this in an interactive node
@@ -172,7 +172,6 @@ srun --partition=general --qos=general --mem=36G -N 1 -n 1 -c 12 --pty bash
 ```{r engine='bash', eval=F, echo=TRUE}
 module load cutadapt
 
-# i think the adapter sequences are the same as last time
 # cutadapt arguments:
 # -m : minimum length
 # -O : [capital letter o] minimum overlap length between adapter and read
@@ -194,7 +193,7 @@ tail Z143_UMI_test_cutadapt.txt
 # 47  45296 0.0 2 41996 2565 735
 ```
 
-Counting how many sequences follow the spike in counts (at length 39): UMI length = 8.
+Counting how many sequences follow the spike in counts (at length 39, last column): UMI length = 8.
 
 **Trim and Align**
 
@@ -273,11 +272,11 @@ Note the large spike in alignment rate when 8 bases are trimmed--this is another
 
 # PRO alignment and parallelization:
 
-"pro_processing.sh"
+The following code chunk was run as "pro_processing.sh" and generally follows the PEPPRO method (https://doi.org/10.1186/s13059-021-02349-4) for PRO-seq processing and quality control assessment. 
 ```{r engine='bash', eval=F, echo=TRUE}
 #! /usr/bin/bash
 
-#SBATCH --job-name=pro_processing_XXXXXXX.sh     # name for job
+#SBATCH --job-name=pro_processing_XXXXXXX.sh
 #SBATCH -N 1                  
 #SBATCH -n 1                 
 #SBATCH -c 24                  
@@ -483,6 +482,8 @@ cat *_QC_metrics.txt | awk '!x[$0]++' > project_QC_metrics.txt
 
 plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO
 ```
+
+This plot is saved as `ZNF143_pro_metrics_depth_final.pdf`.
 
 
 # Input for pTA
