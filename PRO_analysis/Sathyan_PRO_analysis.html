@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2023-09-15" />
+<meta name="date" content="2024-11-04" />
 
 <title>PRO-seq analysis</title>
 
@@ -54,7 +54,7 @@ h4 {font-size: 18px;}
 h5 {font-size: 16px;}
 h6 {font-size: 12px;}
 code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
-pre:not([class]) { background-color: white }</style>
+</style>
 <script>
 
 /**
@@ -704,47 +704,53 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2023-09-15</h4>
+<h4 class="date">2024-11-04</h4>
 
 </div>
 
 <h1>Contents</h1>
 <div id="TOC">
 <ul>
-<li><a href="#pro-seq-analysis" id="toc-pro-seq-analysis"><span class="toc-section-number">1</span> PRO-seq analysis</a>
+<li><a href="#introduction" id="toc-introduction"><span class="toc-section-number">1</span> Introduction</a></li>
+<li><a href="#pro-seq-analysis" id="toc-pro-seq-analysis"><span class="toc-section-number">2</span> PRO-seq analysis</a>
 <ul>
-<li><a href="#confirming-umi-length" id="toc-confirming-umi-length"><span class="toc-section-number">1.1</span> Confirming UMI length</a></li>
+<li><a href="#confirming-umi-length" id="toc-confirming-umi-length"><span class="toc-section-number">2.1</span> Confirming UMI length</a></li>
 </ul></li>
-<li><a href="#pro-alignment-and-parallelization" id="toc-pro-alignment-and-parallelization"><span class="toc-section-number">2</span> PRO alignment and parallelization:</a>
+<li><a href="#pro-alignment-and-parallelization" id="toc-pro-alignment-and-parallelization"><span class="toc-section-number">3</span> PRO alignment and parallelization:</a>
 <ul>
-<li><a href="#run-the-previous-chunk-in-parallel" id="toc-run-the-previous-chunk-in-parallel"><span class="toc-section-number">2.1</span> Run the previous chunk in parallel</a></li>
+<li><a href="#run-the-previous-chunk-in-parallel" id="toc-run-the-previous-chunk-in-parallel"><span class="toc-section-number">3.1</span> Run the previous chunk in parallel</a></li>
 </ul></li>
-<li><a href="#input-for-pta" id="toc-input-for-pta"><span class="toc-section-number">3</span> Input for pTA</a></li>
-<li><a href="#input-for-tssinference" id="toc-input-for-tssinference"><span class="toc-section-number">4</span> Input for TSSinference</a>
+<li><a href="#input-for-pta" id="toc-input-for-pta"><span class="toc-section-number">4</span> Input for pTA</a></li>
+<li><a href="#input-for-tssinference" id="toc-input-for-tssinference"><span class="toc-section-number">5</span> Input for TSSinference</a>
 <ul>
-<li><a href="#annotations" id="toc-annotations"><span class="toc-section-number">4.1</span> Annotations</a></li>
+<li><a href="#annotations" id="toc-annotations"><span class="toc-section-number">5.1</span> Annotations</a></li>
 </ul></li>
-<li><a href="#tssinference" id="toc-tssinference"><span class="toc-section-number">5</span> TSSInference</a></li>
-<li><a href="#primarytranscriptannotation" id="toc-primarytranscriptannotation"><span class="toc-section-number">6</span> primaryTranscriptAnnotation</a></li>
-<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">7</span> Differential expression analysis</a></li>
-<li><a href="#code-for-making-integrated-ucsc-tracks" id="toc-code-for-making-integrated-ucsc-tracks"><span class="toc-section-number">8</span> Code for making integrated UCSC tracks</a></li>
-<li><a href="#code-for-inferring-regulatory-elements-using-bidirectional-txn" id="toc-code-for-inferring-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">9</span> Code for inferring regulatory elements using bidirectional TXN</a>
+<li><a href="#tssinference" id="toc-tssinference"><span class="toc-section-number">6</span> TSSInference</a></li>
+<li><a href="#primarytranscriptannotation" id="toc-primarytranscriptannotation"><span class="toc-section-number">7</span> primaryTranscriptAnnotation</a></li>
+<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">8</span> Differential expression analysis</a></li>
+<li><a href="#code-for-making-integrated-ucsc-tracks" id="toc-code-for-making-integrated-ucsc-tracks"><span class="toc-section-number">9</span> Code for making integrated UCSC tracks</a></li>
+<li><a href="#code-for-inferring-regulatory-elements-using-bidirectional-txn" id="toc-code-for-inferring-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</a>
 <ul>
-<li><a href="#create-cdfs-reference-code-from-genex-course" id="toc-create-cdfs-reference-code-from-genex-course"><span class="toc-section-number">9.1</span> Create CDFs (reference code from genex course)</a></li>
-<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">9.2</span> Plot an MA plot for activated and repressed and unchanged</a></li>
+<li><a href="#create-cdfs-reference-code-from-genex-course" id="toc-create-cdfs-reference-code-from-genex-course"><span class="toc-section-number">10.1</span> Create CDFs (reference code from genex course)</a></li>
+<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">10.2</span> Plot an MA plot for activated and repressed and unchanged</a></li>
 </ul></li>
-<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">10</span> Determining threshold for “functional” ChIP peaks</a>
+<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">11</span> Determining threshold for “functional” ChIP peaks</a>
 <ul>
-<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">10.1</span> Merge quantile beds</a></li>
-<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">10.2</span> Plot all cumulative quantiles together</a></li>
+<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">11.1</span> Merge quantile beds</a></li>
+<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">11.2</span> Plot all cumulative quantiles together</a></li>
 </ul></li>
-<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">11</span> Features of Repressed Genes</a></li>
-<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">12</span> Picking SP ChIP antibodies</a></li>
+<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">12</span> Features of Repressed Genes</a></li>
+<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">13</span> Picking SP ChIP antibodies</a></li>
 </ul>
 </div>
 
-<div id="pro-seq-analysis" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> PRO-seq analysis</h1>
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>This is a vignette accompanying the manuscript “ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes” (doi: <a href="https://doi.org/10.1101/2024.05.13.594008" class="uri">https://doi.org/10.1101/2024.05.13.594008</a>). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.</p>
+</div>
+<div id="pro-seq-analysis" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> PRO-seq analysis</h1>
+<p>Combine FASTQs for ZNF143-dTAG PRO-seq data from two different sequencing runs:</p>
 <pre class="bash"><code>cd /labs/Guertin/ZNF143_PRO
 
 for i in ./dep1/*_dep1_*.fastq.gz
@@ -758,6 +764,7 @@ do
     echo $x # replicate number, PE2
     cat $i ./dep2/${pre}_dep2_${suf} &gt; ${pre}_${x}_final.fastq.gz
 done </code></pre>
+<p>Load modules, pre-run seqOutBias, and parse the hg38 annotation file:</p>
 <pre class="bash"><code>module load bowtie2/2.5.0
 module load genometools/1.5.10
 module load bedtools/2.29.0
@@ -870,8 +877,8 @@ awk  &#39;{OFS=&quot;\t&quot;;} $6 == &quot;+&quot; {print $1,$2+20,$2 + 120,$4,
 #define and name all introns 
 subtractBed -s -a Homo_sapiens.GRCh38.${release}.bed -b Homo_sapiens.GRCh38.${release}.all.exons.merged.bed | \
     sort -k1,1 -k2,2n &gt; Homo_sapiens.GRCh38.${release}.introns.bed </code></pre>
-<div id="confirming-umi-length" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Confirming UMI length</h2>
+<div id="confirming-umi-length" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Confirming UMI length</h2>
 <p>This is important for removing adapter steps later. Even if you know this number from your experimental protocol it doesn’t hurt to confirm it in your data. Before doing any tests, subset some reads from any one of your FASTQs so these tests don’t take forever to run. Make sure you are subsetting from a PE1 file!</p>
 <pre class="bash"><code># grab 4 million reads
 zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 &gt; Z143_UMI_test.fastq
@@ -966,8 +973,8 @@ for x in Z143_UMI_test_clipped*.fastq
 <p>Note the large spike in alignment rate when 8 bases are trimmed–this is another point in favor of the UMI length = 8.</p>
 </div>
 </div>
-<div id="pro-alignment-and-parallelization" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> PRO alignment and parallelization:</h1>
+<div id="pro-alignment-and-parallelization" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> PRO alignment and parallelization:</h1>
 <p>“pro_processing.sh”</p>
 <pre class="bash"><code>#! /usr/bin/bash
 
@@ -1144,8 +1151,8 @@ rm ${name}.notCombined_1.fastq.gz
 rm ${name}.notCombined_2.fastq.gz
 
 echo &#39;script complete&#39;</code></pre>
-<div id="run-the-previous-chunk-in-parallel" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Run the previous chunk in parallel</h2>
+<div id="run-the-previous-chunk-in-parallel" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Run the previous chunk in parallel</h2>
 <pre class="bash"><code>
 file=pro_processing.sh
 
@@ -1168,8 +1175,8 @@ gzip *_PE2_final.fastq</code></pre>
 plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
 </div>
 </div>
-<div id="input-for-pta" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Input for pTA</h1>
+<div id="input-for-pta" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Input for pTA</h1>
 <p>Normalize bigWigs from seqOutBias:</p>
 <pre class="bash"><code>PRO_normalization -c hg38.chrom.sizes</code></pre>
 <p>Then merge bigWigs based on strand (control and experimental conditions together):</p>
@@ -1197,8 +1204,8 @@ rm ${name}_minus${pair}_scaled_sorted.bg
 rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg</code></pre>
 </div>
-<div id="input-for-tssinference" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Input for TSSinference</h1>
+<div id="input-for-tssinference" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Input for TSSinference</h1>
 <p>This is basically the same as the above, but for PE2 reads instead of PE1.</p>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE2&quot;
@@ -1223,8 +1230,8 @@ rm ${name}_plus${pair}_scaled_sorted.bg
 rm ${name}_minus${pair}_scaled_sorted.bg
 rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg</code></pre>
-<div id="annotations" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Annotations</h2>
+<div id="annotations" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Annotations</h2>
 <p>The starting file for filtering these annotations was obtained from the gencode website here: <a href="https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz">https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz</a>, specifically the version of basic annotation which contained reference chromosomes only.</p>
 <pre class="r"><code>gunzip gencode.v42.basic.annotation.gtf.gz
 
@@ -1240,8 +1247,8 @@ grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.anno
     grep -v &quot;\tENSG&quot; &gt; gencode.hg38.v42.basic.firstExon.latest.filtered.bed</code></pre>
 </div>
 </div>
-<div id="tssinference" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> TSSInference</h1>
+<div id="tssinference" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> TSSInference</h1>
 <pre class="r"><code>library(bigWig)
 # source TSSinference functions
 source(&quot;TSSinference.R&quot;)
@@ -1284,8 +1291,8 @@ save(flipTSSmaxH, file=&quot;flipTSSmaxH.Rdata&quot;)
 
 write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = &quot;flipTSSmaxH.bed&quot;, quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = FALSE)</code></pre>
 </div>
-<div id="primarytranscriptannotation" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> primaryTranscriptAnnotation</h1>
+<div id="primarytranscriptannotation" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> primaryTranscriptAnnotation</h1>
 <p>Prepare specific annotations:</p>
 <pre class="bash"><code>grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
    awk &#39;{if($3==&quot;exon&quot;){print $0}}&#39; | \
@@ -1423,8 +1430,8 @@ final.coords = inferred.coords$bed
 write.table(final.coords, file = &quot;HEK_ZNF143_gene_annotations_new_infCoords.bed&quot;,
 sep = &quot;\t&quot;, row.names=FALSE, col.names=FALSE, quote=FALSE)</code></pre>
 </div>
-<div id="differential-expression-analysis" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> Differential expression analysis</h1>
+<div id="differential-expression-analysis" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Differential expression analysis</h1>
 <p>Setup and get functions:</p>
 <pre class="r"><code>library(bigWig)
 library(lattice)
@@ -1537,13 +1544,13 @@ tighten_summit_window &lt;- function(res.deseq) {
   return(df)
 }</code></pre>
 </div>
-<div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> Code for making integrated UCSC tracks</h1>
+<div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh</a>
 <a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh</a></p>
 </div>
-<div id="code-for-inferring-regulatory-elements-using-bidirectional-txn" class="section level1" number="9">
-<h1><span class="header-section-number">9</span> Code for inferring regulatory elements using bidirectional TXN</h1>
+<div id="code-for-inferring-regulatory-elements-using-bidirectional-txn" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</h1>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh</a></p>
 <pre class="bash"><code>
 awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$6}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.minus.bed
@@ -1619,8 +1626,8 @@ for (i in levels(sample.conditions)[-1]) {
   df.x = rbind(df.x, unchanged)
   df.x = rbind(df.x, repressed)
 }</code></pre>
-<div id="create-cdfs-reference-code-from-genex-course" class="section level2" number="9.1">
-<h2><span class="header-section-number">9.1</span> Create CDFs (reference code from genex course)</h2>
+<div id="create-cdfs-reference-code-from-genex-course" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> Create CDFs (reference code from genex course)</h2>
 <p>Set up functions and packages:</p>
 <pre class="r"><code>library(latticeExtra)
 library(DESeq2)
@@ -1891,8 +1898,8 @@ save(plot.df, file=&quot;ZNF143_diffExp_binding_distance_TSS.Rdata&quot;)</code>
 #   }
 # plot_cdf(df.cdf, tf = &quot;ZNF143&quot;, col.lines = c(rep(&quot;grey60&quot;,20),colorRampPalette(c(&quot;red&quot;,&quot;pink&quot;))(13),colorRampPalette(c(&quot;blue&quot;, &quot;light blue&quot;))(7)), line.type = c(rep(2, 20), rep(1,20)))</code></pre>
 </div>
-<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="9.2">
-<h2><span class="header-section-number">9.2</span> Plot an MA plot for activated and repressed and unchanged</h2>
+<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> Plot an MA plot for activated and repressed and unchanged</h2>
 <p>Unchanged can be the combine matched genes (match a set for act and a
 set for repressed).</p>
 <pre class="r"><code># use df.x from DESeq above
@@ -1948,10 +1955,10 @@ dim(deseqGenesInfo)
 write.table(deseqGenesInfo,file=&quot;ZNF143dTag_PRO_DESeq_genes_categorized.bed&quot;,quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = TRUE)</code></pre>
 </div>
 </div>
-<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="10">
-<h1><span class="header-section-number">10</span> Determining threshold for “functional” ChIP peaks</h1>
-<div id="merge-quantile-beds" class="section level2" number="10.1">
-<h2><span class="header-section-number">10.1</span> Merge quantile beds</h2>
+<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="11">
+<h1><span class="header-section-number">11</span> Determining threshold for “functional” ChIP peaks</h1>
+<div id="merge-quantile-beds" class="section level2" number="11.1">
+<h2><span class="header-section-number">11.1</span> Merge quantile beds</h2>
 <p>Make cumulative bed files of the ChIP quantile peaks starting from the most intense and including each level in the next merged file.</p>
 <pre class="bash"><code>cd /labs/Guertin/ZNF143_ChIP/
 
@@ -1975,8 +1982,8 @@ do
     wc -l qmerge$((i+1)).bed
 done 2&gt;&amp;1 | tee merging_scheme.txt</code></pre>
 </div>
-<div id="plot-all-cumulative-quantiles-together" class="section level2" number="10.2">
-<h2><span class="header-section-number">10.2</span> Plot all cumulative quantiles together</h2>
+<div id="plot-all-cumulative-quantiles-together" class="section level2" number="11.2">
+<h2><span class="header-section-number">11.2</span> Plot all cumulative quantiles together</h2>
 <p>Note: this takes place in a different directory than the immediately preceding code chunk.</p>
 <pre class="bash"><code>srun --partition=general --qos=general --pty --mem=16G -c 2 bash
 cd /labs/Guertin/ZNF143_PRO
@@ -2095,8 +2102,8 @@ plot_cdf(df.cdf, tf = &quot;qmerge_cumulative&quot;, cat = cat, col.lines = c(re
 <p>The threshold is set at the trace for <code>qmerge6</code>, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.</p>
 </div>
 </div>
-<div id="features-of-repressed-genes" class="section level1" number="11">
-<h1><span class="header-section-number">11</span> Features of Repressed Genes</h1>
+<div id="features-of-repressed-genes" class="section level1" number="12">
+<h1><span class="header-section-number">12</span> Features of Repressed Genes</h1>
 <p>How many repressed genes are “far” i.e. &gt;440 distance from a ZNF143 binding site?</p>
 <pre class="r"><code>repFar = rep.df[(abs(rep.df$dis) &gt; 440) &amp; (rep.df$status == &quot;Repressed&quot;), ]
 dim(repFar)
@@ -2184,8 +2191,8 @@ range(repNearInfo$log2FoldChange)
 save(repNearInfo, file=&quot;repNearInfo.Rdata&quot;)</code></pre>
 <p>[make barchart of results]</p>
 </div>
-<div id="picking-sp-chip-antibodies" class="section level1" number="12">
-<h1><span class="header-section-number">12</span> Picking SP ChIP antibodies</h1>
+<div id="picking-sp-chip-antibodies" class="section level1" number="13">
+<h1><span class="header-section-number">13</span> Picking SP ChIP antibodies</h1>
 <p>Which SP transcription factors are expressed in our HEK cells?</p>
 <pre class="r"><code>hek.sp = counts.df[grepl(&quot;_SP[0-9]$&quot;,rownames(counts.df)),]
 # 6 SPs: 1,2,3,4,8,9
