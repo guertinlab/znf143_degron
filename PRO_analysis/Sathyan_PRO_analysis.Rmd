@@ -984,7 +984,7 @@ plotPCAlattice <- function(df, file = 'PCA_lattice.pdf') {
 }
 ```
 
-DESeq2 analysis: 
+DESeq2 analysis and MA plot (Fig. 3A): 
 
 ```{r engine='R', eval=F, echo=TRUE}
 inferred.coords = final.coords
@@ -1007,7 +1007,71 @@ sample.conditions = factor(c("untreated","untreated","untreated","untreated","tr
 deseq.df = DESeqDataSetFromMatrix(counts.df, cbind.data.frame(sample.conditions, rep), ~ rep + sample.conditions)
 deseq.df = DESeq(deseq.df)
 
-# Create tables of activated/repressed genes and their matching genes 
+# Categorize genes into activated (up) and repressed (down)
+upRS = res.deseq[res.deseq$padj < 0.1 & !is.na(res.deseq$padj) & res.deseq$log2FoldChange > 0,]
+upRS.strand = merge(cbind(tighten_summit_window(activated), "Up"), inferred.coords, by.x = "gene", by.y = "gene")[,c(2, 3, 4, 1, 5, 10)]  
+write.table(upRS.strand, file = paste0('ZNF143dTAG_up_genes_20240220.bed'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
+
+downRS = res.deseq[res.deseq$padj < 0.1 & !is.na(res.deseq$padj) & res.deseq$log2FoldChange < 0,]
+downRS.strand = merge(cbind(tighten_summit_window(repressed), "Down"), inferred.coords, by.x = "gene", by.y = "gene")[,c(2, 3, 4, 1, 5, 10)] 
+write.table(downRS.strand, file = paste0('ZNF143dTAG_down_genes_20240220.bed'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
+
+dim(upRS) # 182
+upRScoords = tighten_summit_window(upRS)
+
+dim(downRS) # 365
+downRScoords = tighten_summit_window(downRS)
+
+# Get matched (on baseMean) unchanged genes for up and down genes
+unchanged = res.deseq[!is.na(res.deseq$padj) & res.deseq$padj > 0.1 & abs(res.deseq$log2FoldChange) < 0.01,]
+unchanged$treatment = 0
+upRS$treatment = 1
+df.deseq.effects.lattice = rbind(unchanged, upRS) 
+out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = "optimal", ratio = 1) 
+unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,] 
+unchanged.strand = merge(cbind(tighten_summit_window(unchanged), "Matched to Up"), inferred.coords, by.x = "gene", by.y = "gene")[,c(2, 3, 4, 1, 5, 10)] 
+write.table(unchanged.strand, file = paste0('ZNF143dTAG_up_matched_genes_20240220.bed'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
+
+unchanged$treatment = "Matched to Up"
+upRS$treatment = "Up"
+dfRS = rbind(upRS, unchanged)
+
+unchanged = res.deseq[!is.na(res.deseq$padj) & res.deseq$padj > 0.1 & abs(res.deseq$log2FoldChange) < 0.01,]
+unchanged$treatment = 0
+downRS$treatment = 1
+df.deseq.effects.lattice = rbind(unchanged, downRS)
+out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = "optimal", ratio = 1)
+unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
+unchanged.strand = merge(cbind(tighten_summit_window(unchanged), "Matched to Down"), inferred.coords, by.x = "gene", by.y = "gene")[,c(2, 3, 4, 1, 5, 10)] 
+write.table(unchanged.strand, file = paste0('ZNF143dTAG_down_matched_genes_20240220.bed'), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = '\t')
+
+unchanged$treatment = "Matched to Down"
+downRS$treatment = "Down"
+dfRS = rbind(dfRS, unchanged)
+dfRS = rbind(dfRS, downRS)
+dfRS$design = "rep+SC"
+dfRScoords = tighten_summit_window(dfRS)
+dfRS = cbind(dfRScoords,dfRS)
+
+# Add information about matched status and category into DESeq results table
+resRSdeseq = res.deseq
+deseqCoords = tighten_summit_window(resRSdeseq)
+resRSdeseq = cbind(deseqCoords,resRSdeseq)
+resRSdeseq$cat = "Other"
+resRSdeseq[resRSdeseq$gene %in% upRScoords$gene,]$cat = "Up"
+resRSdeseq[resRSdeseq$gene %in% downRScoords$gene,]$cat = "Down"
+
+resRSdeseq$matchUp = "No"
+resRSdeseq[resRSdeseq$gene %in% dfRS[dfRS$treatment == "Matched to Up",]$gene,]$matchUp = "Yes"
+
+resRSdeseq$matchDown = "No"
+resRSdeseq[resRSdeseq$gene %in% dfRS[dfRS$treatment == "Matched to Down",]$gene,]$matchDown = "Yes"
+
+deseqAll = resRSdeseq
+deseqAll$fullCatRS = paste(deseqAll$catRS,deseqAll$matchUpRS,deseqAll$matchDownRS,sep=".")
+
+# Make MA plot
+
 
 # for (i in levels(sample.conditions)[-1]) {
 #   res.deseq = results(deseq.df, contrast = c("sample.conditions", i, "untreated"))
