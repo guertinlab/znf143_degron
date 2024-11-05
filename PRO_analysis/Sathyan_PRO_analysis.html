@@ -1710,51 +1710,30 @@ resRSdeseq[resRSdeseq$gene %in% dfRS[dfRS$treatment == &quot;Matched to Down&quo
 deseqAll = resRSdeseq
 deseqAll$fullCatRS = paste(deseqAll$catRS,deseqAll$matchUpRS,deseqAll$matchDownRS,sep=&quot;.&quot;)
 
+# What the full categories mean:
+# - Up.No.No = up gene (pink) 
+# - Other.Yes.No = matched to up gene (dark grey) 
+# - Down.No.No = down gene (blue) 
+# - Other.No.Yes = matched to down gene (dark grey) 
+# - Other.Yes.Yes or Other.No.No = other gene (light grey) 
+
+deseqAll_strand = merge(deseqAll, inferred.coords[,c(4,6)], by=&quot;gene&quot;) 
+deseqAll2 = deseqAll_strand[,c(2:4,1,5,28,6:27)]
+
 # Make MA plot
+levelsMA = c(&quot;Other.Yes.Yes&quot;,&quot;Other.No.No&quot;,&quot;Other.Yes.No&quot;, &quot;Other.No.Yes&quot;,&quot;Up.No.No&quot;,&quot;Down.No.No&quot;)
+deseqAll$fullCatRS = factor(deseqAll$fullCatRS, levels = levelsMA)
 
-
-# for (i in levels(sample.conditions)[-1]) {
-#   res.deseq = results(deseq.df, contrast = c(&quot;sample.conditions&quot;, i, &quot;untreated&quot;))
-#   sum(res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj))
-  
-#   activated = res.deseq[res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &gt; 0,]
-#   activated.strand = merge(cbind(tighten_summit_window(activated), &quot;Activated&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]  
-#   write.table(activated.strand, file = paste0(i, &#39;_activated_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
-  
-#   unchanged = res.deseq[!is.na(res.deseq$padj) &amp; res.deseq$padj &gt; 0.1 &amp; abs(res.deseq$log2FoldChange) &lt; 0.01,]
-
-#   #unchanged = unchanged[sample(x, size, replace = FALSE, prob = NULL),]
-#   unchanged$treatment = 0
-#   activated$treatment = 1
-#   df.deseq.effects.lattice = rbind(unchanged, activated)
-#   out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
-#   unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
-#   unchanged.strand = merge(cbind(tighten_summit_window(unchanged), &quot;Matched to Activated&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]   
-
-#   write.table(unchanged.strand, file = paste0(i, &#39;_activated_matched_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
-#   unchanged$treatment = &quot;Matched to Activated&quot;
-#   activated$treatment = &quot;Activated&quot;
-#   df.x = rbind(activated, unchanged)
-  
-#   repressed = res.deseq[res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &lt; 0,]
-#   repressed.strand = merge(cbind(tighten_summit_window(repressed), &quot;Repressed&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]  
-#   write.table(repressed.strand, file = paste0(i, &#39;_repressed_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
-#   unchanged = res.deseq[!is.na(res.deseq$padj) &amp; res.deseq$padj &gt; 0.1 &amp; abs(res.deseq$log2FoldChange) &lt; 0.01,]
-
-#   # unchanged = res.deseq[rownames(res.deseq) %notin% rownames(repressed) &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &gt; 0,]
-#    unchanged$treatment = 0
-#   repressed$treatment = 1
-#   df.deseq.effects.lattice = rbind(unchanged, repressed)
-#   out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
-#   unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
-#   unchanged.strand = merge(cbind(tighten_summit_window(unchanged), &quot;Matched to Repressed&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]   
-
-#   write.table(unchanged.strand, file = paste0(i, &#39;_repressed_matched_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
-#   unchanged$treatment = &quot;Matched to Repressed&quot;
-#   repressed$treatment = &quot;Repressed&quot;
-#   df.x = rbind(df.x, unchanged)
-#   df.x = rbind(df.x, repressed)
-# }</code></pre>
+pdf(&quot;MAplot_deseq_ZNF143pro_20240220.pdf&quot;, useDingbats = FALSE, width=3.83, height=3.83)
+xyplot(deseqAll$log2FoldChangeRS ~ log(deseqAll$baseMeanRS, base=10),
+    groups=deseqAll$fullCatRS,
+    col=c(&quot;grey90&quot;,&quot;grey90&quot;,&quot;grey30&quot;,&quot;grey30&quot;,&quot;#ce228e&quot; ,&quot;#2290cf&quot;),
+    main=&quot;Differential Expression\nrep + sample.condition&quot;, scales=&quot;free&quot;, aspect=1, pch=20, cex=0.5,
+    ylab=expression(&quot;log&quot;[2]~&quot;PRO-seq fold change&quot;), 
+    xlab=expression(&quot;log&quot;[10]~&quot;Mean of Normalized Counts&quot;),
+    par.settings=list(par.xlab.text=list(cex=1.1,font=2), 
+                        par.ylab.text=list(cex=1.1,font=2)))
+dev.off()</code></pre>
 </div>
 <div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
 <h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
