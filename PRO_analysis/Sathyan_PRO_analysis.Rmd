@@ -1318,7 +1318,7 @@ write.table(repressed.treatment[,colNames], "ZNF143_dTAGV1_down_treatment.txt", 
 
 ```
 
-After running the model, the results were compiled into `combinedResults.txt.gz` and plotted with the following code chunk:
+Rudradeep Mukherjee ran the model and plotted the results (`combinedResults.txt.gz`) with the following code chunk:
 
 ```{r engine='R', eval=F, echo=TRUE}
 library(dplyr)
@@ -1347,6 +1347,8 @@ ggplot(summary.combined_df) +
 ggsave("ZNF143_median_foldchange.pdf") # Fig 3D
 
 ```
+
+# Identifying shifting TSSs
 
 
 
