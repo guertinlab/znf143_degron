@@ -759,6 +759,7 @@ Download the pTA repository from https://github.com/WarrenDavidAnderson/genomics
 ```{r engine='bash', eval=F, echo=TRUE}
 source("/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/gene_ann.R")
 source("/Users/jinhongdong/software/genomicsRpackage-master/primaryTranscriptAnnotation/R/map_tu.R")
+
 ```
 
 Prepare annotation files and data:
@@ -791,6 +792,7 @@ library(primaryTranscriptAnnotation)
 # for each gene: get largest interval and read counts for annotated transcripts
 largest.interval.bed = get.largest.interval(bed=gencode.transcript)
 transcript.reads = read.count.transcript(bed=gencode.transcript, bw.plus=bw.plus.pe1, bw.minus=bw.minus.pe1)
+
 ```
 
 Decide cutoffs for "unexpressed" genes: 
@@ -805,6 +807,7 @@ abline(v=den.cut, col="red")
 hist(log(transcript.reads$counts), breaks=200, col="black",xlab="ln(read count)",main="") 
 abline(v=cnt.cut, col="red")
 dev.off()
+
 ```
 
 Cutoffs for natural log of read density (-8) and counts (1) were determined by visual inspection of the plots. Run primaryTranscriptAnnotation to call transcription termination sites and get coordinates for each gene's transcription unit:
@@ -871,6 +874,7 @@ final.coords = inferred.coords$bed
 dim(final.coords) # [1] 13276     6
 
 write.table(final.coords, file="HEK_ZNF143_infcoords_contrTU_20240219.bed", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+
 ```
 
 
@@ -982,6 +986,7 @@ plotPCAlattice <- function(df, file = 'PCA_lattice.pdf') {
                col = colpal))
   dev.off()
 }
+
 ```
 
 DESeq2 analysis and MA plot (Fig. 3A): 
@@ -1079,6 +1084,7 @@ deseqAll$fullCatRS = paste(deseqAll$catRS,deseqAll$matchUpRS,deseqAll$matchDownR
 
 deseqAll_strand = merge(deseqAll, inferred.coords[,c(4,6)], by="gene") 
 deseqAll2 = deseqAll_strand[,c(2:4,1,5,28,6:27)]
+write.table(deseqAll_strand[,c(2:4,1,5,28,6:27)],file="deseqAll_20240220.txt",sep="\t",row.names=FALSE,col.names=FALSE,quote=FALSE)
 
 # Make MA plot
 levelsMA = c("Other.Yes.Yes","Other.No.No","Other.Yes.No", "Other.No.Yes","Up.No.No","Down.No.No")
@@ -1094,6 +1100,7 @@ xyplot(deseqAll$log2FoldChangeRS ~ log(deseqAll$baseMeanRS, base=10),
     par.settings=list(par.xlab.text=list(cex=1.1,font=2), 
                         par.ylab.text=list(cex=1.1,font=2)))
 dev.off()
+
 ```
 
 
@@ -1107,12 +1114,164 @@ https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro
 
 https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_dreg.sh
 ```{r engine='bash', eval=F, echo=TRUE}
-
 awk '{OFS="\t";} {print $1,$2,$6}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.minus.bed
 awk '{OFS="\t";} {print $1,$6,$3}' ZNF143_total.dREG.peak.full.bed > ZNF143_total.dREG.peak.plus.bed
+
+```
+
+# Detour to ChIP-seq analysis 
+
+Please see ChIP-seq analysis vignette for processing of ZNF143-dTAG ChIP-seq samples and identification of functional ZNF143 binding sites.
+
+# Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)
+
+Uses the previously identified ZNF143 binding sites and plots their distance to up and down genes in a cumulative distribution function.
+
+Key inputs:
+
+- gene file: deseqAll_20240220.txt
+- Binding sites: ZNF143strict_comp29_inferredSites_peakIntensities_unique.bed 
+
+```{r engine='R', eval=F, echo=TRUE}
+source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R')
+source('https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R')
+source('https://raw.githubusercontent.com/guertinlab/genex/main/ChIP_analysis/cdf_functions.R')
+
+bedTools.closest <- function(functionstring="/usr/local/bin/bedtools2-2.31.0/bin/closestBed",bed1,bed2,opt.string="") {
+  
+  options(scipen =99) # not to use scientific notation when writing out
+  
+  #write bed formatted dataframes to tempfile
+  write.table(bed1,file= 'a.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
+  write.table(bed2,file= 'b.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
+  
+  # create the command string and call the command using system()
+  command1=paste('sort -k1,1 -k2,2n', 'a.file.bed', '> a.file.sorted.bed')
+  cat(command1,"\n")
+  try(system(command1))
+  command2=paste('sort -k1,1 -k2,2n', 'b.file.bed', '> b.file.sorted.bed')
+  cat(command2,"\n")
+  try(system(command2))
+  
+  # use opt.string argument to add options for closestBed
+  command=paste(functionstring,opt.string,"-a",'a.file.sorted.bed',"-b",'b.file.sorted.bed',">",'out.file.bed',sep=" ")
+  cat(command,"\n")
+  try(system(command))
+  
+  res=read.table('out.file.bed',sep ="\t", header=F, comment.char='')
+  
+  command3=paste('rm', 'a.file.bed', 'b.file.bed', 'a.file.sorted.bed', 'b.file.sorted.bed', 'out.file.bed')
+  cat(command3,"\n")
+  try(system(command3))
+  
+  colnames(res) = c(colnames(bed1), colnames(bed2), 'disMOTIFcTSS' )
+  return(res)
+}
+
+znf143binding = read.table(file = "./motif_analysis_201/ZNF143strict_comp29_inferredSites_peakIntensities_unique.bed", sep="\t", header=FALSE)
+colnames(znf143binding) = c("chrMotif","startMotif","endMotif","motif","peakIntens","strandMotif")
+
+bed.tss = get.tss(deseqAll2) 
+colnames(bed.tss) = c("cTSSchr","cTSSstart","cTSSend","gene","baseMeanRS","strand")
+write.table(bed.tss,file="controlCalledTSS_20240222.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
+identical(bed.tss$gene,deseqAll$gene) # TRUE
+distances = bedTools.closest(bed1 = bed.tss, bed2 = znf143binding, opt.string = '-D a')
+deseqAlldist = merge(deseqAll2,distances[,c(1:4,7:13)],by="gene")
+
+plot_cdf <- function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1, abline=1) {
+pdf(paste0(tf, "_CDF_", cat, ".pdf"), width=6.2, height=3.83) 
+         print(ecdfplot(~log(abs(disMOTIFcTSS), base = 10), groups = fullCatRS, data = df.all,
+         auto.key = list(lines=TRUE, points=FALSE, cex = cex),
+         col = col.lines,
+         aspect = 1,
+                                        #xlim = c(0, 50000),
+         scales=list(relation="free",alternating=c(1,1,1,1)),
+         ylab = 'Cumulative Distribution Function',
+         xlab = expression('log'[10]~'ZNF143 inferred binding site distance from TSS'),
+                                        #index.cond = list(c(2,1)),
+         between=list(y=1.0),
+         type = 'a',
+         xlim = c(0,8),
+         lwd=2,
+         lty=line.type,
+         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
+         panel = function(...) {
+             panel.abline(v= log(abline, base=10), lty =2) # variable line location
+             panel.ecdfplot(...)
+         }))
+    dev.off()
+}
+
+trimmed2 = deseqAlldist[(deseqAlldist$fullCatRS != "Other.No.No"),]
+trimmed2 = droplevels(trimmed2)
+
+matchedDown = deseqAlldist[deseqAlldist$matchDownRS == "Yes",] 
+matchedDown$cdfCAT = "Matched to Down"
+matchedUp = deseqAlldist[deseqAlldist$matchUpRS == "Yes",]
+matchedUp$cdfCAT = "Matched to Up"
+downCDF = deseqAlldist[deseqAlldist$catRS == "Down",]
+downCDF$cdfCAT = "Down"
+upCDF = deseqAlldist[deseqAlldist$catRS == "Up",]
+upCDF$cdfCAT = "Up"
+
+plotCDFrs = rbind(matchedDown,matchedUp,downCDF,upCDF)
+plotCDFrs$cdfCAT = factor(plotCDFrs$cdfCAT,levels=c("Matched to Down","Matched to Up","Down","Up"))
+
+col.lines=c("grey80","grey60","#2290cf","#ce228e")
+
+pdf("RS_CDF_20240304.pdf", width=6.2, height=3.83) 
+ecdfplot(~log(abs(disMOTIFcTSS), base = 10), groups = cdfCAT, 
+    data = plotCDFrs,
+    auto.key = list(lines=TRUE, points=FALSE, cex = 1),
+    col = col.lines,
+    aspect = 1,
+                                #xlim = c(0, 50000),
+    scales=list(relation="free",alternating=c(1,1,1,1), axs="i"),
+    ylab = 'Cumulative Distribution Function',
+    xlab = expression('log'[10]~'ZNF143 inferred binding site distance from TSS'),
+                                #index.cond = list(c(2,1)),
+    between=list(y=1.0),
+    type = 'a',
+    xlim = c(0,6.5),
+    ylim = c(0,1.0),
+    lwd=2,
+    lty=line.type,
+    par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
+    panel = function(...) {
+        panel.abline(v= log(500, base=10), lty =2) # variable line location
+        panel.ecdfplot(...)
+    })
+dev.off()
+
 ```
 
 
+# deepTools heatmap (Fig. 3C)
+
+```{r engine='bash', eval=F, echo=TRUE}
+# Generate input bigWigs
+awk '{OFS="\t";} {print $1,$2,$3,$5}' ZNF143strict_comp29_inferredSites_peakIntensities_unique.bed > ZNF143strict_comp29_inferredSites_peakIntensities_unique.bedGraph
+sizes=/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes
+wigToBigWig -clip ZNF143strict_comp29_inferredSites_peakIntensities_unique.bedGraph $sizes ZNF143strict_comp29_inferredSites_peakIntensities_unique.bigWig
+
+# Create heatmap with custom color gradient
+computeMatrix reference-point --referencePoint TSS -b 500 -a 500 -p 7 --missingDataAsZero \
+  -R ZNF143dTAG_down_genes_20240220_repSC.bed ZNF143dTAG_up_genes_20240220_repSC.bed --binSize 1 \
+  -S ./motif_analysis_201/ZNF143strict_comp29_inferredSites_peakIntensities_unique.bigWig \
+  -o matrix_HA_ChIP_ZNF143_peaks_diffExp_TSS.gz --outFileSortedRegions ZNF143_TSS_computeMatrix_outRegions.bed
+
+customBright="#000004FF,#ff9147,#ff9d45,#ffa944,#ffb543,#ffc144,#ffcd46,#ffd949,#ffe54e,#fef155,#fbfd5d,#fbfd5d,#eaf951,#d8f546,#c5f13b,#b2ed31,#9ce927,#85e51f,#6be018,#4adc15,#00d715,#00d715,#00de49,#00e46b,#00e988,#00eea2,#00f3ba,#00f6d0,#24fae2,#53fdf2,#75ffff"
+
+plotHeatmap -m matrix_HA_ChIP_ZNF143_peaks_diffExp_TSS_20240328.gz -out heatmap_HA_ChIP_ZNF143_motifs.pdf \
+    --heatmapHeight 7 --zMax 5000 --linesAtTickMarks \
+    --regionsLabel "dTAG Repressed" "dTAG Activated" --xAxisLabel "Distance from TSS" --dpi 500 \
+    --samplesLabel "ZNF143 motif locations" --colorList ${customBright} --whatToShow "heatmap and colorbar"
+
+```
+
+
+
+# Old stuff
 
 ## Create CDFs (reference code from genex course)
 
