@@ -1269,6 +1269,85 @@ plotHeatmap -m matrix_HA_ChIP_ZNF143_peaks_diffExp_TSS_20240328.gz -out heatmap_
 
 ```
 
+# Compartment modeling (Fig. 3D)
+
+For the scripts mentioned in this section, please see the repository for our updated compartment model, which contains a vignette and functions [https://github.com/guertinlab/compartment_model](https://github.com/guertinlab/compartment_model). The vignette was followed to create Fig. 3D in the ZNF143 manuscript. 
+
+The following code is to generate the inputs for the compartment model:
+
+```{r engine='R', eval=F, echo=TRUE}
+source("pause_workflow_funcs_v2.R") # from guertinlab/compartment_model/R/ on Github
+
+bw.cntrl.plus = load.bigWig('HEK_CloneZD29_30min_control_plus_PE1_scaled.bigWig')
+bw.cntrl.minus = load.bigWig('HEK_CloneZD29_30min_control_minus_PE1_scaled.bigWig')
+
+bw.cond1.plus = load.bigWig('HEK_CloneZD29_30min_dTAGV1_plus_PE1_scaled.bigWig')
+bw.cond1.minus = load.bigWig('HEK_CloneZD29_30min_dTAGV1_minus_PE1_scaled.bigWig')
+
+pTA = deseqAlldist[,c(2,3,4,1,5,6)]
+write.table(deseqAlldist[,c(2,3,4,1,5,6)],file="inferred_transcript_units_ZNF143_PRO.bed",sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE)
+df.pause.body <- find.pause.regions(pTA,bw.cntrl.plus,bw.cntrl.minus)
+rownames(df.pause.body) = df.pause.body$gene
+
+merged.pbody.dtagv1.vs.control = merge(df.pause.body, deseqAlldist[,c(2,3,4,1,5,6,12)])
+merged.pbody.dtagv1.vs.control = merged.pbody.dtagv1.vs.control[,c(colnames(df.pause.body),colnames(deseqAlldist[,c(2,3,4,1,5,6,12)]))]
+
+bedOut = deseqAlldist[,c(2,3,4,1,5,6,12)]
+colnames(bedOut) = c("chr","start","end","gene","baseMean","strand","treatment")
+saveRDS(bedOut,file="ZNF143_pro_deseq_categories.bed")
+
+run.plotting.steps(merged.pbody.dtagv1.vs.control, "Control", bw.cntrl.plus, bw.cntrl.minus, "ZNF143_dTAGV1", bw.cond1.plus, bw.cond1.minus, "ZNF143_dTAGV1 (all genes)", color.names=c(rgb(1,0,0,1/2), rgb(0,0,1,1/2)))
+# output:
+# [1] "saved composite.ZNF143_dTAGV1.v.Control.rds"
+# [1] "will use 3.510542 as ylimit"
+# [1] "saved composite_PolII_density_around_ZNF143_dTAGV1 (all genes)_genes_ZNF143_dTAGV1.v.Control.pdf"
+# [1] "saved density.ZNF143_dTAGV1.v.Control.rds"
+# [1] "box-whisker-violin: setting min(ylim): -3.734154, max(ylim): 3.703059"
+# [1] "saved pause.index.fc.ZNF143_dTAGV1.v.Control.pdf"
+
+density.obj = readRDS("density.ZNF143_dTAGV1.v.Control.rds")
+
+# down genes only
+repressed.baseline = subset(density.obj, cond == "Control" & catRS == "Down")
+dim(repressed.baseline) #[1] 365  21
+repressed.treatment = subset(density.obj, cond == "ZNF143_dTAGV1" & catRS == "Down")
+dim(repressed.treatment) # [1] 365  21
+colNames = c("gene", "pause_sum", "body_avg")
+write.table(repressed.baseline[,colNames], "ZNF143_dTAGV1_down_baseline.txt",  sep="\t", quote=F, row.names=F)
+write.table(repressed.treatment[,colNames], "ZNF143_dTAGV1_down_treatment.txt",  sep="\t", quote=F, row.names=F)
+
+```
+
+After running the model, the results were compiled into `combinedResults.txt.gz` and plotted with the following code chunk:
+
+```{r engine='R', eval=F, echo=TRUE}
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+combined_df = read.table("/Users/rudradeepmukherjee/Documents/UConn Health/comparment.model.project/datasets, genome/ZNF143_Data/Jinhong/combinedResults.txt", sep="\t", header=T)
+
+combined_df$kinit_FC = combined_df$initiation_ZNF143_dTAGv1 / combined_df$initiation_baseline
+combined_df$krel_FC = combined_df$pauseRelease_ZNF143_dTAGv1 / combined_df$pauseRelease_baseline
+
+summary.combined_df = combined_df %>% group_by(gene) %>% summarise_at(c("kinit_FC", "krel_FC"), c("mean", "min", "max", "median"))
+
+ggplot(summary.combined_df) + 
+        geom_violin(aes(x="Initiation", y = kinit_FC_median), scale="width") + 
+        geom_violin(aes(x="Pause Release", y = krel_FC_median), scale="width") +
+        geom_boxplot(aes(x="Initiation", y = kinit_FC_median), width = 0.3, alpha=0.3) + 
+        geom_boxplot(aes(x="Pause Release", y = krel_FC_median), width = 0.3, alpha=0.3) +
+        geom_point(aes(x="Initiation", y = kinit_FC_median), position="jitter", alpha=0.2) + 
+        geom_point(aes(x="Pause Release", y = krel_FC_median), position="jitter", alpha=0.2) +
+          
+        scale_y_continuous(trans=log10_trans(),
+                breaks=trans_breaks('log10', function(x) 10^x),
+                labels=trans_format('log10', math_format(.x))) + ylab(expression(log[10] ~ "median foldchange")) +
+             theme_bw() + fontTheme
+ggsave("ZNF143_median_foldchange.pdf") # Fig 3D
+
+```
+
 
 
 # Old stuff
