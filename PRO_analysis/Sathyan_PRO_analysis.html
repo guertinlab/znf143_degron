@@ -732,29 +732,45 @@ function toggle_visibility(id1) {
 <li><a href="#dtag-called-tsss" id="toc-dtag-called-tsss"><span class="toc-section-number">6.2</span> dTAG-called TSSs</a></li>
 </ul></li>
 <li><a href="#primarytranscriptannotation" id="toc-primarytranscriptannotation"><span class="toc-section-number">7</span> primaryTranscriptAnnotation</a></li>
-<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">8</span> Differential expression analysis</a></li>
+<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">8</span> Differential expression analysis</a>
+<ul>
+<li><a href="#deseq2-analysis-and-ma-plot-fig.-3a" id="toc-deseq2-analysis-and-ma-plot-fig.-3a"><span class="toc-section-number">8.1</span> DESeq2 analysis and MA plot (Fig. 3A):</a></li>
+</ul></li>
 <li><a href="#code-for-making-integrated-ucsc-tracks" id="toc-code-for-making-integrated-ucsc-tracks"><span class="toc-section-number">9</span> Code for making integrated UCSC tracks</a></li>
 <li><a href="#code-for-inferring-regulatory-elements-using-bidirectional-txn" id="toc-code-for-inferring-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</a></li>
 <li><a href="#detour-to-chip-seq-analysis" id="toc-detour-to-chip-seq-analysis"><span class="toc-section-number">11</span> Detour to ChIP-seq analysis</a></li>
 <li><a href="#make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b" id="toc-make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b"><span class="toc-section-number">12</span> Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)</a></li>
 <li><a href="#deeptools-heatmap-fig.-3c" id="toc-deeptools-heatmap-fig.-3c"><span class="toc-section-number">13</span> deepTools heatmap (Fig. 3C)</a></li>
 <li><a href="#compartment-modeling-fig.-3d" id="toc-compartment-modeling-fig.-3d"><span class="toc-section-number">14</span> Compartment modeling (Fig. 3D)</a></li>
-<li><a href="#identifying-shifting-tsss" id="toc-identifying-shifting-tsss"><span class="toc-section-number">15</span> Identifying shifting TSSs</a></li>
-<li><a href="#old-stuff" id="toc-old-stuff"><span class="toc-section-number">16</span> Old stuff</a>
+<li><a href="#identifying-shifting-tsss" id="toc-identifying-shifting-tsss"><span class="toc-section-number">15</span> Identifying shifting TSSs</a>
 <ul>
-<li><a href="#create-cdfs-reference-code-from-genex-course" id="toc-create-cdfs-reference-code-from-genex-course"><span class="toc-section-number">16.1</span> Create CDFs (reference code from genex course)</a></li>
-</ul></li>
-<li><a href="#cdf-move-this-section-later" id="toc-cdf-move-this-section-later"><span class="toc-section-number">17</span> CDF [move this section later]</a>
+<li><a href="#find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart" id="toc-find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart"><span class="toc-section-number">15.1</span> Find fraction of genes with shifted max TSS locations (Fig. 3E barchart)</a></li>
+<li><a href="#quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f" id="toc-quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f"><span class="toc-section-number">15.2</span> Quantified cTSS and dTSS changes after ZNF143 degradation (Fig. 3F)</a>
 <ul>
-<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">17.1</span> Plot an MA plot for activated and repressed and unchanged</a></li>
+<li><a href="#violin-plot" id="toc-violin-plot"><span class="toc-section-number">15.2.1</span> Violin plot</a></li>
+<li><a href="#barchart" id="toc-barchart"><span class="toc-section-number">15.2.2</span> Barchart</a></li>
 </ul></li>
-<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">18</span> Determining threshold for “functional” ChIP peaks</a>
+</ul></li>
+<li><a href="#heatmaps-of-promoter-enriched-motifs-fig.-5b-6a-s8" id="toc-heatmaps-of-promoter-enriched-motifs-fig.-5b-6a-s8"><span class="toc-section-number">16</span> Heatmaps of promoter-enriched motifs (Fig. 5B, 6A, S8)</a>
 <ul>
-<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">18.1</span> Merge quantile beds</a></li>
-<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">18.2</span> Plot all cumulative quantiles together</a></li>
+<li><a href="#defining-promoter-enriched-motifs" id="toc-defining-promoter-enriched-motifs"><span class="toc-section-number">16.1</span> Defining “promoter-enriched” motifs</a></li>
+<li><a href="#fimo-for-specific-motifs" id="toc-fimo-for-specific-motifs"><span class="toc-section-number">16.2</span> FIMO for specific motifs</a></li>
 </ul></li>
-<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">19</span> Features of Repressed Genes</a></li>
-<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">20</span> Picking SP ChIP antibodies</a></li>
+<li><a href="#old-stuff" id="toc-old-stuff"><span class="toc-section-number">17</span> Old stuff</a>
+<ul>
+<li><a href="#create-cdfs-reference-code-from-genex-course" id="toc-create-cdfs-reference-code-from-genex-course"><span class="toc-section-number">17.1</span> Create CDFs (reference code from genex course)</a></li>
+</ul></li>
+<li><a href="#cdf-move-this-section-later" id="toc-cdf-move-this-section-later"><span class="toc-section-number">18</span> CDF [move this section later]</a>
+<ul>
+<li><a href="#plot-an-ma-plot-for-activated-and-repressed-and-unchanged" id="toc-plot-an-ma-plot-for-activated-and-repressed-and-unchanged"><span class="toc-section-number">18.1</span> Plot an MA plot for activated and repressed and unchanged</a></li>
+</ul></li>
+<li><a href="#determining-threshold-for-functional-chip-peaks" id="toc-determining-threshold-for-functional-chip-peaks"><span class="toc-section-number">19</span> Determining threshold for “functional” ChIP peaks</a>
+<ul>
+<li><a href="#merge-quantile-beds" id="toc-merge-quantile-beds"><span class="toc-section-number">19.1</span> Merge quantile beds</a></li>
+<li><a href="#plot-all-cumulative-quantiles-together" id="toc-plot-all-cumulative-quantiles-together"><span class="toc-section-number">19.2</span> Plot all cumulative quantiles together</a></li>
+</ul></li>
+<li><a href="#features-of-repressed-genes" id="toc-features-of-repressed-genes"><span class="toc-section-number">20</span> Features of Repressed Genes</a></li>
+<li><a href="#picking-sp-chip-antibodies" id="toc-picking-sp-chip-antibodies"><span class="toc-section-number">21</span> Picking SP ChIP antibodies</a></li>
 </ul>
 </div>
 
@@ -1336,6 +1352,7 @@ write.table(oldExon1, file=&quot;gencode_exon1_parsed_updated.bed&quot;,sep=&quo
 </div>
 <div id="tssinference" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> TSSInference</h1>
+<p>The <code>TSSinference.R</code> script can be found at: <a href="https://github.com/guertinlab/TSSinference">https://github.com/guertinlab/TSSinference</a>.</p>
 <div id="control-called-tsss" class="section level2" number="6.1">
 <h2><span class="header-section-number">6.1</span> Control-called TSSs</h2>
 <p>For differential gene expression analysis, call TSSs from the control data only.</p>
@@ -1363,35 +1380,7 @@ dim(controlTSSmaxH) # 15586 genes</code></pre>
 <p>Reassigning the “problem TSS”:
 These coordinates were chosen manually by selecting the read peak closest to the annotated version of ABCB1 in the genome browser that had an appreciable peak.</p>
 <pre class="r"><code>controlTSSmaxH[grepl(&quot;ABCB1&quot;,controlTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,controlTSSmaxH$chrom),]$start = 87600883
-controlTSSmaxH[grepl(&quot;ABCB1&quot;,controlTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,controlTSSmaxH$chrom),]$end = 87600884
-
-# run TSSinference and select primary TSSs based on height (read count)
-# potential.tss2 = TSSinference(gene.exon1, bw.minus, bw.plus, densityFilter=FALSE)
-# flipTSS = potential.tss2[!is.na(potential.tss2$height),]
-# flipTSS.sort = flipTSS[order(flipTSS$chrom, flipTSS$start),]
-# flipTSS.sort = flipTSS.sort[!(flipTSS.sort$chrom == &quot;chrM&quot;),]
-# flipTSSmaxH = do.call(rbind, lapply( split(flipTSS.sort, as.factor(flipTSS.sort$gene)), function(x) {return(x[which.max(x$height),])}))
-
-# write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = &quot;flipTSSmaxH.bed&quot;, quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = FALSE)
-
-# to identify the problem row
-# flipTSSmaxH[grepl(&quot;ABCB1&quot;,flipTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,flipTSSmaxH$chrom),]
-# #       chrom    start      end  gene  misc strand   height         up     down
-# # ABCB1  chr7 87628641 87628642 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
-
-# flipTSSmaxH[grepl(&quot;ABCB1&quot;,flipTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,flipTSSmaxH$chrom),]$start = 87600883
-# flipTSSmaxH[grepl(&quot;ABCB1&quot;,flipTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,flipTSSmaxH$chrom),]$end = 87600884
-# # the height and up/down densities are wrong but the position is the important thing here
-
-# #check
-# flipTSSmaxH[grepl(&quot;ABCB1&quot;,flipTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,flipTSSmaxH$chrom),]
-# #       chrom    start      end  gene  misc strand   height         up     down
-# # ABCB1  chr7 87600883 87600884 ABCB1 ABCB1      - 638.6562 0.03999625 6.610102
-
-# # new as of 09-13-23
-# save(flipTSSmaxH, file=&quot;flipTSSmaxH.Rdata&quot;)
-
-# write.table(flipTSSmaxH[, c(1,2,3,4,7,6)], file = &quot;flipTSSmaxH.bed&quot;, quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = FALSE)</code></pre>
+controlTSSmaxH[grepl(&quot;ABCB1&quot;,controlTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,controlTSSmaxH$chrom),]$end = 87600884</code></pre>
 </div>
 <div id="dtag-called-tsss" class="section level2" number="6.2">
 <h2><span class="header-section-number">6.2</span> dTAG-called TSSs</h2>
@@ -1633,7 +1622,8 @@ plotPCAlattice &lt;- function(df, file = &#39;PCA_lattice.pdf&#39;) {
                col = colpal))
   dev.off()
 }</code></pre>
-<p>DESeq2 analysis and MA plot (Fig. 3A):</p>
+<div id="deseq2-analysis-and-ma-plot-fig.-3a" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> DESeq2 analysis and MA plot (Fig. 3A):</h2>
 <pre class="r"><code>inferred.coords = final.coords
 
 # use unnormalized bigWigs and get size factors from DESeq2
@@ -1743,6 +1733,7 @@ xyplot(deseqAll$log2FoldChangeRS ~ log(deseqAll$baseMeanRS, base=10),
                         par.ylab.text=list(cex=1.1,font=2)))
 dev.off()</code></pre>
 </div>
+</div>
 <div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
 <h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh</a>
@@ -1757,7 +1748,7 @@ awk &#39;{OFS=&quot;\t&quot;;} {print $1,$6,$3}&#39; ZNF143_total.dREG.peak.full
 </div>
 <div id="detour-to-chip-seq-analysis" class="section level1" number="11">
 <h1><span class="header-section-number">11</span> Detour to ChIP-seq analysis</h1>
-<p>Please see ChIP-seq analysis vignette for processing of ZNF143-dTAG ChIP-seq samples and identification of functional ZNF143 binding sites.</p>
+<p>Please see ChIP-seq analysis vignette (<a href="https://guertinlab.github.io/znf143_degron/ChIP_analysis/Sathyan_ChIP_analysis.html" class="uri">https://guertinlab.github.io/znf143_degron/ChIP_analysis/Sathyan_ChIP_analysis.html</a>) for processing of ZNF143-dTAG ChIP-seq samples and identification of functional ZNF143 binding sites.</p>
 </div>
 <div id="make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b" class="section level1" number="12">
 <h1><span class="header-section-number">12</span> Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)</h1>
@@ -1969,11 +1960,253 @@ ggsave(&quot;ZNF143_median_foldchange.pdf&quot;) # Fig 3D</code></pre>
 </div>
 <div id="identifying-shifting-tsss" class="section level1" number="15">
 <h1><span class="header-section-number">15</span> Identifying shifting TSSs</h1>
+<pre class="r"><code># Add control-called TSSs (cTSS) and dTAG-called TSSs (dTSS) into 
+# the table with all DESeq results and gene categorizations
+colnames(dTAGtssAllmaxH) = c(&quot;dTSSchr&quot;,&quot;dTSSstart&quot;,&quot;dTSSend&quot;,&quot;gene&quot;,&quot;misc&quot;,&quot;strand&quot;,&quot;dTSSheight&quot;,&quot;dTSSupDens&quot;,&quot;dTSSdownDens&quot;)
+deseqAlldistTSSs = merge(deseqAlldist,dTAGtssAllmaxH[,c(&quot;dTSSchr&quot;,&quot;dTSSstart&quot;,&quot;dTSSend&quot;,&quot;gene&quot;,&quot;dTSSheight&quot;,&quot;dTSSupDens&quot;,&quot;dTSSdownDens&quot;)],by=&quot;gene&quot;,all.x=TRUE)
+
+colnames(controlTSSmaxH) = c(&quot;cTSSchr&quot;,&quot;cTSSstart&quot;,&quot;cTSSend&quot;,&quot;gene&quot;,&quot;misc&quot;,&quot;strand&quot;,&quot;cTSSheight&quot;,&quot;cTSSupDens&quot;,&quot;cTSSdownDens&quot;)
+deseqAlldistTSSconds = merge(deseqAlldistTSSs,controlTSSmaxH[,c(&quot;gene&quot;,&quot;cTSSheight&quot;,&quot;cTSSupDens&quot;,&quot;cTSSdownDens&quot;)],by=&quot;gene&quot;,all.x=TRUE)
+
+# distances from nearest ZNF143 motif to the dTSSs: disMOTIFdTSS
+bedTools.closest &lt;- function(functionstring=&quot;/usr/local/bin/bedtools2-2.31.0/bin/closestBed&quot;,bed1,bed2,opt.string=&quot;&quot;,distLabel = &quot;dis&quot;) {
+  
+  options(scipen =99) # not to use scientific notation when writing out
+  
+  #write bed formatted dataframes to tempfile
+  write.table(bed1,file= &#39;a.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  write.table(bed2,file= &#39;b.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  
+  # create the command string and call the command using system()
+  command1=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;a.file.bed&#39;, &#39;&gt; a.file.sorted.bed&#39;)
+  cat(command1,&quot;\n&quot;)
+  try(system(command1))
+  command2=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;b.file.bed&#39;, &#39;&gt; b.file.sorted.bed&#39;)
+  cat(command2,&quot;\n&quot;)
+  try(system(command2))
+  
+  # use opt.string argument to add options for closestBed
+  command=paste(functionstring,opt.string,&quot;-a&quot;,&#39;a.file.sorted.bed&#39;,&quot;-b&quot;,&#39;b.file.sorted.bed&#39;,&quot;&gt;&quot;,&#39;out.file.bed&#39;,sep=&quot; &quot;)
+  cat(command,&quot;\n&quot;)
+  try(system(command))
+  
+  res=read.table(&#39;out.file.bed&#39;,sep =&quot;\t&quot;, header=F, comment.char=&#39;&#39;)
+  
+  command3=paste(&#39;rm&#39;, &#39;a.file.bed&#39;, &#39;b.file.bed&#39;, &#39;a.file.sorted.bed&#39;, &#39;b.file.sorted.bed&#39;, &#39;out.file.bed&#39;)
+  cat(command3,&quot;\n&quot;)
+  try(system(command3))
+  
+  colnames(res) = c(colnames(bed1), colnames(bed2), distLabel )
+  return(res)
+}
+
+bed.tss = deseqAlldistTSSconds[!is.na(deseqAlldistTSSconds$dTSSchr),c(&quot;dTSSchr&quot;,&quot;dTSSstart&quot;,&quot;dTSSend&quot;,&quot;gene&quot;,&quot;baseMeanRS&quot;,&quot;strand&quot;)]
+distances = bedTools.closest(bed1 = bed.tss, bed2 = znf143binding, opt.string = &#39;-D a&#39;, distLabel = &quot;disMOTIFdTSS&quot;)
+colnames(distances) = c(&quot;dTSSchr&quot;,&quot;dTSSstart&quot;, &quot;dTSSend&quot;, &quot;gene&quot;, &quot;baseMeanRS&quot;, &quot;strand&quot;, &quot;chrMotifDT&quot;, &quot;startMotifDT&quot;,&quot;endMotifDT&quot;,&quot;motifDT&quot;, &quot;peakIntensDT&quot;, &quot;strandMotifDT&quot;,&quot;disMOTIFdTSS&quot;)
+
+# Merge back into giant table
+znf143genesDF = merge(deseqAlldistTSSconds,distances[,c(&quot;gene&quot;,&quot;chrMotifDT&quot;, &quot;startMotifDT&quot;,&quot;endMotifDT&quot;,&quot;motifDT&quot;, &quot;peakIntensDT&quot;, &quot;strandMotifDT&quot;,&quot;disMOTIFdTSS&quot;)],by=&quot;gene&quot;, all.x=TRUE)</code></pre>
+<div id="find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart" class="section level2" number="15.1">
+<h2><span class="header-section-number">15.1</span> Find fraction of genes with shifted max TSS locations (Fig. 3E barchart)</h2>
+<pre class="r"><code># Create coords cols for cTSS and dTSS 
+znf143genesDF$cTSScoords = paste0(znf143genesDF$cTSSchr,&quot;:&quot;,znf143genesDF$cTSSstart,&quot;-&quot;,znf143genesDF$cTSSend)
+znf143genesDF$dTSScoords = paste0(znf143genesDF$dTSSchr,&quot;:&quot;,znf143genesDF$dTSSstart,&quot;-&quot;,znf143genesDF$dTSSend)
+
+# Categorize by presence/absence of TSS shift
+znf143genesDF$TSSshift = &quot;No&quot;
+znf143genesDF$TSSshift[znf143genesDF$cTSScoords != znf143genesDF$dTSScoords] = &quot;Yes&quot;
+
+# Number of down promo genes that have a shifting max TSS: 
+dim(znf143genesDF[znf143genesDF$catRS == &quot;Down&quot; &amp; abs(znf143genesDF$disMOTIFcTSS) &lt; 500 &amp; znf143genesDF$disMOTIFcTSS &lt; 0 &amp; znf143genesDF$TSSshift == &quot;Yes&quot;,])
+# 119 out of 292 = 40.7% 
+
+# Match unchanged genes on control TSS heights
+znf143genesDF$catRS[znf143genesDF$log2FoldChangeRS &lt; 0.01 &amp; znf143genesDF$log2FoldChangeRS &gt; -0.01 &amp; znf143genesDF$padjRS &gt; 0.1] = &quot;Unchanged&quot; 
+# 1430 unchanged genes
+
+unchanged = znf143genesDF[znf143genesDF$catRS == &quot;Unchanged&quot; &amp; abs(znf143genesDF$disMOTIFcTSS) &gt; 500,]
+unchanged$treatment = 0
+down500promo = znf143genesDF[znf143genesDF$catRS == &quot;Down&quot; &amp; znf143genesDF$disMOTIFdTSS &gt; -500 &amp; znf143genesDF$disMOTIFcTSS &lt; 0,]
+down500promo$treatment = 1
+df.deseq.effects.lattice = rbind(unchanged, down500promo) # SAVE WORKSPACE 
+out = matchit(treatment ~ cTSSheight, data = df.deseq.effects.lattice[!is.na(df.deseq.effects.lattice$cTSSheight),], method = &quot;optimal&quot;, ratio = 1)
+cTSSmatches = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
+znf143genesDF$matchDownPromoCTSS = znf143genesDF$gene %in% cTSSmatches$gene
+
+# Matched unchanged genes with shifting TSSs 
+dim(znf143genesDF[znf143genesDF$matchDownPromoCTSS == TRUE &amp; znf143genesDF$TSSshift == &quot;Yes&quot;,])
+# [1] 57 66
+dim(znf143genesDF[znf143genesDF$matchDownPromoCTSS == TRUE,])
+# [1] 292  66 # 57/292 = 19.5 % 
+
+# How many unchanged genes overall have shifted TSSs?
+dim(znf143genesDF[znf143genesDF$catRS == &quot;Unchanged&quot; &amp; abs(znf143genesDF$disMOTIFcTSS) &gt; 500 &amp; znf143genesDF$TSSshift == &quot;Yes&quot;,]) # 324 out of 1215 = 26.7% 
+
+plot.barchart &lt;- function(df.barchart, cols = c(&quot;grey&quot;, &quot;blue&quot;, &quot;green&quot;, &quot;purple&quot;, &quot;yellow&quot;, &quot;pink&quot;),filename = &quot;barchart_AS.pdf&quot;) {
+  pdf(filename, width=3, height=4)
+
+  polycol &lt;- trellis.par.get(&quot;superpose.polygon&quot;)
+  # colors will fill from last row upwards
+  polycol$col &lt;- cols
+  trellis.par.set(&quot;superpose.polygon&quot;,polycol)
+
+  print(barchart(as.numeric(as.character(fraction))~factor, data = df.barchart, groups=p_n,
+                 stack=TRUE,
+                 as.table=TRUE,
+                 layout=c(1,1),
+               #auto.key = list(title = &quot;&quot;,rows=3,fill=colors,just=&quot;bottom&quot;),
+                 #ain=&quot;H3R26Cit Peaks&quot;,
+               #xlab = &quot;HSF1 or HSF2 Peaks&quot;,
+                 ylab=&quot;Fraction with shifted max TSS&quot;,
+                 cex.axis=1.2,
+                 between=list(y=0.5, x=0.5),
+                 font.axis=1,
+                 par.settings=list(par.xlab.text=list(cex=1.0,font=1),
+                   par.ylab.text=list(cex=1.2,font=1),
+                   axis.text=list(cex=1,font=1),
+                   strip.background=list(col=&quot;#ecdaf5&quot;),
+                   par.main.text=list(cex=1.2, font=1)),
+                                        #aspect = 1,
+                 scales=list(x=list(alternating=c(1,1,1,0,0,0),rot=0),
+                   y=list(alternating=c(1,1)))))
+  
+  dev.off()
+}
+
+num = c(119,173,57,235)
+totals = c(292,292,292,292)
+p_n = c(&quot;ayes&quot;,&quot;bno&quot;,&quot;ayes&quot;,&quot;bno&quot;)
+factor = c(&quot;Down&quot;,&quot;Down&quot;,&quot;Matched&quot;,&quot;Matched&quot;)
+barDF = as.data.frame(cbind(num,totals,p_n,factor))
+barDF$fraction = as.numeric(barDF$num)/as.numeric(barDF$totals)
+barDF
+#   num totals  p_n  factor  fraction
+# 1 119    293 ayes    Down 0.4061433
+# 2 174    293  bno    Down 0.5938567
+# 3  10     41 ayes Matched 0.2439024
+# 4  31     41  bno Matched 0.7560976
+
+colors = c(&quot;orange&quot;,&quot;grey&quot;)
+plot.barchart(barDF,cols=colors,filename=&quot;barchart_downPromo_TSSshifts_20240326.pdf&quot;)</code></pre>
 </div>
-<div id="old-stuff" class="section level1" number="16">
-<h1><span class="header-section-number">16</span> Old stuff</h1>
-<div id="create-cdfs-reference-code-from-genex-course" class="section level2" number="16.1">
-<h2><span class="header-section-number">16.1</span> Create CDFs (reference code from genex course)</h2>
+<div id="quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f" class="section level2" number="15.2">
+<h2><span class="header-section-number">15.2</span> Quantified cTSS and dTSS changes after ZNF143 degradation (Fig. 3F)</h2>
+<div id="violin-plot" class="section level3" number="15.2.1">
+<h3><span class="header-section-number">15.2.1</span> Violin plot</h3>
+<pre class="r"><code>library(&#39;reshape2&#39;)
+
+# Add read counts at cTSS positions in the dTAG condition to the giant table
+cTSSbed = znf143genesDF[,c(&quot;cTSSchr&quot;,&quot;cTSSstart&quot;,&quot;cTSSend&quot;,&quot;gene&quot;,&quot;cTSSheight&quot;,&quot;strand&quot;)]
+bwPlus = load.bigWig(bw.plusDtag)
+bwMinus = load.bigWig(bw.minusDtag)
+cTSSbed$cTSSdCount = bed6.region.probeQuery.bigWig(bwPlus, bwMinus, cTSSbed, op = &quot;sum&quot;, abs.value = TRUE, gap.value = 0)
+test = merge(znf143genesDF,cTSSbed[,c(&quot;gene&quot;,&quot;cTSSdCount&quot;)],by=&quot;gene&quot;,all.x=TRUE)
+znf143genesDF = test
+
+# Add read counts at dTSS positions in the control samples to the giant table
+dTSSbed = znf143genesDF[,c(&quot;dTSSchr&quot;,&quot;dTSSstart&quot;,&quot;dTSSend&quot;,&quot;gene&quot;,&quot;dTSSheight&quot;,&quot;strand&quot;)]
+# 84 genes with NA for dTSS coordinates; need to be removed for probeQuery 
+dTSSbed = dTSSbed[!is.na(dTSSbed$dTSSchr),]
+bwPlus = load.bigWig(bw.plus)
+bwMinus = load.bigWig(bw.minus)
+dTSSbed$dTSScCount = bed6.region.probeQuery.bigWig(bwPlus, bwMinus, dTSSbed, op = &quot;sum&quot;, abs.value = TRUE, gap.value = 0)
+test = merge(znf143genesDF,dTSSbed[,c(&quot;gene&quot;,&quot;dTSScCount&quot;)],by=&quot;gene&quot;,all.x=TRUE)
+znf143genesDF = test
+
+# Categorize all TSSs
+znf143genesDF$cTSSinc = as.numeric(znf143genesDF$cTSSdCount) &gt; as.numeric(znf143genesDF$cTSSheight)
+znf143genesDF$dTSSinc = as.numeric(znf143genesDF$dTSSheight) &gt; as.numeric(znf143genesDF$dTSScCount)
+
+downPromoAll = znf143genesDF[znf143genesDF$catRS == &quot;Down&quot; &amp; znf143genesDF$disMOTIFcTSS &gt; -500 &amp; znf143genesDF$disMOTIFcTSS &lt; 0,] 
+
+downPromoShiftYesCTSStall = melt(downPromoAll[downPromoAll$TSSshift == &quot;Yes&quot;,c(&quot;gene&quot;,&quot;cTSSheight&quot;,&quot;cTSSdCount&quot;,&quot;cTSSinc&quot;)], id.vars=c(&quot;gene&quot;,&quot;cTSSinc&quot;), variable.name=&quot;dTAGcondition&quot;, value.name=&quot;TSSheight&quot;)
+
+downPromoShiftYesDTSStall = melt(downPromoAll[downPromoAll$TSSshift == &quot;Yes&quot;,c(&quot;gene&quot;,&quot;dTSSheight&quot;,&quot;dTSScCount&quot;,&quot;dTSSinc&quot;)], id.vars=c(&quot;gene&quot;,&quot;dTSSinc&quot;), variable.name=&quot;dTAGcondition&quot;, value.name=&quot;TSSheight&quot;)
+
+downPromoShiftYesCTSStall$TSStype = &quot;Control TSS&quot;
+downPromoShiftYesDTSStall$TSStype = &quot;dTAG TSS&quot;
+
+names(downPromoShiftYesDTSStall) = c(&quot;gene&quot;,&quot;cTSSinc&quot;, &quot;dTAGcondition&quot;, &quot;TSSheight&quot;,&quot;TSStype&quot;)
+downPromoShiftsOnly= rbind(downPromoShiftYesCTSStall,downPromoShiftYesDTSStall)
+# remove NAs (there were no NAs)
+downPromoShiftsOnlyClean = na.omit(as.data.frame(downPromoShiftsOnly)) # 119 genes
+downPromoShiftsOnlyClean$dTAGcondition = as.character(downPromoShiftsOnlyClean$dTAGcondition)
+downPromoShiftsOnlyClean$dTAGcondition[downPromoShiftsOnlyClean$dTAGcondition == &quot;cTSSheight&quot;] = &quot;control height&quot;
+downPromoShiftsOnlyClean$dTAGcondition[downPromoShiftsOnlyClean$dTAGcondition == &quot;dTSScCount&quot;] = &quot;control height&quot;
+downPromoShiftsOnlyClean$dTAGcondition[downPromoShiftsOnlyClean$dTAGcondition == &quot;dTSSheight&quot;] = &quot;dTAG height&quot;
+downPromoShiftsOnlyClean$dTAGcondition[downPromoShiftsOnlyClean$dTAGcondition == &quot;cTSSdCount&quot;] = &quot;dTAG height&quot;
+
+pdf(&quot;gg2_bwViolin_downProm_log10cHeights_allShiftedTSSs.pdf&quot;, useDingbats = FALSE, width=5, height=4)
+ggplot(downPromoShiftsOnlyClean, aes(x = dTAGcondition,y=log(as.numeric(TSSheight),10))) +
+    facet_grid(cols = vars(TSStype)) +
+    geom_violin(width=0.8) + 
+    geom_boxplot(aes(fill = factor(dTAGcondition)), alpha = .2) + 
+    geom_line(aes(group = gene, col = cTSSinc)) + 
+    scale_color_manual(name=&quot;TSS height\nafter dTAGV1&quot;,labels= c(&quot;Decreasing&quot;,&quot;Increasing&quot;),values = c(&quot;#5b5b5b8C&quot;,&quot;#EC008C8C&quot;)) +
+    geom_point(size = 0.8)+
+    scale_x_discrete(labels=c(&quot;0 min&quot;,&quot;30 min&quot;)) +
+    labs(x=&quot;dTAGV1 treatment&quot;,y=expression(log[10]~&quot;TSS height&quot;),fill=&quot;Condition&quot;) +
+    theme(panel.background = element_rect(fill=&quot;transparent&quot;),
+        plot.background = element_rect(fill=&quot;transparent&quot;, color=NA),
+        legend.background = element_rect(fill=&quot;transparent&quot;),
+        legend.box.background = element_rect(fill=&quot;transparent&quot;),
+        axis.line = element_line(color = &quot;black&quot;))
+dev.off()</code></pre>
+</div>
+<div id="barchart" class="section level3" number="15.2.2">
+<h3><span class="header-section-number">15.2.2</span> Barchart</h3>
+<pre class="r"><code># control TSS increased: 4
+length(unique(downPromoAllByShift[downPromoAllByShift$TSStype == &quot;Control TSS&quot; &amp; downPromoAllByShift$cTSSinc == TRUE,&quot;gene&quot;]))
+# control TSS decreased: 115 (total 119)
+length(unique(downPromoAllByShift[downPromoAllByShift$TSStype == &quot;Control TSS&quot; &amp; downPromoAllByShift$cTSSinc == FALSE,&quot;gene&quot;]))
+
+# dTAG TSS increased: 81
+length(unique(downPromoAllByShift[downPromoAllByShift$TSStype == &quot;dTAG TSS&quot; &amp; downPromoAllByShift$cTSSinc == TRUE,&quot;gene&quot;]))
+# dTAG TSS decreased: 38 (total 119)
+length(unique(downPromoAllByShift[downPromoAllByShift$TSStype == &quot;dTAG TSS&quot; &amp; downPromoAllByShift$cTSSinc == FALSE,&quot;gene&quot;]))
+
+# no shift increased: 29
+length(unique(downPromoAllByShift[downPromoAllByShift$TSStype == &quot;No shift&quot; &amp; downPromoAllByShift$cTSSinc == TRUE,&quot;gene&quot;]))
+# no shift decreased: 145 (total 174)
+length(unique(downPromoAllByShift[downPromoAllByShift$TSStype == &quot;No shift&quot; &amp; downPromoAllByShift$cTSSinc == FALSE,&quot;gene&quot;]))
+
+num = c(4,115,81,38,29,145)
+totals = c(119,119,119,119,174,174)
+p_n = c(&quot;aInc&quot;,&quot;bDec&quot;,&quot;aInc&quot;,&quot;bDec&quot;,&quot;aInc&quot;,&quot;bDec&quot;)
+factor = c(&quot;Control&quot;,&quot;Control&quot;,&quot;dTAG&quot;,&quot;dTAG&quot;,&quot;No shift&quot;,&quot;No shift&quot;)
+barDF = as.data.frame(cbind(num,totals,p_n,factor))
+barDF$fraction = as.numeric(barDF$num)/as.numeric(barDF$totals)
+barDF
+#   num totals  p_n      factor   fraction
+# 1   4    119 aInc Control TSS 0.03361345
+# 2 115    119 bDec Control TSS 0.96638655
+# 3  81    119 aInc    dTAG TSS 0.68067227
+# 4  38    119 bDec    dTAG TSS 0.31932773
+# 5  29    174 aInc    No shift 0.16666667
+# 6 145    174 bDec    No shift 0.83333333
+colors = c(&quot;#EC008C8C&quot;,&quot;#5b5b5b8C&quot;)
+plot.barchart(barDF,cols=colors,filename=&quot;barchart_downPromo_TSSshiftIncreases_20240326.pdf&quot;)
+
+# manually change y-axis label to &quot;Fraction of TSSs that Increased +dTAG&quot;
+# and add numbers for each category</code></pre>
+</div>
+</div>
+</div>
+<div id="heatmaps-of-promoter-enriched-motifs-fig.-5b-6a-s8" class="section level1" number="16">
+<h1><span class="header-section-number">16</span> Heatmaps of promoter-enriched motifs (Fig. 5B, 6A, S8)</h1>
+<div id="defining-promoter-enriched-motifs" class="section level2" number="16.1">
+<h2><span class="header-section-number">16.1</span> Defining “promoter-enriched” motifs</h2>
+<p>We called sense- and anti-sense TSSs for every gene in our control samples in order to establish rough boundaries for “promoters”. Within these boundaries, we performed de novo motif analysis with MEME and matched to the JASPAR database to identify which transcription factor motifs were most enriched.</p>
+</div>
+<div id="fimo-for-specific-motifs" class="section level2" number="16.2">
+<h2><span class="header-section-number">16.2</span> FIMO for specific motifs</h2>
+<p>YY1, SP1, ETS, Nrf1, bZIP</p>
+</div>
+</div>
+<div id="old-stuff" class="section level1" number="17">
+<h1><span class="header-section-number">17</span> Old stuff</h1>
+<div id="create-cdfs-reference-code-from-genex-course" class="section level2" number="17.1">
+<h2><span class="header-section-number">17.1</span> Create CDFs (reference code from genex course)</h2>
 <p>Set up functions and packages:</p>
 <pre class="r"><code>library(latticeExtra)
 library(DESeq2)
@@ -2115,8 +2348,8 @@ pdf(paste0(tf, &quot;_CDF_&quot;, cat, &quot;.pdf&quot;), width=6.2, height=3.83
 cat treated* &gt; HEK_ZNF143dTag_merged_treated_diffExp.bed</code></pre>
 </div>
 </div>
-<div id="cdf-move-this-section-later" class="section level1" number="17">
-<h1><span class="header-section-number">17</span> CDF [move this section later]</h1>
+<div id="cdf-move-this-section-later" class="section level1" number="18">
+<h1><span class="header-section-number">18</span> CDF [move this section later]</h1>
 <p>Create a CDF of activated, repressed, and matched genes:</p>
 <pre class="r"><code># Get bed with diff exp labeling, gene names, and gene coordinates
 gene.file=read.table(file = &quot;./ZNF143dTAG_diffExp/HEK_ZNF143dTag_merged_treated_diffExp.bed&quot;, sep=&quot;\t&quot;, header=FALSE)
@@ -2247,8 +2480,8 @@ save(plot.df, file=&quot;ZNF143_diffExp_binding_distance_TSS.Rdata&quot;)</code>
     
 #   }
 # plot_cdf(df.cdf, tf = &quot;ZNF143&quot;, col.lines = c(rep(&quot;grey60&quot;,20),colorRampPalette(c(&quot;red&quot;,&quot;pink&quot;))(13),colorRampPalette(c(&quot;blue&quot;, &quot;light blue&quot;))(7)), line.type = c(rep(2, 20), rep(1,20)))</code></pre>
-<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="17.1">
-<h2><span class="header-section-number">17.1</span> Plot an MA plot for activated and repressed and unchanged</h2>
+<div id="plot-an-ma-plot-for-activated-and-repressed-and-unchanged" class="section level2" number="18.1">
+<h2><span class="header-section-number">18.1</span> Plot an MA plot for activated and repressed and unchanged</h2>
 <p>Unchanged can be the combine matched genes (match a set for act and a
 set for repressed).</p>
 <pre class="r"><code># use df.x from DESeq above
@@ -2304,11 +2537,11 @@ dim(deseqGenesInfo)
 write.table(deseqGenesInfo,file=&quot;ZNF143dTag_PRO_DESeq_genes_categorized.bed&quot;,quote = FALSE, sep =&#39;\t&#39;, row.names = FALSE, col.names = TRUE)</code></pre>
 </div>
 </div>
-<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="18">
-<h1><span class="header-section-number">18</span> Determining threshold for “functional” ChIP peaks</h1>
+<div id="determining-threshold-for-functional-chip-peaks" class="section level1" number="19">
+<h1><span class="header-section-number">19</span> Determining threshold for “functional” ChIP peaks</h1>
 <p>[this has majorly changed]</p>
-<div id="merge-quantile-beds" class="section level2" number="18.1">
-<h2><span class="header-section-number">18.1</span> Merge quantile beds</h2>
+<div id="merge-quantile-beds" class="section level2" number="19.1">
+<h2><span class="header-section-number">19.1</span> Merge quantile beds</h2>
 <p>Make cumulative bed files of the ChIP quantile peaks starting from the most intense and including each level in the next merged file.</p>
 <pre class="bash"><code>cd /labs/Guertin/ZNF143_ChIP/
 
@@ -2332,8 +2565,8 @@ do
     wc -l qmerge$((i+1)).bed
 done 2&gt;&amp;1 | tee merging_scheme.txt</code></pre>
 </div>
-<div id="plot-all-cumulative-quantiles-together" class="section level2" number="18.2">
-<h2><span class="header-section-number">18.2</span> Plot all cumulative quantiles together</h2>
+<div id="plot-all-cumulative-quantiles-together" class="section level2" number="19.2">
+<h2><span class="header-section-number">19.2</span> Plot all cumulative quantiles together</h2>
 <p>Note: this takes place in a different directory than the immediately preceding code chunk.</p>
 <pre class="bash"><code>srun --partition=general --qos=general --pty --mem=16G -c 2 bash
 cd /labs/Guertin/ZNF143_PRO
@@ -2452,8 +2685,8 @@ plot_cdf(df.cdf, tf = &quot;qmerge_cumulative&quot;, cat = cat, col.lines = c(re
 <p>The threshold is set at the trace for <code>qmerge6</code>, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.</p>
 </div>
 </div>
-<div id="features-of-repressed-genes" class="section level1" number="19">
-<h1><span class="header-section-number">19</span> Features of Repressed Genes</h1>
+<div id="features-of-repressed-genes" class="section level1" number="20">
+<h1><span class="header-section-number">20</span> Features of Repressed Genes</h1>
 <p>How many repressed genes are “far” i.e. &gt;440 distance from a ZNF143 binding site?</p>
 <pre class="r"><code>repFar = rep.df[(abs(rep.df$dis) &gt; 440) &amp; (rep.df$status == &quot;Repressed&quot;), ]
 dim(repFar)
@@ -2541,8 +2774,8 @@ range(repNearInfo$log2FoldChange)
 save(repNearInfo, file=&quot;repNearInfo.Rdata&quot;)</code></pre>
 <p>[make barchart of results]</p>
 </div>
-<div id="picking-sp-chip-antibodies" class="section level1" number="20">
-<h1><span class="header-section-number">20</span> Picking SP ChIP antibodies</h1>
+<div id="picking-sp-chip-antibodies" class="section level1" number="21">
+<h1><span class="header-section-number">21</span> Picking SP ChIP antibodies</h1>
 <p>Which SP transcription factors are expressed in our HEK cells?</p>
 <pre class="r"><code>hek.sp = counts.df[grepl(&quot;_SP[0-9]$&quot;,rownames(counts.df)),]
 # 6 SPs: 1,2,3,4,8,9
