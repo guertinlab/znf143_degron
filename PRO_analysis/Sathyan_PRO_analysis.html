@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2024-11-04" />
+<meta name="date" content="2024-11-05" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2024-11-04</h4>
+<h4 class="date">2024-11-05</h4>
 
 </div>
 
@@ -1626,77 +1626,71 @@ plotPCAlattice &lt;- function(df, file = &#39;PCA_lattice.pdf&#39;) {
                col = colpal))
   dev.off()
 }</code></pre>
-<p>DESeq2 analysis: [START HERE]</p>
-<pre class="r"><code>inferred.coords=read.table(&#39;HEK_ZNF143_gene_annotations_new_infCoords.bed&#39;, sep=&quot;\t&quot;, header =FALSE)
+<p>DESeq2 analysis:</p>
+<pre class="r"><code>inferred.coords = final.coords
 
-# use unnormalized bigWigs
-counts.df = abs(get.raw.counts.interval(inferred.coords, &quot;/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/seqOutBias_bw&quot;, file.prefix = &quot;H&quot;))
-
+# use unnormalized bigWigs and get size factors from DESeq2
+counts.df = abs(get.raw.counts.interval(inferred.coords, &quot;/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/seqOutBias_bw&quot;, file.prefix = &quot;HEK_CloneZD29&quot;))
 estimateSizeFactorsForMatrix(counts.df)
 
 
-#PCA for experiments
-
-dds = run.deseq.list.dds(counts.df)
+# check PCA 
+dds = run.deseq.list.dds(counts.df) 
 rld &lt;- rlog(dds)
-
-plotPCA(rld) # basic plot
-
-# more informative plot:
 pca.plot = plotPCA(rld, intgroup=&quot;sample.conditions&quot;, returnData=TRUE)
 pca.plot$sample.conditions = rownames(pca.plot)
-plotPCAlattice(pca.plot, file = &#39;PCA_ZNF143_PRO.pdf&#39;)
+plotPCAlattice(pca.plot, file = &#39;PCA_ZNF143_PRO_contrTU_20240220.pdf&#39;) 
 
+# run DESeq
 rep = factor(sapply(strsplit(colnames(counts.df), &#39;rep&#39;), &#39;[&#39;, 2))
 sample.conditions = factor(c(&quot;untreated&quot;,&quot;untreated&quot;,&quot;untreated&quot;,&quot;untreated&quot;,&quot;treated&quot;,&quot;treated&quot;,&quot;treated&quot;,&quot;treated&quot;), levels=c(&quot;untreated&quot;,&quot;treated&quot;))
-
-
 deseq.df = DESeqDataSetFromMatrix(counts.df, cbind.data.frame(sample.conditions, rep), ~ rep + sample.conditions)
 deseq.df = DESeq(deseq.df)
 
 # Create tables of activated/repressed genes and their matching genes 
-for (i in levels(sample.conditions)[-1]) {
-  res.deseq = results(deseq.df, contrast = c(&quot;sample.conditions&quot;, i, &quot;untreated&quot;))
-  sum(res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj))
+
+# for (i in levels(sample.conditions)[-1]) {
+#   res.deseq = results(deseq.df, contrast = c(&quot;sample.conditions&quot;, i, &quot;untreated&quot;))
+#   sum(res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj))
   
-  activated = res.deseq[res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &gt; 0,]
-  activated.strand = merge(cbind(tighten_summit_window(activated), &quot;Activated&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]    
-  write.table(activated.strand, file = paste0(i, &#39;_activated_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
+#   activated = res.deseq[res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &gt; 0,]
+#   activated.strand = merge(cbind(tighten_summit_window(activated), &quot;Activated&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]  
+#   write.table(activated.strand, file = paste0(i, &#39;_activated_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
   
-  unchanged = res.deseq[!is.na(res.deseq$padj) &amp; res.deseq$padj &gt; 0.1 &amp; abs(res.deseq$log2FoldChange) &lt; 0.01,]
+#   unchanged = res.deseq[!is.na(res.deseq$padj) &amp; res.deseq$padj &gt; 0.1 &amp; abs(res.deseq$log2FoldChange) &lt; 0.01,]
 
-  #unchanged = unchanged[sample(x, size, replace = FALSE, prob = NULL),]
-  unchanged$treatment = 0
-  activated$treatment = 1
-  df.deseq.effects.lattice = rbind(unchanged, activated)
-  out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
-  unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
-  unchanged.strand = merge(cbind(tighten_summit_window(unchanged), &quot;Matched to Activated&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)] 
+#   #unchanged = unchanged[sample(x, size, replace = FALSE, prob = NULL),]
+#   unchanged$treatment = 0
+#   activated$treatment = 1
+#   df.deseq.effects.lattice = rbind(unchanged, activated)
+#   out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
+#   unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
+#   unchanged.strand = merge(cbind(tighten_summit_window(unchanged), &quot;Matched to Activated&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]   
 
-  write.table(unchanged.strand, file = paste0(i, &#39;_activated_matched_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
-  unchanged$treatment = &quot;Matched to Activated&quot;
-  activated$treatment = &quot;Activated&quot;
-  df.x = rbind(activated, unchanged)
+#   write.table(unchanged.strand, file = paste0(i, &#39;_activated_matched_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
+#   unchanged$treatment = &quot;Matched to Activated&quot;
+#   activated$treatment = &quot;Activated&quot;
+#   df.x = rbind(activated, unchanged)
   
-  repressed = res.deseq[res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &lt; 0,]
-  repressed.strand = merge(cbind(tighten_summit_window(repressed), &quot;Repressed&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]    
-  write.table(repressed.strand, file = paste0(i, &#39;_repressed_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
-  unchanged = res.deseq[!is.na(res.deseq$padj) &amp; res.deseq$padj &gt; 0.1 &amp; abs(res.deseq$log2FoldChange) &lt; 0.01,]
+#   repressed = res.deseq[res.deseq$padj &lt; 0.1 &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &lt; 0,]
+#   repressed.strand = merge(cbind(tighten_summit_window(repressed), &quot;Repressed&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]  
+#   write.table(repressed.strand, file = paste0(i, &#39;_repressed_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
+#   unchanged = res.deseq[!is.na(res.deseq$padj) &amp; res.deseq$padj &gt; 0.1 &amp; abs(res.deseq$log2FoldChange) &lt; 0.01,]
 
-  # unchanged = res.deseq[rownames(res.deseq) %notin% rownames(repressed) &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &gt; 0,]
-   unchanged$treatment = 0
-  repressed$treatment = 1
-  df.deseq.effects.lattice = rbind(unchanged, repressed)
-  out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
-  unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
-  unchanged.strand = merge(cbind(tighten_summit_window(unchanged), &quot;Matched to Repressed&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)] 
+#   # unchanged = res.deseq[rownames(res.deseq) %notin% rownames(repressed) &amp; !is.na(res.deseq$padj) &amp; res.deseq$log2FoldChange &gt; 0,]
+#    unchanged$treatment = 0
+#   repressed$treatment = 1
+#   df.deseq.effects.lattice = rbind(unchanged, repressed)
+#   out = matchit(treatment ~ baseMean, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
+#   unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
+#   unchanged.strand = merge(cbind(tighten_summit_window(unchanged), &quot;Matched to Repressed&quot;), inferred.coords, by.x = &quot;gene&quot;, by.y = &quot;V4&quot;)[,c(2, 3, 4, 1, 5, 10)]   
 
-  write.table(unchanged.strand, file = paste0(i, &#39;_repressed_matched_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
-  unchanged$treatment = &quot;Matched to Repressed&quot;
-  repressed$treatment = &quot;Repressed&quot;
-  df.x = rbind(df.x, unchanged)
-  df.x = rbind(df.x, repressed)
-}</code></pre>
+#   write.table(unchanged.strand, file = paste0(i, &#39;_repressed_matched_genes.bed&#39;), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &#39;\t&#39;)
+#   unchanged$treatment = &quot;Matched to Repressed&quot;
+#   repressed$treatment = &quot;Repressed&quot;
+#   df.x = rbind(df.x, unchanged)
+#   df.x = rbind(df.x, repressed)
+# }</code></pre>
 </div>
 <div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
 <h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
