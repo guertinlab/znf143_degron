@@ -668,7 +668,6 @@ gene.exon1 = parse.bed.exon1("gencode_exon1_parsed_updated.bed")
 
 # assign bigWig variables
 # IMPORTANT: because these are PE2, switch the plus and minus bigWigs!
-# These two are the ones with control + experimental merged
 bw.plus='HEK_CloneZD29_30min_control_minus_PE2_scaled.bigWig'
 bw.minus='HEK_CloneZD29_30min_control_plus_PE2_scaled.bigWig'
 
@@ -1463,7 +1462,7 @@ plot.barchart(barDF,cols=colors,filename="barchart_downPromo_TSSshifts_20240326.
 
 ### Violin plot
 ```{r engine='R', eval=F, echo=TRUE}
-library('reshape2')
+library(reshape2)
 
 # Add read counts at cTSS positions in the dTAG condition to the giant table
 cTSSbed = znf143genesDF[,c("cTSSchr","cTSSstart","cTSSend","gene","cTSSheight","strand")]
@@ -1566,671 +1565,205 @@ plot.barchart(barDF,cols=colors,filename="barchart_downPromo_TSSshiftIncreases_2
 
 ```
 
-# Heatmaps of promoter-enriched motifs (Fig. 5B, 6A, S8)
+# Heatmaps of promoter-enriched motifs 
 
-## Defining "promoter-enriched" motifs
+## Identify boundaries of promoters with divergent TSSs 
 
-We called sense- and anti-sense TSSs for every gene in our control samples in order to establish rough boundaries for "promoters". Within these boundaries, we performed de novo motif analysis with MEME and matched to the JASPAR database to identify which transcription factor motifs were most enriched. 
-
-
-
-## FIMO for specific motifs 
-
-YY1, SP1, ETS, Nrf1, bZIP
-
-
-
-
-# Old stuff
-
-## Create CDFs (reference code from genex course)
-
-Set up functions and packages:
 ```{r engine='R', eval=F, echo=TRUE}
-library(latticeExtra)
-library(DESeq2)
-library(lattice)
-library(dplyr)
-library(ggplot2)
-library(limma)
 library(bigWig)
-library(gplots)
+# Identify sense TSSs
+# Note the order of the bigWig files--this is necessary for using PE2 files to identify sense-direction TSSs for genes
+bw.plus='HEK_CloneZD29_30min_control_minus_PE2_scaled.bigWig'
+bw.minus='HEK_CloneZD29_30min_control_plus_PE2_scaled.bigWig'
+# densityFilter = TRUE means it will only look for the predominant TSS in each gene.
+realPredomBase = TSSinference(gene.exon1, bw.plus, bw.minus, tssWin = 100, top.num.peaks = 20, low.limit.tss.factor = 3, denWin = 100, densityFilter = TRUE)
+realPredom = realPredomBase[!(is.na(realPredomBase$height)),]
+realPredom = realPredom[!(realPredom$chrom == "chrM"),]
 
-# make sure these functions are sourced
-source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R')
-source('https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R')
-source('https://raw.githubusercontent.com/guertinlab/genex/main/ChIP_analysis/cdf_functions.R')
+# Make a metaprofile of signal on anti-sense strand relative to sense TSSs
+realPredomBed = fiveprime.bed(realPredom, upstreamWindow = 500, downstreamWindow = 100)
+yBoth = metaprofile.bigWig(realPredomBed, bwMinus, bw.minus = bwPlus,
+                 step = 1, name = "Signal", matrix.op = NULL,
+                 profile.op = bootstrapped.confinterval.metaprofile,
+                 alpha=0.05, n.samples=1000)
 
-# previous version of cdf.deseq.df:
-# cdf.deseq.df <- function(df, genes = gene.file, chip.peaks = chip.peaks) {
-#   bed.tss.activated = filter.deseq.into.bed(df, genes, cat = "Repressed")
-#   bed.tss.unchanged = filter.deseq.into.bed(df, genes, cat = "Matched to Repressed")
-#   act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
-#   unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
+plot(seq(-500,100),yBoth$middle, ylab = "divergent TSS PROseq signal", xlab = "Distance from predominant TSS", type = "l")
+polygon(c(seq(-330,0), 0,-330),c(yBoth$middle[170:500],0,0), col="lightblue")
+# This plot is named: "divergent_signal_80_percent_AUC_shaded.pdf"
 
-#   df.up.can = cbind(act.distance[,c(4, 10)], "Repressed")
-#   df.un.can = cbind(unreg.distance[,c(4, 10)], "Matched to Repressed")
+# Redefine search area for anti-sense TSSs based on previous plot
+divergBed = realPredom[,1:6]
+divWin = 346 # basepairs upstream of sense TSS to anchor search window 
+# for plus strand genes, move start to (start - divWin)
+# and move end to (end - 57)
+divergBed[,2][divergBed$strand == "+"] = divergBed[,2][divergBed$strand == "+"] - divWin
+divergBed[,3][divergBed$strand == "+"] = divergBed[,3][divergBed$strand == "+"] - 57
+# for minus strand genes, move end to (end + divWin)
+# and move start to (start + 57)
+divergBed[,3][divergBed$strand == "-"] = divergBed[,3][divergBed$strand == "-"] + divWin
+divergBed[,2][divergBed$strand == "-"] = divergBed[,2][divergBed$strand == "-"] + 57
 
-#   colnames(df.up.can) = c(colnames(df.up.can)[1:2], 'status')
-#   colnames(df.un.can) = c(colnames(df.up.can)[1:2], 'status')
+# Identify anti-sense direction TSSs 
+# Note: a key change from the previous is the flipping of the order of the bigWig files, as named above
+divNoDensTSSbase = TSSinference_wip(divergBed, bw.minus, bw.plus, tssWin = 0, top.num.peaks = 20, low.limit.tss.factor = 3, denWin = 100, densityFilter = FALSE)
+divNoDensTSS = divNoDensTSSbase[!(is.na(divNoDensTSSbase$height)),]
 
-#   df.all = rbind(df.up.can, df.un.can)
-#   df.all$status = factor(df.all$status, levels = c("Repressed", "Matched to Repressed"))
-#   return(df.all)
-# }
+divNoDensPredomTSS = do.call(rbind, lapply(split(divNoDensTSS, as.factor(divNoDensTSS$gene)), function(x) {return(x[which.max(x$height),])}))
 
-# filter.deseq.into.bed <- function(deseq.df, gene.file, cat = 'R1881 Activated') {
-#   deseq.df = deseq.df[deseq.df$treatment == cat,]
-#   #print(dim(deseq.df))
-#   #scientific notation was messing this up occasionally
-#   x = gene.file$V4
-#   #print(length(x))
-#   y = gene.file[x %in% rownames(deseq.df),]
-#   #print(dim(y))
-#   z = get.tss(y)
-#   #print(dim(z))
-#   return(z)
-# }
-
-# filter.deseq.into.bed <- function(deseq.df, gene.file, cat = 'R1881 Activated') {
-#   deseq.df = deseq.df[deseq.df$treatment == cat,]
-#   print(dim(deseq.df))
-#   #scientific notation was messing this up occasionally
-#   x = gene.file$V4
-#   print(length(x))
-#   xy=sapply(strsplit(sapply(strsplit(rownames(deseq.df), ':'), '[', 2), "-"), "[", 2)
-#   gene = sapply(strsplit(xy, "_"), "[", 2)
-#   y = gene.file[x %in% gene,]
-#   #print(dim(y))
-#   z = get.tss(y)
-#   #print(dim(z))
-#   return(z)
-# }
-
-# makes input dataframe for plotting function
-cdf.deseq.df <- function(genes = gene.file, chip.peaks = chip.peaks, cat = "Repressed", opt.str="") {
-  bed.tss.activated = get.tss(genes[genes$V5 == cat,])
-  bed.tss.unchanged = get.tss(genes[genes$V5 == paste0("Matched to ", cat),])
-  
-  # note 'functionstring' in bedTools.closest
-  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
-  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = '-D a')
-
-  df.up.can = cbind(act.distance[,c(4, 10)], paste0(opt.str,cat))
-  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0(opt.str,"Matched to ", cat))
-
-  colnames(df.up.can) = c(colnames(df.up.can)[1:2], 'status')
-  colnames(df.un.can) = c(colnames(df.up.can)[1:2], 'status')
-
-  df.all = rbind(df.up.can, df.un.can)
-  df.all$status = factor(df.all$status, levels = c(paste0(opt.str,cat), paste0(opt.str,"Matched to ", cat)))
-  return(df.all)
+# Order antisense TSSs in order of decreasing distance from sense TSS
+divSenseDiff = as.data.frame(c())
+for (i in unique(divNoDensPredomTSS$gene)){
+    st = divNoDensPredomTSS[divNoDensPredomTSS$gene == i,]$strand
+    chrom = divNoDensPredomTSS[divNoDensPredomTSS$gene == i,]$chrom
+    if (st == "+"){
+        newStart = divNoDensPredomTSS[divNoDensPredomTSS$gene == i,]$end
+        newEnd = realPredom[realPredom$gene == i,]$start
+        dist = newEnd - newStart
+        newRow = c(chrom, newStart, newEnd, i, "div_sense_diff", st, dist)
+        divSenseDiff = rbind(divSenseDiff, newRow)
+    } else if (st == "-") {
+        newStart = realPredom[realPredom$gene == i,]$end
+        newEnd = divNoDensPredomTSS[divNoDensPredomTSS$gene == i,]$start
+        dist = newEnd - newStart
+        newRow = c(chrom, newStart, newEnd, i, "div_sense_diff", st, dist)
+        divSenseDiff = rbind(divSenseDiff, newRow)
+    }
 }
+colnames(divSenseDiff) = c(colnames(divPredomTSS)[1:6],"distance")
+divSenseDiff = divSenseDiff[order(divSenseDiff$distance, decreasing = TRUE),]
 
-bedTools.closest <- function(functionstring="/usr/local/bin/bedtools2-2.31.0/bin/closestBed",bed1,bed2,opt.string="") {
-  
-  options(scipen =99) # not to use scientific notation when writing out
-  
-  #write bed formatted dataframes to tempfile
-  write.table(bed1,file= 'a.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
-  write.table(bed2,file= 'b.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
-  
-  # create the command string and call the command using system()
-  command1=paste('sort -k1,1 -k2,2n', 'a.file.bed', '> a.file.sorted.bed')
-  cat(command1,"\n")
-  try(system(command1))
-  command2=paste('sort -k1,1 -k2,2n', 'b.file.bed', '> b.file.sorted.bed')
-  cat(command2,"\n")
-  try(system(command2))
-  
-  # use opt.string argument to add options for closestBed
-  command=paste(functionstring,opt.string,"-a",'a.file.sorted.bed',"-b",'b.file.sorted.bed',">",'out.file.bed',sep=" ")
-  cat(command,"\n")
-  try(system(command))
-  
-  res=read.table('out.file.bed',sep ="\t", header=F, comment.char='')
-  
-  command3=paste('rm', 'a.file.bed', 'b.file.bed', 'a.file.sorted.bed', 'b.file.sorted.bed', 'out.file.bed')
-  cat(command3,"\n")
-  try(system(command3))
-  
-  colnames(res) = c(colnames(bed1), colnames(bed2), 'dis' )
-  return(res)
-}
+# Not every gene will have a corresponding anti-sense TSS.
+# Keep only genes that have both types of predominant TSS:
+realPredomDiffOrder = realPredom[realPredom$gene %in% divSenseDiff$gene,]
+# Reorder realPredom by divSenseDiff order
+realPredomDiffOrder = realPredomDiffOrder[order(match(realPredomDiffOrder$gene, divSenseDiff$gene)),]
+# Check if order is correct
+identical(realPredomDiffOrder$gene, divSenseDiff$gene)
+# [1] TRUE
 
-# plotting function
-plot_cdf <- function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1, abline=1) {
-pdf(paste0(tf, "_CDF_", cat, ".pdf"), width=6.2, height=3.83) 
-         print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
-         auto.key = list(lines=TRUE, points=FALSE, cex = cex),
-         col = col.lines,
-         aspect = 1,
-                                        #xlim = c(0, 50000),
-         scales=list(relation="free",alternating=c(1,1,1,1)),
-         ylab = 'Cumulative Distribution Function',
-         xlab = expression('log'[10]~'ZNF143 inferred binding site distance from TSS'),
-                                        #index.cond = list(c(2,1)),
-         between=list(y=1.0),
-         type = 'a',
-         xlim = c(0,8),
-         lwd=2,
-         lty=line.type,
-         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
-         panel = function(...) {
-             panel.abline(v= log(abline, base=10), lty =2) # variable line location
-             panel.ecdfplot(...)
-         }))
-    dev.off()
-}
+# Add distance column
+realPredomDiffOrder$TSSdistance = divSenseDiff$distance
+
+# write to file
+write.table(realPredomDiffOrder, file = "predomTSS_dec_divTSSdistance_order.bed", quote = FALSE, sep ='\t', row.names = FALSE, col.names = FALSE)
 ```
 
-One last important setup step!! Concatenate the `treated*bed` files into one file. This will be how you get the TSSs, according to each category.
+Create heatmap of anti-sense and sense TSSs, ordered by decreasing distance between the two (Fig 6A):
+
+```{r engine='R', eval=F, echo=TRUE}
+# This script is available in the "PRO_analysis" folder in the repository containing this vignette
+source("/Users/jinhongdong/Desktop/TSSinference/heatmaps_mjg_functions.R")
+
+y = read.table('predomTSS_dec_divTSSdistance_order.bed')
+#this helps make a window that is not off by one intended base
+y[y[,6] == "+",][,3] = y[y[,6] == "+",][,3] -1
+y[y[,6] != "+",][,2] = y[y[,6] != "+",][,2] +1
+
+compObject = create.composites.heatmaps("/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/oldwigs/", y, region = 700, step = 1, file.prefix = "HEK_CloneZD29*scaled")
+
+draw.heatmap.both.pro.overlap(compObject[[2]], file = 'uaTSS_sTSS_decreasing_dist_heatmap.pdf', upstream = -700, downstream = 700, convert.zeros =FALSE, sub.set = 8000, arrangement = 'asis', order.buffer = 1, avg.rows = 20,
+                              width.vp = 2, height.vp = 4, colors.ramp = c("#ffffff00","#FF0000FF", "#590000FF", "#510000FF", "#2F0000FF", "#2d0101FF","#2E0000FF"),
+                              colors.ramp.2 = c("#ffffff00","#0000FF80", "#00105980", "#00115180", "#00072F80", "#00072E80", "#01072d80"))
+  
+```
+
+
+## FIMO of motifs (Fig. 5B, 6A, S8)
+
+This loop runs through all the mentioned motifs used in the paper and looks for matches in the entire hg38 reference genome. Motifs queried (JASPAR database version):
+
+- MA0506.2 Nrf1
+- MA0516.3 SP2
+- MA0750.2 ZBTB7A (ETS)
+- MA1145.1 FOSL2::JUND (bZIP)
+- MA1651.1 YY1
 
 ```{r engine='bash', eval=F, echo=TRUE}
-# in ./ZNF143dTAG_diffExp/
-cat treated* > HEK_ZNF143dTag_merged_treated_diffExp.bed
-```
-
-# CDF [move this section later]
-Create a CDF of activated, repressed, and matched genes:
-```{r engine='R', eval=F, echo=TRUE}
-# Get bed with diff exp labeling, gene names, and gene coordinates
-gene.file=read.table(file = "./ZNF143dTAG_diffExp/HEK_ZNF143dTag_merged_treated_diffExp.bed", sep="\t", header=FALSE)
-dim(gene.file)
-# [1] 1080    6
-unique(gene.file$V5)
-# [1] "Activated"            "Matched to Activated" "Repressed"            "Matched to Repressed"
-
-# Get bed of binding sites
-znf143binding = read.table(file = "./ChIP/ZNF143_inferred_binding_final.bed", sep="\t", header=FALSE)
-dim(znf143binding)
-# [1] 2182    7
-head(znf143binding) # V4 is peak intensity, V5 is p(?)-value from MAST
-#     V1      V2      V3      V4       V5 V6 V7
-# 1 chr1  959263  959292 2722.53 2.11e-09  -  1
-# 2 chr1 1116181 1116210 3190.65 2.52e-11  -  1
-# 3 chr1 1375404 1375433 2394.84 2.68e-08  -  1
-# 4 chr1 1399504 1399533 1645.84 2.75e-06  -  1
-# 5 chr1 1407340 1407369 2004.74 3.57e-07  -  1
-# 6 chr1 1615805 1615834 3892.84 9.67e-16  +  1
-unique(znf143binding$V3-znf143binding$V2)
-# [1] 29
-
-# make plottable df for repressed and matches
-rep.df = cdf.deseq.df(genes=gene.file, chip.peaks= znf143binding, cat="Repressed")
-dim(rep.df)
-# [1] 714   3 # correct number because we have 714/2=357 repressed genes
-head(rep.df)
-#       V4  dis    status
-# 1  CENPS -103 Repressed
-# 2   EMC1 -191 Repressed
-# 3  HMGCL    0 Repressed
-# 4  SRRM1    0 Repressed
-# 5  TXLNA  -79 Repressed
-# 6 ZBTB8B -160 Repressed
-unique(rep.df$status)
-# [1] Repressed            Matched to Repressed
-# Levels: Repressed Matched to Repressed
-
-# make plottable df for activated and matches
-act.df = cdf.deseq.df(genes=gene.file, chip.peaks= znf143binding, cat="Activated")
-dim(act.df)
-# [1] 366   3 # we have 366/2=183 activated genes
-head(act.df)
-#        V4     dis    status
-# 1     ID3 -132234 Activated
-# 2 ATP5IF1   23173 Activated
-# 3  TRIM62 -156544 Activated
-# 4    PPCS  389891 Activated
-# 5    TOE1     258 Activated
-# 6     IPP   63428 Activated
-unique(act.df$status)
-# [1] Activated            Matched to Activated
-# Levels: Activated Matched to Activated
-
-# merge rep/act and plot
-plot.df = rbind(rep.df, act.df)
-
-length(unique(plot.df$V4))
-[1] 1001
-> dim(plot.df)
-[1] 1080    3
-length(unique(rep.df$V4))
-[1] 714
-> length(unique(act.df$V4))
-[1] 366
-# This suggests that there are some matched genes that are matches for both repressed and activated genes?
-
-plot_cdf(plot.df, tf = "ZNF143_binding_vs_TSS", col.lines = c("#2290cf", "grey60", "#ce228e","grey90"), cat = "diffExp", line.type = c(1), cex = 0.75)
-
-#now with a line to separate genes that are "far" vs "near" 
-plot_cdf(plot.df, tf = "ZNF143_binding_vs_TSS", col.lines = c("#2290cf", "grey60", "#ce228e","grey90"), cat = "diffExp_440", line.type = c(1), cex = 0.75, abline=440)
-
-# save items for easier replotting later
-save(rep.df, file="rep.df.Rdata")
-save(act.df, file="act.df.Rdata")
-save(plot.df, file="ZNF143_diffExp_binding_distance_TSS.Rdata")
-```
-
-```{r engine='R', eval=F, echo=TRUE}
-# old stuff:
-
-# df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table('/Users/guertinlab/Desktop/ZNF143_ChIP/quantile1.bed', sep = '\t',header=FALSE))
-
-# plot_cdf <- function(df.all, tf="quantile", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1)) {
-# pdf(paste0(tf, "FIG_cdf_compare_Reg_classes.pdf"), width=6.2, height=3.83) 
-# 	print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
-#          auto.key = list(lines=TRUE, points=FALSE),
-#          col = col.lines,
-#          aspect = 1,
-#                                         #xlim = c(0, 50000),
-#          scales=list(relation="free",alternating=c(1,1,1,1)),
-#          ylab = 'Cumulative Distribution Function',
-#          xlab = expression('log'[10]~'ZNF143 Distance from TSS'),
-#                                         #index.cond = list(c(2,1)),
-#          between=list(y=1.0),
-#          type = 'a',
-#          xlim = c(0,8),
-#          lwd=2,
-# 		 lty=line.type,
-#          par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
-#          panel = function(...) {
-#              panel.abline(v= 200, lty =2)
-#              panel.ecdfplot(...)
-#          }))
-# 	dev.off()
-# }
-
-
-# #make sure that the "cdf.deseq.df" function is the one from above, not sourced
-# for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quantile*bed"))) {
-# 	print(chip.peak)
-# 	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-# 	print(quantile.name)
-# 	df.all = cdf.deseq.df(df = df.x, genes = gene.file, chip.peaks=read.table(chip.peak, sep="\t",header=FALSE))
-#     plot_cdf(df.all, tf = quantile.name)
-# 	}
-	
-# df.cdf = data.frame(matrix(nrow = 0, ncol = 3)) 	
-# colnames(df.cdf) = c("V4", "dis", "status")
-# for (chip.peak in Sys.glob(file.path("/Users/guertinlab/Desktop/ZNF143_ChIP/quantile*bed"))) {
-# 	print(chip.peak)
-# 	quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-# 	print(quantile.name)
-# 	df.all = cdf.deseq.df(df = df.x, genes = gene.file,
-#     chip.peaks=read.table(chip.peak, sep="\t", header=FALSE))
-# 	x = paste(as.character(df.all[,3]), quantile.name)
-# 	df.all[,3] = x
-# 	df.cdf = rbind(df.cdf, df.all)
-#     #plot_cdf(df.all, tf = quantile)
-	
-# 	}
-# plot_cdf(df.cdf, tf = "ZNF143", col.lines = c(rep("grey60",20),colorRampPalette(c("red","pink"))(13),colorRampPalette(c("blue", "light blue"))(7)), line.type = c(rep(2, 20), rep(1,20)))
-```
-
-
-## Plot an MA plot for activated and repressed and unchanged
-
-Unchanged can be the combine matched genes (match a set for act and a
-set for repressed).
-
-```{r engine='R', eval=F, echo=TRUE}
-# use df.x from DESeq above
-temp = df.x
-unique(temp$treatment)
-
-dim(res.deseq[is.na(res.deseq$padj),])
-# [1] 240   6
-otherGenes = res.deseq[!(rownames(res.deseq) %in% rownames(temp)) & !(is.na(res.deseq$padj)),]
-otherGenes$treatment = "Other"
-
-ma.df = rbind(temp,otherGenes)
-dim(ma.df)
-# [1] 12172     7
-
-levelsMA = c("Other","Matched to Activated", "Matched to Repressed","Activated","Repressed")
-ma.df$treatment = factor(ma.df$treatment, levels = levelsMA)
-
-save(ma.df,file="ZNF143dTag_PRO_DESeq_genes_categorized.Rdata",header=TRUE)
-
-# Adapting this plotting function from the genex course's ATAC-seq vignette
-ma.plot.lattice <- function(ma.df, filename = 'file.name', 
-         title.main = "Differential Expression",
-         col = c("grey90",  "grey60", "#ce228e" , "#2290cf"))
-  {
-  pdf(paste("MA_plot_", filename, ".pdf", sep=''), 
-      useDingbats = FALSE, width=3.83, height=3.83);
-  print(xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
-               groups=ma.df$treatment,
-               col= col,
-                main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
-               ylab=expression("log"[2]~"PRO-seq fold change"), 
-               xlab=expression("log"[10]~"Mean of Normalized Counts"),
-               par.settings=list(par.xlab.text=list(cex=1.1,font=2), 
-                                 par.ylab.text=list(cex=1.1,font=2))));
-  dev.off()
-  }
-
-ma.plot.lattice(ma.df, filename='ZNF143_dTAG_PRO_230913', col=c("grey90","grey30","grey30", "#ce228e" ,"#2290cf"))
-```
-
-<!-- ```{r  echo=F, fig.align = "center", fig.cap="Differential Expression after ZNF143 degradation"}
-#library(knitr) # only need to do this for the first image in the vignette
-knitr::include_graphics("./MA_plot_ZNF143_dTAG_PRO.png") 
-``` -->
-
-Create a BED of all genes from DESeq categorized according to activated, matched to activated, repressed, matched to repressed, and other:
-```{r engine='R', eval=F, echo=TRUE}
-deseqGenes = tighten_summit_window(ma.df)
-dim(deseqGenes)
-# [1] 12172     4
-
-deseqGenesInfo = cbind(deseqGenes, ma.df)
-dim(deseqGenesInfo)
-# [1] 12172    11
-
-write.table(deseqGenesInfo,file="ZNF143dTag_PRO_DESeq_genes_categorized.bed",quote = FALSE, sep ='\t', row.names = FALSE, col.names = TRUE)
-```
-
-# Determining threshold for "functional" ChIP peaks
-[this has majorly changed]
-
-## Merge quantile beds
-
-Make cumulative bed files of the ChIP quantile peaks starting from the most intense and including each level in the next merged file.
-
-```{r engine='bash', eval=F, echo=TRUE}
-cd /labs/Guertin/ZNF143_ChIP/
-
-cat quantile1_summits.bed quantile0.95_summits.bed > qmerge1.bed
-quants=($(seq 0.9 -0.05 0.05))
-newQ=()
-# remove trailing zeroes to match existing file names
-for i in {0..17}
+genome="/Users/jinhongdong/fileRef/human38/hg38.fa"
+for i in *meme # motifs mentioned above
 do
-    newQ[$i]=$(echo ${quants[$i]} | sed '/\./ s/\.\{0,1\}0\{1,\}$//')
+  mot=$(echo $i | cut -f 1,2 -d '.')
+  echo $mot
+  echo "Start: $(date)"
+  fimo --text --max-stored-scores 10000000 -oc ${mot}_out --motif $mot $i $genome > ${mot}_fimo_out.txt
+  echo "End: $(date)"
+done 2>&1 | tee fimo_log.txt
+
+```
+
+Afterward, to create the heatmaps, convert the FIMO outputs into bigWigs:
+
+```{r engine='bash', eval=F, echo=TRUE}
+hg38chromSize="/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes"
+
+for i in *fimo_out.txt
+do
+  MOTIF=$(echo $i | cut -f 1 -d "_")
+  # Convert FIMO output into BED format 
+  # The 5th column of these BEDs can just be the pvalue or score fimo/MAST gives you
+  awk '{OFS="\t";} { if($6=="+") print $3, $4, $5, $7}' ${MOTIF}_fimo_out.txt | sort -k 1,1 -k2,2n | mergeBed -c 4 -o mean -d -1 > ${MOTIF}_fimo_plus.bed
+  awk '{OFS="\t";} { if($6=="-") print $3, $4, $5, $7}' ${MOTIF}_fimo_out.txt | sort -k 1,1 -k2,2n | mergeBed -c 4 -o max -d -1 > ${MOTIF}_fimo_minus.bed
+  # The filenames of the output bigWigs have `_PE2_scaled` 
+  # for naming consistency in the R functions
+  wigToBigWig ${MOTIF}_fimo_plus.bed $hg38chromSize ${MOTIF}_fimo_plus_PE2_scaled.bigWig 
+  wigToBigWig ${MOTIF}_fimo_minus.bed $hg38chromSize ${MOTIF}_fimo_minus_PE2_scaled.bigWig 
 done
 
-# serially merge quantiles together
-for i in {1..18}
-do
-    k=${newQ[$((i-1))]} #bash arrays are 0-indexed
-    #echo $i
-    #echo $k
-    echo "Now merging" qmerge${i}.bed "with" quantile${k}_summits.bed "to create" qmerge$((i+1)).bed 
-    cat qmerge${i}.bed quantile${k}_summits.bed > qmerge$((i+1)).bed
-    wc -l qmerge$((i+1)).bed
-done 2>&1 | tee merging_scheme.txt
 ```
 
-## Plot all cumulative quantiles together
+To make the heatmaps and composite plots, make a template script to be populated with the specific motif name:
 
-Note: this takes place in a different directory than the immediately preceding code chunk.
+"fimo_plots_template.R":
+
+```{r}
+#!/usr/local/bin/Rscript
+
+setwd("/Users/jinhongdong/Desktop/TSSinference/fimo")
+
+library(bigWig)
+library(lattice)
+
+# This script is available in the "PRO_analysis" folder in the repository containing this vignette
+source("/Users/jinhongdong/Desktop/TSSinference/heatmaps_mjg_functions.R")
+
+y = read.table('predomTSS_dec_divTSSdistance_order.bed')
+
+z = y[y[,6] == "+",]
+z[z[,6] == "+",][,3] = z[z[,6] == "+",][,3] -1
+
+#this helps make a window that is not off by one intended base
+y[y[,6] == "+",][,3] = y[y[,6] == "+",][,3] -1
+y[y[,6] != "+",][,2] = y[y[,6] != "+",][,2] +1
+
+plotHM = create.composites.heatmaps('/Users/jinhongdong/Desktop/TSSinference/fimo', y, region = 700, step = 1, file.prefix = 'XXX')
+
+# PDF of heatmap in the anchored region
+draw.heatmap.both.pro.overlap(plotHM[[2]], file = 'XXX_heatmap_fimo.pdf', upstream = -700, downstream = 700, convert.zeros =FALSE, sub.set = 8000, arrangement = 'asis', order.buffer = 1, avg.rows = 1,
+                              width.vp = 2, height.vp = 4, colors.ramp = c("#ffffff00","#FF0000FF", "#590000FF", "#510000FF", "#2F0000FF", "#2d0101FF","#2E0000FF"),
+                              colors.ramp.2 = c("#ffffff00","#0000FF80", "#00105980", "#00115180", "#00072F80", "#00072E80", "#01072d80"))
+
+# PDF of composite signal peaks according to anchor region. 
+composites.func.panels.pro.2(plotHM[[1]], num = 700, fact = "XXX", col.lines = c('blue', 'red'))
+```
+
+This loop creates individual R scripts for each motif: 
 
 ```{r engine='bash', eval=F, echo=TRUE}
-srun --partition=general --qos=general --pty --mem=16G -c 2 bash
-cd /labs/Guertin/ZNF143_PRO
-module load R/4.1.2
-R
-```
+file="fimo_plots_template.R"
 
-Setup (mostly same as above)
-```{r engine='R', eval=F, echo=TRUE}
-library(latticeExtra)
-library(DESeq2)
-library(lattice)
-library(dplyr)
-library(ggplot2)
-library(limma)
-library(bigWig)
-library(gplots)
-library(RColorBrewer)
-library(viridis)
-source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R')
-source('https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R')
-source('https://raw.githubusercontent.com/guertinlab/genex/main/ChIP_analysis/cdf_functions.R')
+for i in *fimo_out.txt
+do
+  MOTIF=$(echo $i | cut -f 1 -d "_")
+  echo $MOTIF
+  sed -e "s/XXX/${MOTIF}/g" "$file" > ${MOTIF}_fimo_plots.R
+done
 
-# use these functions instead of their sourced versions
-cdf.deseq.df <- function(genes = gene.file, chip.peaks = chip.peaks, cat = "Repressed") {
-  bed.tss.activated = get.tss(genes[genes$V5 == cat,])
-  bed.tss.unchanged = get.tss(genes[genes$V5 == paste0("Matched to ", cat),])
-  # I used the long way to call closestBed because of how I installed bedtools
-  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks[,c(1:3)], opt.string = 'closest -D a')
-  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks[,c(1:3)], opt.string = 'closest -D a')
-
-  df.up.can = cbind(act.distance[,c(4, 10)], cat)
-  df.un.can = cbind(unreg.distance[,c(4, 10)], paste0("Matched to ", cat))
-
-  colnames(df.up.can) = c(colnames(df.up.can)[1:2], 'status')
-  colnames(df.un.can) = c(colnames(df.up.can)[1:2], 'status')
-
-  df.all = rbind(df.up.can, df.un.can)
-  df.all$status = factor(df.all$status, levels = c(cat, paste0("Matched to ", cat)))
-  return(df.all)
-}
-
-bedTools.closest <- function(functionstring="/home/FCAM/jdong/software/bedtools",bed1,bed2,opt.string="") {
-  
-  options(scipen =99) # not to use scientific notation when writing out
-  
-  #write bed formatted dataframes to tempfile
-  write.table(bed1,file= 'a.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
-  write.table(bed2,file= 'b.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
-  
-  # create the command string and call the command using system()
-  command1=paste('sort -k1,1 -k2,2n', 'a.file.bed', '> a.file.sorted.bed')
-  cat(command1,"\n")
-  try(system(command1))
-  command2=paste('sort -k1,1 -k2,2n', 'b.file.bed', '> b.file.sorted.bed')
-  cat(command2,"\n")
-  try(system(command2))
-  
-  command=paste(functionstring, opt.string,"-a",'a.file.sorted.bed',"-b",'b.file.sorted.bed',">",'out.file.bed',sep=" ")
-  cat(command,"\n")
-  try(system(command))
-  
-  res=read.table('out.file.bed',sep ="\t", header=F, comment.char='')
-  
-  command3=paste('rm', 'a.file.bed', 'b.file.bed', 'a.file.sorted.bed', 'b.file.sorted.bed', 'out.file.bed')
-  cat(command3,"\n")
-  try(system(command3))
-  
-  colnames(res) = c(colnames(bed1), colnames(bed2), 'dis' )
-  return(res)
-}
+for i in *plots.R
+do
+  Rscript $i
+done
 
 ```
-
-Making CDF plot:
-```{r engine='R', eval=F, echo=TRUE}
-gene.file=read.table(file = "HEK_ZNF143_gene_annotations.bed", sep="\t", header=FALSE)
-cat = "Repressed"
-
-df.cdf = data.frame(matrix(nrow = 0, ncol = 3))   
-colnames(df.cdf) = c("V4", "dis", "status")
-
-for (chip.peak in Sys.glob(file.path("/labs/Guertin/ZNF143_ChIP/qmerge*bed"))) {
-    print(chip.peak)
-    quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
-    print(quantile.name)
-    df.all = cdf.deseq.df(genes = gene.file,
-        chip.peaks=read.table(chip.peak, header=FALSE),
-        cat = cat)
-    x = paste(as.character(df.all[,3]), quantile.name)
-    df.all[,3] = x
-    df.cdf = rbind(df.cdf, df.all)
-    }
-
-# check that all plotting arguments are correct
-function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), cex = 1, abline=1) {
-pdf(paste0(tf, "_CDF_", cat, ".pdf"), width=6.2, height=3.83) 
-         print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
-         auto.key = list(lines=TRUE, points=FALSE, cex = cex, space="right"),
-         col = col.lines,
-         aspect = 1,
-                                        #xlim = c(0, 50000),
-         scales=list(relation="free",alternating=c(1,1,1,1)),
-         ylab = 'Cumulative Distribution Function',
-         xlab = expression('log'[10]~'ZNF143 Distance from TSS'),
-                                        #index.cond = list(c(2,1)),
-         between=list(y=1.0),
-         type = 'a',
-         xlim = c(0,8),
-         lwd=2,
-         lty=line.type,
-         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
-         panel = function(...) {
-             panel.abline(v= log(abline, base=10), lty =2) # variable line location
-             panel.ecdfplot(...)
-         }))
-    dev.off()
-}
-
-# I'm making the threshold line forest green to make it easier to see on the plot
-plot_cdf(df.cdf, tf = "qmerge_cumulative", cat = cat, col.lines = c(rep.int("grey60",19), brewer.pal(8,"Spectral"), plasma(13)[1:7], "#154a19", plasma(13)[9:11]), line.type = c(rep.int(2, 19), rep.int(1,19)), cex = 0.3)
-```
-
-qmerge_cumulative_CDF_Repressed.pdf
-
-The threshold is set at the trace for `qmerge6`, which corresponds to quantile 0.7 and above. Using this threshold, return to ChIP vignette for motif analysis.
-
-# Features of Repressed Genes
-
-How many repressed genes are "far" i.e. >440 distance from a ZNF143 binding site?
-```{r engine='R', eval=F, echo=TRUE}
-repFar = rep.df[(abs(rep.df$dis) > 440) & (rep.df$status == "Repressed"), ]
-dim(repFar)
-[1] 42  3
-42/357 = 0.12 # 12% 
-```
-
-What are the features of these genes? (from DESeq)
-```{r engine='R', eval=F, echo=TRUE}
-# massive DESeq results table: deseqGenesInfo, aka "ZNF143dTag_PRO_DESeq_genes_categorized.bed"
-
-repFarInfo = deseqGenesInfo[deseqGenesInfo$gene %in% repFar$V4,]
-dim(repFarInfo)
-# [1] 42 11
-unique(repFarInfo$treatment)
-# [1] Repressed
-
-# The gene order is different so before cbinding I need to sort them somehow
-identical(repFar[order(repFar$V4),"V4"], repFarInfo[order(repFarInfo$gene),"gene"])
-# [1] TRUE
-repFar = repFar[order(repFar$V4),]
-repFarInfo = repFarInfo[order(repFarInfo$gene),]
-identical(repFar$V4,repFarInfo$gene)
-# [1] TRUE
-
-# Add distance to deseq table
-repFarInfo$dis = repFar$dis
-
-# Get stats: gene length, mean expression, log fold change
-repFarInfo$geneLength = repFarInfo$end - repFarInfo$start
-mean(repFarInfo$geneLength)
-# [1] 63715.67
-range(repFarInfo$geneLength)
-# [1]   6209 546739
-
-mean(repFarInfo$baseMean)
-# [1] 1260.029
-range(repFarInfo$baseMean)
-# [1]  126.8172 8766.4077
-
-mean(repFarInfo$log2FoldChange)
-# [1] -0.3695827
-range(repFarInfo$log2FoldChange)
-# [1] -1.7049706 -0.1391026
-
-save(repFarInfo, file="repFarInfo.Rdata")
-```
-
-Do the same for the genes "near" ZNF143 binding sites:
-How many are there?
-```{r engine='R', eval=F, echo=TRUE}
-repNear = rep.df[(abs(rep.df$dis) <= 440) & (rep.df$status == "Repressed"), ]
-dim(repNear)
-#[1] 315   3 
-315/357 = 0.88 # 88% are considered "near" 
-```
-
-What are their features?
-```{r engine='R', eval=F, echo=TRUE}
-repNearInfo = deseqGenesInfo[deseqGenesInfo$gene %in% repNear$V4,]
-dim(repNearInfo)
-# [1] 315  11
-unique(repNearInfo$treatment)
-# [1] Repressed
-
-# Again sort by gene name before combining distance to ZNF143 binding site to rest of DESeq results
-identical(repNear[order(repNear$V4),"V4"], repNearInfo[order(repNearInfo$gene),"gene"])
-# [1] TRUE
-repNear = repNear[order(repNear$V4),]
-repNearInfo = repNearInfo[order(repNearInfo$gene),]
-identical(repNear$V4,repNearInfo$gene)
-# [1] TRUE
-
-# Add distance to deseq table
-repNearInfo$dis = repNear$dis
-
-# Get stats: gene length, mean expression, log fold change
-repNearInfo$geneLength = repNearInfo$end - repNearInfo$start
-mean(repNearInfo$geneLength)
-# [1] 50206.47
-range(repNearInfo$geneLength)
-# [1]   5124 333659
-
-mean(repNearInfo$baseMean)
-# [1] 1322.995 
-range(repNearInfo$baseMean)
-# [1]    74.26092 11485.49980
-
-mean(repNearInfo$log2FoldChange)
-# [1] -0.3408784
-range(repNearInfo$log2FoldChange)
-# [1] -1.2069426 -0.1181158
-
-save(repNearInfo, file="repNearInfo.Rdata")
-```
-
-[make barchart of results]
-
-
-# Picking SP ChIP antibodies
-
-Which SP transcription factors are expressed in our HEK cells?
-
-```{r engine='R', eval=F, echo=TRUE}
-hek.sp = counts.df[grepl("_SP[0-9]$",rownames(counts.df)),]
-# 6 SPs: 1,2,3,4,8,9
-save(hek.sp,file="HEK_ZD29_SP_counts.Rdata")
-```
-
-Manually calculate FPKM for one SP from one sample:
-```{r engine='R', eval=F, echo=TRUE}
-# total counts per sample
-sum(counts.df$HEK_CloneZD29_30min_control_rep1)
-# [1] 14779516
-sum(counts.df$HEK_CloneZD29_30min_control_rep2)
-# [1] 14500393
-sum(counts.df$HEK_CloneZD29_30min_control_rep3)
-# [1] 14053817
-sum(counts.df$HEK_CloneZD29_30min_control_rep4)
-# [1] 14735850
-
-# FPKM for SP1 in first control replicate
-14779516/1000000 # divide total reads by 1 mill (scaling factor)
-# [1] 14.77952
-1285/14.77952 # divide counts for SP1 by scale factor
-# [1] 86.94464 # this is FPM: fragments per million
-53380187-53420344 # gene length
-# [1] -40157
-86.94464/40 # divide FPM by gene length in kilobases
-# [1] 2.173616 
-
-```
-
-[] Confirm total read counts
 
 
 
