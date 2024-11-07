@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2024-11-06" />
+<meta name="date" content="2024-11-07" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2024-11-06</h4>
+<h4 class="date">2024-11-07</h4>
 
 </div>
 
@@ -736,8 +736,8 @@ function toggle_visibility(id1) {
 <ul>
 <li><a href="#deseq2-analysis-and-ma-plot-fig.-3a" id="toc-deseq2-analysis-and-ma-plot-fig.-3a"><span class="toc-section-number">8.1</span> DESeq2 analysis and MA plot (Fig. 3A):</a></li>
 </ul></li>
-<li><a href="#code-for-making-integrated-ucsc-tracks" id="toc-code-for-making-integrated-ucsc-tracks"><span class="toc-section-number">9</span> Code for making integrated UCSC tracks</a></li>
-<li><a href="#code-for-inferring-regulatory-elements-using-bidirectional-txn" id="toc-code-for-inferring-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</a></li>
+<li><a href="#make-integrated-ucsc-tracks-for-genome-browser-viewing" id="toc-make-integrated-ucsc-tracks-for-genome-browser-viewing"><span class="toc-section-number">9</span> Make integrated UCSC tracks for genome browser viewing</a></li>
+<li><a href="#infer-regulatory-elements-using-bidirectional-txn" id="toc-infer-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">10</span> Infer regulatory elements using bidirectional TXN</a></li>
 <li><a href="#detour-to-chip-seq-analysis" id="toc-detour-to-chip-seq-analysis"><span class="toc-section-number">11</span> Detour to ChIP-seq analysis</a></li>
 <li><a href="#make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b" id="toc-make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b"><span class="toc-section-number">12</span> Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)</a></li>
 <li><a href="#deeptools-heatmap-fig.-3c" id="toc-deeptools-heatmap-fig.-3c"><span class="toc-section-number">13</span> deepTools heatmap (Fig. 3C)</a></li>
@@ -761,7 +761,7 @@ function toggle_visibility(id1) {
 
 <div id="introduction" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
-<p>This is a vignette accompanying the manuscript “ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes” (doi: <a href="https://doi.org/10.1101/2024.05.13.594008" class="uri">https://doi.org/10.1101/2024.05.13.594008</a>). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.</p>
+<p>This is a vignette for PRO-seq analysis accompanying the manuscript “ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes” (doi: <a href="https://doi.org/10.1101/2024.05.13.594008" class="uri">https://doi.org/10.1101/2024.05.13.594008</a>). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.</p>
 </div>
 <div id="pro-seq-analysis" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> PRO-seq analysis</h1>
@@ -1718,13 +1718,17 @@ xyplot(deseqAll$log2FoldChangeRS ~ log(deseqAll$baseMeanRS, base=10),
 dev.off()</code></pre>
 </div>
 </div>
-<div id="code-for-making-integrated-ucsc-tracks" class="section level1" number="9">
-<h1><span class="header-section-number">9</span> Code for making integrated UCSC tracks</h1>
+<div id="make-integrated-ucsc-tracks-for-genome-browser-viewing" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Make integrated UCSC tracks for genome browser viewing</h1>
+<p>For easier viewing, create genome browser tracks with signals integrated along the entire read:</p>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh</a>
 <a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh</a></p>
+<p>The resulting PRO-seq tracks are available on our trackhub, available on the UCSC genome browser by connecting to: <code>http://guertinlab.cam.uchc.edu/ znf143_hub/hub.txt</code>.</p>
 </div>
-<div id="code-for-inferring-regulatory-elements-using-bidirectional-txn" class="section level1" number="10">
-<h1><span class="header-section-number">10</span> Code for inferring regulatory elements using bidirectional TXN</h1>
+<div id="infer-regulatory-elements-using-bidirectional-txn" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Infer regulatory elements using bidirectional TXN</h1>
+<p>Regulatory regions were inferred with dREG’s web portal (<a href="https://dreg.js2.scigap.org" class="uri">https://dreg.js2.scigap.org</a>).
+The output was analyzed according to the following script:</p>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/dREG/ZNF143_dREG_analysis.R" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/dREG/ZNF143_dREG_analysis.R</a></p>
 <pre class="bash"><code>awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$6}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.minus.bed
 awk &#39;{OFS=&quot;\t&quot;;} {print $1,$6,$3}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.plus.bed
