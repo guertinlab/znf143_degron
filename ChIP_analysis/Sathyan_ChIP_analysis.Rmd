@@ -34,18 +34,22 @@ pre[class] {
 }
 ```
 
-# ChIP-seq experiments
+# Introduction
 
-ChIP-seq measures protein abundance on DNA and one can quantify
-protein modifications if an antibody to the modification is
-available. 
+This is a vignette for ChIP-seq and motif analysis accompanying the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.
 
-# ChIP-seq experimental design
+# ChIP-seq alignment and peak calling
 
-We perform an IgG IP as
-a control. 
+The general methods for removing adapters, alignment, and peak calling are identical through all the ChIP-seq experiments performed. The samples analyzed in the manuscript are:
 
-# ChIP-seq analysis
+- HEK293T ZNF143-dTAG Mock IP samples
+- HEK293T ZNF143-dTAG control (no treatment) with anti-HA (ZNF143) ChIP 
+- HEK293T ZNF143-dTAG degraded (+dTAGV-1) with anti-HA (ZNF143) ChIP 
+- HEK293T ZNF143-dTAG control (no treatment) with anti-SP1 ChIP 
+- HEK293T ZNF143-dTAG degraded (+dTAGV-1) with anti-SP1 ChIP
+- HEK293T ZNF143-dTAG control (no treatment) with anti-Nrf1 ChIP 
+- HEK293T ZNF143-dTAG degraded (+dTAGV-1) with anti-Nrf1 ChIP
+
 
 First we name the experiments with the trailing name being `PE1` or
 `PE2` for paired end data. 
@@ -53,8 +57,8 @@ First we name the experiments with the trailing name being `PE1` or
 ```{r engine='bash', eval=F, echo=TRUE}
 for i in *_S*R1_001.fastq.gz
 do
-    nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_S" '{print $1}')
-    echo $nm
+  nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_S" '{print $1}')
+  echo $nm
 	two=$(echo $i | awk -F"/" '{print $NF}' | awk -F"R1_001.fastq.gz" '{print $1}')
 	mv $i ${nm}_PE1.fastq.gz
 	mv ${two}R2_001.fastq.gz ${nm}_PE2.fastq.gz
@@ -62,7 +66,7 @@ done
 ```
 
 
-## Cut off the adapter with `cutadapt`
+## Remove adapters
 
 In our daily workflow in the lab we use
 `cutadapt` to remove adapter sequences. The options we use below are:
@@ -113,11 +117,429 @@ piped to `samtools markdup` to remove duplicate reads. Duplicate reads
 have the same PE1 and PE2 ends. This is very unlikely to happen by
 chance unless you sequence to very high read depth, so these reads are
 considered PCR amplicon duplicates. The `fixmate` step is necessary to
-pipe to `markdup`. While reads are sorted by coordinate, we run also
-run `seqOutBias` to generate a `bigWig` file for later steps.
+pipe to `markdup`. After removing duplicates, the reads are sorted by name (`-n`) so paired
+end reads are adjacent in the file. 
 
-After removing duplicates, the reads are sorted by name (`-n`) so paired
-end reads are adjacent in the file. We use the entire DNA fragment for making the
+Template script "chip_align_only.sh":
+```{r engine='bash', eval=F, echo=TRUE}
+#! /usr/bin/bash
+
+#SBATCH --job-name=chip_align_XXXXXXX.sh     # name for job
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 24                 
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=32G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.err
+
+export TMPDIR=/scratch/jhdtemp/tmp
+
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+name=XXXXXXX
+read_size=40
+module load samtools/1.16.1
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+module load bowtie2
+module load bedtools
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+genome=/home/FCAM/jdong/human38/hg38.fa
+genome_index=/home/FCAM/jdong/human38/hg38
+ncore=40
+
+echo "Start: $(date)"
+echo "Begin alignment"
+bowtie2 -p $ncore --maxins 800 -x $genome_index -1 ${name}_PE1_no_adapt.fastq -2 ${name}_PE2_no_adapt.fastq | samtools sort -@ $ncore -n -o ${name}.bw.bam
+echo "Zipping done; begin BAM processing"
+samtools fixmate -m ${name}.bw.bam - | samtools sort -@ $ncore - | samtools markdup -s -r - ${name}.hg38.bam
+
+echo "Alignment complete"
+echo "End: $(date)"
+```
+
+Generate sbatch scripts for each sample and submit to the cluster for parallel processing:
+
+```{r engine='bash', eval=F, echo=TRUE}
+file=chip_align_only.sh
+
+for i in *_PE1.fastq
+do
+    nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_PE1.fastq" '{print $1}')
+    echo $nm
+    sed -e "s/XXXXXXX/${nm}/g" "$file" > chip_align_${nm}.sh
+    sleep 1
+done
+
+# manually check if substitutions worked, then submit all
+for i in chip_align_*rep*.sh
+do
+    echo $i
+    sbatch $i
+done
+```
+
+## seqOutBias 
+
+### Pre-run seqtable 
+
+For each specific read size, a tallymer file needs to be created by seqOutBias prior to running it to generate bigWigs from the aligned reads. This can be done separately since it can take some time and only needs to be completed once per read size. Since our reads are 40 bases long: 
+
+```{r engine='bash', eval=F, echo=TRUE}
+seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
+genome=/home/FCAM/jdong/human38/hg38.fa
+read_size=40
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+
+echo "Start: $(date)"
+seqOutBias seqtable $genome --read-size=40
+echo "End: $(date)"
+
+```
+
+This will generate the following output files for our particular read size:
+
+- tallymer=hg38.tal_${read_size}.gtTxt.gz
+- table=hg38_${read_size}.4.2.2.tbl
+
+### Run seqOutBias
+
+We will generate sbatch scripts for each sample and run them simultaneously.
+
+Template script "SP1chIP_seqOB_template.sh": 
+```{r engine='bash', eval=F, echo=TRUE}
+#! /usr/bin/bash
+
+#SBATCH --job-name=SP1chIP_seqOB2_XXXXXXX     # name for job
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 1                  
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=24G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+export TMPDIR=/scratch/jhdtemp/tmp
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+name=XXXXXXX
+read_size=40
+seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
+tallymerFile=/scratch/jhdtemp/sOB_tallymer/hg38.tal_${read_size}.gtTxt.gz
+tableFile=/scratch/jhdtemp/sOB_tallymer/hg38_${read_size}.4.2.2.tbl
+module load samtools/1.16.1
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+module load bowtie2
+module load bedtools
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+genome=/home/FCAM/jdong/human38/hg38.fa
+
+echo "Begin seqOutBias"
+seqOutBias scale ${tableFile} ${name}.hg38.bam --tallymer=$tallymerFile --shift-counts --no-scale --bw=${name}.seqOut.bigWig --read-size=${read_size} 2>&1 | tee ${name}_seqOutBias.log
+echo "End seqOutBias"
+```
+
+Make individual scripts and submit:
+
+```{r engine='bash', eval=F, echo=TRUE}
+file=SP1chIP_seqOB_template.sh
+
+for i in *_PE1.fastq 
+do
+    nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_PE1.fastq" '{print $1}')
+    echo $nm
+    sed -e "s/XXXXXXX/${nm}/g" "$file" > SP1chIP_seqOB_${nm}.sh
+    sleep 1
+done
+
+# manually check if substitutions worked, then submit all
+for i in SP1chIP_seqOB_*rep*.sh
+do
+    echo $i
+    sbatch $i
+done
+```
+
+This process can be memory intensive, so we found 48G to be sufficient for our larger samples.
+
+## Peak calling 
+We call peaks with MACS3's `callpeak` function using the following arguments:
+
+- `--call-summits`: looks for subpeaks inside every peak called by the default process
+- `-t`: aligned treament files. If listing multiple, they will be pooled.
+- `-c`: aligned control files. If listing multiple, they will be pooled. The same mock IP BAM files were used as background for all peak calling steps.
+- `-g hs`: mappable or effective genome size, or the amount of genome that can be sequenced. Smaller than total genome size due to repetitions. Different for various species; 'hs' (which=2.7e9) is for human genomes.
+- `q`: q-value (minimum false discovery rate) cutoff 
+- `--keep-dup all`: keeps all tags(reads) at every location even if they are duplicates (same coordinate on same strand)
+- `-f BAMPE`: format of input. In this case, we need to specify these BAM files contain paired-end reads
+- `--nomodel`: by specifying `-f BAMPE` we are already bypassing building the shifting model, but this ensures that the model will not be built. Insert sizes determined from read pairs are used as fragments and no shifting is needed.
+- `--tempdir temp_macs`: create this prior to running macs3. Designated directory to store temporary files. Will be empty after the `callpeaks` completes
+ 
+
+```{r engine='bash', eval=F, echo=TRUE}
+module load macs3
+
+mkdir temp_macs
+# ZNF143
+macs3 callpeak --call-summits -t *cont_HA_*sorted.bam -c *IgG*sorted.bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+
+macs3 callpeak --call-summits -t antiSP1*hg38.bam -c mock*hg38.bam -n antiSP1_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+
+macs3 callpeak --call-summits -t antiNrf1*hg38.bam -c /labs/Guertin/ZNF143_SP1_ChIP/Fastq/mock*hg38.bam -n antiNrf1_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
+
+```
+
+### Remove peaks in blacklisted areas 
+
+```{r engine='bash', eval=F, echo=TRUE}
+wget https://github.com/Boyle-Lab/Blacklist/raw/master/lists/hg38-blacklist.v2.bed.gz
+gunzip hg38-blacklist.v2.bed.gz
+blacklist=hg38-blacklist.v2.bed
+sizes=/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes
+
+# loop through all samples
+for i in *_summits.bed
+do
+    name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_summits.bed" '{print $1}')
+    echo $name
+    grep -v "random" ${name}_summits.bed | grep -v "chrUn" | grep -v "chrEBV" | grep -v "chrM" | grep -v "alt" | intersectBed -v -a - -b $blacklist > ${name}_summits_final.bed
+    slopBed -b 50 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_summit_100window.bed
+    slopBed -b 200 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_summit_400window.bed
+done
+
+```
+
+### Fraction of Reads in Peaks (FRiP)
+
+Although low FRiP is not necessarily a cause for alarm with ChIP-seq samples, it can be informative to calculate to look for inconsistencies between samples. 
+
+```{r engine='bash', eval=F, echo=TRUE}
+# Loop through all samples
+
+module load samtools
+
+for i in *_peak_counts.txt
+do
+    name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_peak_counts.txt" '{print $1}')
+    echo $name > ${name}_FRiP.txt
+    awk '{print $NF}' ${name}_peak_counts.txt > ${name}_peak_counts_only.txt
+    RiP=$(awk '{sum+=$1;} END{print sum;}' ${name}_peak_counts_only.txt)
+    echo $name | cat - ${name}_peak_counts_only.txt > ${name}_peak_counts.txt
+    aligned_reads=$(samtools view -c -f 0x42 ${name}.hg38.bam)
+    FRiP=$(echo "scale=2 ; $RiP / $aligned_reads" | bc)
+    echo $FRiP >> ${name}_FRiP.txt
+    rm ${name}_peak_counts_only.txt
+done
+
+```
+
+Our samples typically had FRiPs ranging from 5%-25% (excluding the +dTAGV-1 anti-HA samples, which were much lower). 
+
+# Normalization for genome browser viewing 
+
+Usually we combine replicates into a single track for visualization
+and we compare the tracks between conditions. All ChIP-seq samples are normalized by read depth.
+
+First normalize each replicate separately: 
+
+Template script "normByRep_template.sh":
+```{r engine='bash', eval=F, echo=TRUE}
+#! /usr/bin/bash
+
+#SBATCH --job-name=normByRep_XXXXXXX.sh     # name for job
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 8               
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=12G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.err
+
+export TMPDIR=/scratch/jhdtemp/tmp
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+name=XXXXXXX
+read_size=40
+module load samtools/1.16.1
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+module load bowtie2
+module load bedtools
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+genome=/home/FCAM/jdong/human38/hg38.fa
+genome_index=/home/FCAM/jdong/human38/hg38
+ncore=8
+
+samtools sort -@ $ncore -n -o ${name}.sorted.bam ${name}.hg38.bam
+bedtools bamtobed -i ${name}.sorted.bam -bedpe > ${name}_bed12.bed
+awk '$1==$4 {print $0}' ${name}_bed12.bed | awk '{OFS="\t";} {print $1, $2, $6}' | awk '$1!="." && $3>$2 && (($3 - $2)<2000) {print $0}' | sort -k1,1 -k2,2n > ${name}_read_span.bed
+genomeCoverageBed -bg -i ${name}_read_span.bed -g $sizes > ${name}.bedGraph
+
+echo "Generate normalized bedGraphs and bigWigs"
+depth=`awk -F'\t' '{sum+=$5;}END{print sum;}' ${name}.hg38_not_scaled.bed` # this file is from seqOutBias 
+scaled=$(bc <<< "scale=3 ; 10000000 / $depth") #scale: number of decimal points in result
+echo $scaled
+awk -v scaled="$scaled" '{OFS="\t";} {print $1, $2, $3, $4*scaled}' ${name}.bedGraph > ${name}_normalized.bedGraph
+wigToBigWig -clip ${name}_normalized.bedGraph $sizes ${name}_normalized.bigWig
+
+```
+
+Generate individual scripts and submit:
+
+```{r engine='bash', eval=F, echo=TRUE}
+file=normByRep_template.sh
+
+for i in *_PE1.fastq 
+do
+    nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_PE1.fastq" '{print $1}')
+    echo $nm
+    sed -e "s/XXXXXXX/${nm}/g" "$file" > normByRep_${nm}.sh
+    sleep 1
+done
+
+# manually check if substitutions worked, then submit all
+for i in normByRep_*rep*.sh
+do
+    echo $i
+    sbatch $i
+done
+
+```
+
+
+Then combine and re-normalize all samples within a condition: 
+
+```{r engine='bash', eval=F, echo=TRUE}
+#! /usr/bin/bash
+
+#SBATCH --job-name=merge_normalized
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 1                  
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=32G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+export TMPDIR=/scratch/jdong
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+module load ucsc_genome/2012.05.22
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+
+# For each condition:
+for i in *rep1*normalized.bigWig
+do
+    nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_normalized" '{print $1}')
+    name=$(echo $nm | awk -F"-rep" '{print $1}')
+    echo $name
+    reps=$(ls ${name}-rep*normalized.bigWig | wc -w | bc)
+    echo $reps
+    files=$(ls ${name}-rep*normalized.bigWig) 
+    echo $files
+    bigWigMerge $files ${name}_tmp.bg
+    scaleall=$(bc <<< "scale=4 ; 1.0 / $reps")
+    echo scale:
+    echo $scaleall
+    awk -v scaleall="$scaleall" '{OFS="\t";} {print $1, $2, $3, $4*scaleall}' ${name}_tmp.bg > ${name}_normalized.bedGraph
+    rm ${name}_tmp.bg 
+    wigToBigWig ${name}_normalized.bedGraph $sizes ${name}_merged_normalized.bigWig
+done
+
+```
+
+The normalized bigWigs are available in our trackhub which is available by linking the UCSC genome browser to `http://guertinlab.cam.uchc.edu/ znf143_hub/hub.txt`.
+
+# Calculating peak intensities 
+
+```{r engine='R', eval=F, echo=TRUE}
+# ZNF143
+
+
+
+# SP1
+
+
+
+# Nrf1
+
+# all that other deseq stuff
+
+normCountsNrf1$nrf1ContPeakIntens = rowMeans(normCountsNrf1[,4:7])
+normCountsNrf1sorted = normCountsNrf1[order(as.numeric(normCountsNrf1$nrf1ContPeakIntens), decreasing = FALSE),]
+write.table(normCountsNrf1sorted[,c("chr","start","end","peakCoords","nrf1ContPeakIntens")], sep="\t", quote=FALSE, row.names=FALSE,col.names=FALSE,file="nrf1_peaks_intensities_decreasing_401bp.bed")
+```
+
+# Quick de novo motif analysis 
+
+We do de novo motif analysis after peak calling to verify if our target antibodies pulled down our expected targets. Generally we expect that the top motif to come out of the most intense peaks to be that of our expected transcription factor. This was only done for non-ZNF143 samples since ZNF143 went through a more rigorous de novo motif analysis process (see below). 
+
+```{r engine='bash', eval=F, echo=TRUE}
+cat antiSP1_ChIP_summits.bed | sort -rn -k5 | head -1000 > antiSP1_top1kPeaks.bed
+# search for motif in 100bp window (101 total)
+sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+slopBed -b 50 -i antiSP1_top1kPeaks.bed -g $sizes  | sort -k1,1 -k2,2n > antiSP1_top1kPeaks_101window.bed
+genome=/home/FCAM/jdong/human38/hg38.fa
+fastaFromBed -fi $genome -bed antiSP1_top1kPeaks_101window.bed -fo antiSP1_top1kPeaks_101window.fasta
+
+module load meme/5.4.1
+
+meme -oc antiSP1_top1kPeaks_101window.meme_output -nmotifs 5 -objfun classic -csites 20000 -searchsize 0 -minw 5 -maxw 10 -revcomp -dna -markov_order 3 -maxsize 100000000 antiSP1_top1kPeaks_101window.fasta -mpi
+
+meme -oc Nrf1_motif_analysis_top1k_normCounts.meme_output -nmotifs 3 -p 160 -objfun classic -csites 20000 -searchsize 0 -minw 5 -maxw 19 -revcomp -dna -markov_order 3 -maxsize 100000000 nrf1_normCounts_summits_top1k_101bp.fasta 
+
+```
+
+[add figure of sp motif]
+
+[add figure of Nrf1 motif]
+
+
+
+# ZNF143 ChIP-seq analysis 
+
+## heatmaps
+
+## rigorous de novo motif analysis  
+
+# SP1 ChIP-seq analysis
+
+## subsection(s)
+
+## Differential binding analysis
+
+# Nrf1 ChIP-seq analysis
+
+## subsection(s)
+
+## Differential binding analysis
+
+
+
+# ======= previous =================
+We use the entire DNA fragment for making the
 browser tracks, which is accomplished by converting the paired-end
 `bam` file to a `bed12` and taking out discordant reads. 
 The final step is normalizing to read depth. 
@@ -210,14 +632,7 @@ done
 
 # Combining replicates for the genome browser
 
-Usually we combine replicates into a single track for visualization
-and we compare the tracks between conditions. It is important that we
-read-depth normalize before we combine the signal from each
-replicate. Otherwise, we would be weighting replicates differently;
-for example, if a library is sequenced to twice the read depth and we
-combine first then read depth normalize, then the more high coverage
-data is weighted twice as much in the final visualization. All the
-relevant track files are here:
+
 [http://guertinlab.cam.uchc.edu/znf143_hub/](http://guertinlab.cam.uchc.edu/znf143_hub/)
 
 ```{r engine='bash', eval=F, echo=TRUE}
@@ -258,18 +673,6 @@ done
 ```
 
 # Peak calling
-
-We call peaks with MACS3's `callpeak` function using the following arguments:
-
-- `--call-summits`: looks for subpeaks inside every peak called by the default process
-- `-t`: aligned treament files. If listing multiple, they will be pooled.
-- `-c`: aligned control files. If listing multiple, they will be pooled.
-- `-g hs`: mappable or effective genome size, or the amount of genome that can be sequenced. Smaller than total genome size due to repetitions. Different for various species; 'hs' (which=2.7e9) is for human genomes.
-- `q`: q-value (minimum false discovery rate) cutoff 
-- `--keep-dup all`: keeps all tags(reads) at every location even if they are duplicates (same coordinate on same strand)
-- `-f BAMPE`: format of input. In this case, we need to specify these BAM files contain paired-end reads
-- `--nomodel`: by specifying `-f BAMPE` we are already bypassing building the shifting model, but this ensures that the model will not be built. Insert sizes determined from read pairs are used as fragments and no shifting is needed.
-- `--tempdir temp_macs`: create this prior to running macs3. Designated directory to store temporary files. Will be empty after the `callpeaks` completes
 
 ```{r engine='bash', eval=F, echo=TRUE}
 #! /usr/bin/bash

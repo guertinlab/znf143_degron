@@ -17,7 +17,7 @@ geometry: margin=1in
 
 # Introduction
 
-This is a vignette accompanying the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.
+This is a vignette for PRO-seq analysis accompanying the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.
 
 # PRO-seq analysis
 
@@ -1076,13 +1076,19 @@ dev.off()
 ```
 
 
-# Code for making integrated UCSC tracks
+# Make integrated UCSC tracks for genome browser viewing
+
+For easier viewing, create genome browser tracks with signals integrated along the entire read:
 
 https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh
 https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh
 
+The resulting PRO-seq tracks are available on our trackhub, available on the UCSC genome browser by connecting to: `http://guertinlab.cam.uchc.edu/ znf143_hub/hub.txt`.
 
-# Code for inferring regulatory elements using bidirectional TXN
+# Infer regulatory elements using bidirectional TXN
+
+Regulatory regions were inferred with dREG's web portal (https://dreg.js2.scigap.org).
+The output was analyzed according to the following script: 
 
 https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/dREG/ZNF143_dREG_analysis.R
 ```{r engine='bash', eval=F, echo=TRUE}
