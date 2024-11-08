@@ -848,14 +848,69 @@ mv SRR28879493_2.fastq HEK_CloneZD29_30min_control_rep1_PE2.fastq
 </div>
 <div id="pro-seq-preparation-for-analysis" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> PRO-seq preparation for analysis</h1>
-<p>Use seqOutBias to compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position.
-This is the most time-consuming step of the seqOutBias command but only needs to be completed once before processing the sequencing data. The files can be reused for future samples if the read size is the same.</p>
-<p>Install from source, if you have issues: <a href="mailto:guertin@uchc.edu" class="email">guertin@uchc.edu</a></p>
-<pre class="bash"><code># installation code here? i just got the binaries from Mike though 
+<p>Build indices for reference human genome:</p>
+<pre class="bash"><code>cd /scratch/jdong/ZNF143dTAG/ 
 
-# if seqOutBias is in a directory accessible by PATH, simply call it directly from the command line
-seqOutBias seqtable hg38.fa --read-size=47
+# Build index for reference human genome
+mkdir ./human38/
+cd ./human38/
+wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.gz
+gunzip hg38.fa.gz
+bowtie2-build hg38.fa hg38
+
+# Generate chrom sizes file from hg38 FASTA
+cd ~/human38 
+faToTwoBit hg38.fa hg38.2bit
+twoBitInfo hg38.2bit stdout | sort -k2rn &gt; hg38.chrom.sizes
+
+# Build index for reference human rDNA
+mkdir ../hum_rDNA/
+cd ../hum_rDNA/
+wget https://github.com/databio/ref_decoy/raw/master/human_rDNA.fa.gz
+gunzip human_rDNA.fa.gz
+bowtie2-build human_rDNA.fa human_rDNA
 </code></pre>
+<p>Use seqOutBias (<a href="https://github.com/guertinlab/seqOutBias" class="uri">https://github.com/guertinlab/seqOutBias</a>) to compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position.
+This is the most time-consuming step of the seqOutBias command but only needs to be completed once before processing the sequencing data. The files can be reused for future samples if the read size is the same.</p>
+<p>Install from source following the instructions in the seqOutBias manual; if you have issues: <a href="mailto:guertin@uchc.edu" class="email">guertin@uchc.edu</a></p>
+<pre class="bash"><code>mkdir /scratch/jdong/ZNF143dTAG/sOBfiles/
+cd /scratch/jdong/ZNF143dTAG/sOBfiles/
+mkdir readSize47
+cd readSize47
+
+# Run seqOutBias in the background with the following script:
+
+#! /usr/bin/bash
+
+#SBATCH --job-name=seqOutBias47
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 36                  
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=100G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+export TMPDIR=/scratch/jdong/
+cd /scratch/jdong/ZNF143dTAG/sOBfiles/readSize47
+echo &quot;Current wd:&quot; $(pwd)
+echo &quot;Current node:&quot; $(hostname)
+
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+
+seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
+genome=/home/FCAM/jdong/human38/hg38.fa
+
+echo &quot;Time start seqOutBias:&quot; $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39;)
+
+seqOutBias seqtable $genome --read-size=47
+
+echo &quot;Time script finished:&quot; $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39;)</code></pre>
 <p>Load modules, pre-run seqOutBias, and parse the hg38 annotation file:</p>
 <pre class="bash"><code>module load bowtie2/2.5.0
 module load genometools/1.5.10
@@ -898,26 +953,6 @@ tar -xvf v1.0.0.tar
 cd fqdedup-1.0.0/ 
 cargo build --release
 
-# Build index for reference human genome
-mkdir ../human38/
-cd ../human38/
-wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.gz
-gunzip hg38.fa.gz
-bowtie2-build hg38.fa hg38
-
-# Build index for reference human rDNA
-mkdir ../hum_rDNA/
-cd ../hum_rDNA/
-wget https://github.com/databio/ref_decoy/raw/master/human_rDNA.fa.gz
-gunzip human_rDNA.fa.gz
-bowtie2-build human_rDNA.fa human_rDNA
-
-
-#wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
-# Generate chrom sizes file from hg38 FASTA
-cd ~/human38 
-faToTwoBit hg38.fa hg38.2bit
-twoBitInfo hg38.2bit stdout | sort -k2rn &gt; hg38.chrom.sizes
 
 release=109
 
