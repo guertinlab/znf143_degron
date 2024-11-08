@@ -19,26 +19,111 @@ geometry: margin=1in
 
 This is a vignette for PRO-seq analysis accompanying the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.
 
-# PRO-seq analysis
 
-Combine FASTQs for ZNF143-dTAG PRO-seq data from two different sequencing runs:
-```{r engine='bash', eval=F, echo=TRUE}
-cd /labs/Guertin/ZNF143_PRO
+# Obtain FASTQ files from GEO
 
-for i in ./dep1/*_dep1_*.fastq.gz
-do
-    echo $i
-    pre=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_dep1_" '{print $1}')
-    suf=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_dep1_" '{print $2}')
-    x=$(echo $suf |  awk -F".fastq" '{print $1}')
-    echo $pre # cell type, treatment, condition
-    echo $suf # replicate number, PE2, fastq.gz
-    echo $x # replicate number, PE2
-    cat $i ./dep2/${pre}_dep2_${suf} > ${pre}_${x}_final.fastq.gz
-done 
+Log into the high-performance cluster, start an interactive node, set up the directories, and get the files from GEO accession record GSE266491 for PRO-seq files. 
+
+```{r engine='bash', eval=F, echo=TRUE} 
+# Connect to the cluster
+# ssh jdong@xanadu-submit-ext.cam.uchc.edu 
+
+# Start interactive node
+srun --partition=general --qos=general --mem=2G -N 1 -n 1 -c 1 --pty bash
+
+# Make and change to analysis directories
+mkdir /scratch/jdong/ZNF143dTAG/
+cd /scratch/jdong/ZNF143dTAG/
+mkdir PRO
+cd PRO
+mkdir FASTQ
+cd FASTQ
+
 ```
 
- Load modules, pre-run seqOutBias, and parse the hg38 annotation file:
+The SRA runs for GSE266491 are SRR28879486 through SRR28879493.
+
+"get_SRA_template.sh":
+
+```{r engine='bash', eval=F, echo=TRUE}
+#! /usr/bin/bash
+
+#SBATCH --job-name=get_SRA_SRR288794XXX
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -c 10
+#SBATCH -p general
+#SBATCH --qos=general
+#SBATCH --mem=12G
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+export TMPDIR=/scratch/jdong/
+cd /scratch/jdong/ZNF143dTAG/PRO/FASTQ 
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+module load sratoolkit/3.0.5 # latest version on Xanadu
+
+fasterq-dump SRR288794XXX # replace XXX with number from 86-93 inclusive 
+
+echo "Script finished:" $(date '+%a %Y-%m-%d %H:%M:%S %Z')
+
+```
+
+Make individual scripts for each SRA run.
+
+```{r engine='bash', eval=F, echo=TRUE}
+file=/home/FCAM/jdong/script_templates/get_SRA_template.sh
+
+for i in {86..93}
+do
+  echo $i
+  sed -e "s/XXX/${i}/g" "$file" > get_SRA_SRR288794${i}.sh
+  grep fasterq get_SRA_SRR288794${i}.sh
+done
+
+# Submit jobs 
+for i in {86..93}
+do
+    echo $i
+    sbatch get_SRA_SRR288794${i}.sh
+done
+
+```
+
+
+Rename files:
+
+```{r engine='bash', eval=F, echo=TRUE}
+mv SRR28879486_1.fastq HEK_CloneZD29_30min_dTAGV1_rep4_PE1.fastq
+mv SRR28879486_2.fastq HEK_CloneZD29_30min_dTAGV1_rep4_PE2.fastq
+mv SRR28879487_1.fastq HEK_CloneZD29_30min_dTAGV1_rep3_PE1.fastq
+mv SRR28879487_2.fastq HEK_CloneZD29_30min_dTAGV1_rep3_PE2.fastq
+mv SRR28879488_1.fastq HEK_CloneZD29_30min_dTAGV1_rep2_PE1.fastq
+mv SRR28879488_2.fastq HEK_CloneZD29_30min_dTAGV1_rep2_PE2.fastq
+mv SRR28879489_1.fastq HEK_CloneZD29_30min_dTAGV1_rep1_PE1.fastq
+mv SRR28879489_2.fastq HEK_CloneZD29_30min_dTAGV1_rep1_PE2.fastq
+
+mv SRR28879490_1.fastq HEK_CloneZD29_30min_control_rep4_PE1.fastq
+mv SRR28879490_2.fastq HEK_CloneZD29_30min_control_rep4_PE2.fastq
+
+mv SRR28879491_1.fastq HEK_CloneZD29_30min_control_rep3_PE1.fastq
+mv SRR28879491_2.fastq HEK_CloneZD29_30min_control_rep3_PE2.fastq
+
+mv SRR28879492_1.fastq HEK_CloneZD29_30min_control_rep2_PE1.fastq
+mv SRR28879492_2.fastq HEK_CloneZD29_30min_control_rep2_PE2.fastq
+mv SRR28879493_1.fastq HEK_CloneZD29_30min_control_rep1_PE1.fastq
+mv SRR28879493_2.fastq HEK_CloneZD29_30min_control_rep1_PE2.fastq
+
+```
+
+
+# PRO-seq analysis
+
+Load modules, pre-run seqOutBias, and parse the hg38 annotation file:
 
 ```{r engine='bash', eval=F, echo=TRUE}
 module load bowtie2/2.5.0
@@ -57,9 +142,9 @@ wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/exon_
 wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/plot_all_metrics.R
 wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/differential_expression.R
 
-wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/PRO_normalization
+wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/PRO_normalization_sizefactor 
 wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/normalization_factor.R
-wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/normalize_bedGraph.py
+wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/normalize_bedGraph_v2.py
 
 chmod +x insert_size.R
 chmod +x fqComplexity
@@ -69,9 +154,9 @@ chmod +x exon_intron_ratio.R
 chmod +x plot_all_metrics.R
 chmod +x differential_expression.R
 
-chmod +x normalize_bedGraph.py
+chmod +x normalize_bedGraph_v2.py
 chmod +x normalization_factor.R
-chmod +x PRO_normalization
+chmod +x PRO_normalization_sizefactor
 
 wget https://github.com/guertinlab/fqdedup/archive/refs/tags/v1.0.0.tar.gz
 gunzip v1.0.0.tar.gz

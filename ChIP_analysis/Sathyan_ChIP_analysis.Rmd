@@ -38,6 +38,10 @@ pre[class] {
 
 This is a vignette for ChIP-seq and motif analysis accompanying the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). The analysis follows the published figures, which may differ from the preprint figures in labeling and content.
 
+# Get files from GEO 
+
+SRA 
+
 # ChIP-seq alignment and peak calling
 
 The general methods for removing adapters, alignment, and peak calling are identical through all the ChIP-seq experiments performed. The samples analyzed in the manuscript are:
@@ -474,7 +478,11 @@ The normalized bigWigs are available in our trackhub which is available by linki
 
 # Calculating peak intensities 
 
+After peak calling, we use DESeq2 to calculate normalized peak intensities. For ZNF143-ChIP, we use the manually calculated size factors based on read depth of the control samples, since the +dTAGV-1 ChIP samples have so little signal. For the other ChIPs, we use DESeq2-generated size factors. 
+
 ```{r engine='R', eval=F, echo=TRUE}
+
+
 # ZNF143
 
 
@@ -520,9 +528,22 @@ meme -oc Nrf1_motif_analysis_top1k_normCounts.meme_output -nmotifs 3 -p 160 -obj
 
 # ZNF143 ChIP-seq analysis 
 
-## heatmaps
+## Defining a functional threshold for peak intensity
+
+Getting down to 4682: SF_ZNF143summits_overQuant0.7.bed how did I make this file???????? See ZNF143_15_ChIP2_size_factors_20240108.qmd line 388 and above thank you past me for writing this!!!!!!! 
+
+cumulativeQuantileChIP2_SF_abline400_CDF_Repressed.pdf <-- we picked intensity from this plot. 
+
+(ZNF143_16.5_strict_r1...20240816.qmd)
+
+
+Final file of ZNF143 functional binding sites: (see ZNF143_17_CDF...20240209.qmd)ZNF143strict_comp29_inferredSites_peakIntensities_unique.bed
 
 ## rigorous de novo motif analysis  
+
+## heatmaps
+
+
 
 # SP1 ChIP-seq analysis
 
