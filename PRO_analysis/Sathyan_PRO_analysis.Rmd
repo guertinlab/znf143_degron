@@ -121,18 +121,78 @@ mv SRR28879493_2.fastq HEK_CloneZD29_30min_control_rep1_PE2.fastq
 
 # PRO-seq preparation for analysis
 
-Use seqOutBias to compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position.
-This is the most time-consuming step of the seqOutBias command but only needs to be completed once before processing the sequencing data. The files can be reused for future samples if the read size is the same.
-
-Install from source, if you have issues: guertin@uchc.edu
+Build indices for reference human genome: 
 
 ```{r engine='bash', eval=F, echo=TRUE}
-# installation code here? i just got the binaries from Mike though 
+cd /scratch/jdong/ZNF143dTAG/ 
 
-# if seqOutBias is in a directory accessible by PATH, simply call it directly from the command line
-seqOutBias seqtable hg38.fa --read-size=47
+# Build index for reference human genome
+mkdir ./human38/
+cd ./human38/
+wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.gz
+gunzip hg38.fa.gz
+bowtie2-build hg38.fa hg38
+
+# Generate chrom sizes file from hg38 FASTA
+cd ~/human38 
+faToTwoBit hg38.fa hg38.2bit
+twoBitInfo hg38.2bit stdout | sort -k2rn > hg38.chrom.sizes
+
+# Build index for reference human rDNA
+mkdir ../hum_rDNA/
+cd ../hum_rDNA/
+wget https://github.com/databio/ref_decoy/raw/master/human_rDNA.fa.gz
+gunzip human_rDNA.fa.gz
+bowtie2-build human_rDNA.fa human_rDNA
 
 
+```
+
+
+Use seqOutBias (https://github.com/guertinlab/seqOutBias) to compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position.
+This is the most time-consuming step of the seqOutBias command but only needs to be completed once before processing the sequencing data. The files can be reused for future samples if the read size is the same.
+
+Install from source following the instructions in the seqOutBias manual; if you have issues: guertin@uchc.edu
+
+```{r engine='bash', eval=F, echo=TRUE}
+mkdir /scratch/jdong/ZNF143dTAG/sOBfiles/
+cd /scratch/jdong/ZNF143dTAG/sOBfiles/
+mkdir readSize47
+cd readSize47
+
+# Run seqOutBias in the background with the following script:
+
+#! /usr/bin/bash
+
+#SBATCH --job-name=seqOutBias47
+#SBATCH -N 1                  
+#SBATCH -n 1                 
+#SBATCH -c 36                  
+#SBATCH -p general           
+#SBATCH --qos=general       
+#SBATCH --mem=100G               
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+export TMPDIR=/scratch/jdong/
+cd /scratch/jdong/ZNF143dTAG/sOBfiles/readSize47
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+module load genometools/1.5.10
+module load ucsc_genome/2012.05.22
+module load rust
+
+seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
+genome=/home/FCAM/jdong/human38/hg38.fa
+
+echo "Time start seqOutBias:" $(date '+%a %Y-%m-%d %H:%M:%S %Z')
+
+seqOutBias seqtable $genome --read-size=47
+
+echo "Time script finished:" $(date '+%a %Y-%m-%d %H:%M:%S %Z')
 ```
 
 Load modules, pre-run seqOutBias, and parse the hg38 annotation file:
@@ -179,26 +239,6 @@ tar -xvf v1.0.0.tar
 cd fqdedup-1.0.0/ 
 cargo build --release
 
-# Build index for reference human genome
-mkdir ../human38/
-cd ../human38/
-wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.gz
-gunzip hg38.fa.gz
-bowtie2-build hg38.fa hg38
-
-# Build index for reference human rDNA
-mkdir ../hum_rDNA/
-cd ../hum_rDNA/
-wget https://github.com/databio/ref_decoy/raw/master/human_rDNA.fa.gz
-gunzip human_rDNA.fa.gz
-bowtie2-build human_rDNA.fa human_rDNA
-
-
-#wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
-# Generate chrom sizes file from hg38 FASTA
-cd ~/human38 
-faToTwoBit hg38.fa hg38.2bit
-twoBitInfo hg38.2bit stdout | sort -k2rn > hg38.chrom.sizes
 
 release=109
 
