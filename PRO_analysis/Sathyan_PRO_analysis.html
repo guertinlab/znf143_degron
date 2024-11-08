@@ -713,7 +713,7 @@ function toggle_visibility(id1) {
 <ul>
 <li><a href="#introduction" id="toc-introduction"><span class="toc-section-number">1</span> Introduction</a></li>
 <li><a href="#obtain-fastq-files-from-geo" id="toc-obtain-fastq-files-from-geo"><span class="toc-section-number">2</span> Obtain FASTQ files from GEO</a></li>
-<li><a href="#pro-seq-analysis" id="toc-pro-seq-analysis"><span class="toc-section-number">3</span> PRO-seq analysis</a>
+<li><a href="#pro-seq-preparation-for-analysis" id="toc-pro-seq-preparation-for-analysis"><span class="toc-section-number">3</span> PRO-seq preparation for analysis</a>
 <ul>
 <li><a href="#confirming-umi-length" id="toc-confirming-umi-length"><span class="toc-section-number">3.1</span> Confirming UMI length</a></li>
 </ul></li>
@@ -721,41 +721,42 @@ function toggle_visibility(id1) {
 <ul>
 <li><a href="#run-the-previous-chunk-in-parallel-fig-s1" id="toc-run-the-previous-chunk-in-parallel-fig-s1"><span class="toc-section-number">4.1</span> Run the previous chunk in parallel (Fig S1)</a></li>
 </ul></li>
-<li><a href="#prepare-input-for-pta" id="toc-prepare-input-for-pta"><span class="toc-section-number">5</span> Prepare input for pTA</a></li>
-<li><a href="#prepare-input-for-tssinference" id="toc-prepare-input-for-tssinference"><span class="toc-section-number">6</span> Prepare input for TSSinference</a>
+<li><a href="#pro-seq-normalization" id="toc-pro-seq-normalization"><span class="toc-section-number">5</span> PRO-seq normalization</a></li>
+<li><a href="#prepare-input-for-pta" id="toc-prepare-input-for-pta"><span class="toc-section-number">6</span> Prepare input for pTA</a></li>
+<li><a href="#prepare-input-for-tssinference" id="toc-prepare-input-for-tssinference"><span class="toc-section-number">7</span> Prepare input for TSSinference</a>
 <ul>
-<li><a href="#get-gene-annotations" id="toc-get-gene-annotations"><span class="toc-section-number">6.1</span> Get gene annotations</a></li>
-<li><a href="#re-annotating-transcription-units-after-manual-curation" id="toc-re-annotating-transcription-units-after-manual-curation"><span class="toc-section-number">6.2</span> Re-annotating transcription units after manual curation</a></li>
+<li><a href="#get-gene-annotations" id="toc-get-gene-annotations"><span class="toc-section-number">7.1</span> Get gene annotations</a></li>
+<li><a href="#re-annotating-transcription-units-after-manual-curation" id="toc-re-annotating-transcription-units-after-manual-curation"><span class="toc-section-number">7.2</span> Re-annotating transcription units after manual curation</a></li>
 </ul></li>
-<li><a href="#tssinference" id="toc-tssinference"><span class="toc-section-number">7</span> TSSInference</a>
+<li><a href="#tssinference" id="toc-tssinference"><span class="toc-section-number">8</span> TSSInference</a>
 <ul>
-<li><a href="#control-called-tsss" id="toc-control-called-tsss"><span class="toc-section-number">7.1</span> Control-called TSSs</a></li>
-<li><a href="#dtag-called-tsss" id="toc-dtag-called-tsss"><span class="toc-section-number">7.2</span> dTAG-called TSSs</a></li>
+<li><a href="#control-called-tsss" id="toc-control-called-tsss"><span class="toc-section-number">8.1</span> Control-called TSSs</a></li>
+<li><a href="#dtag-called-tsss" id="toc-dtag-called-tsss"><span class="toc-section-number">8.2</span> dTAG-called TSSs</a></li>
 </ul></li>
-<li><a href="#primarytranscriptannotation" id="toc-primarytranscriptannotation"><span class="toc-section-number">8</span> primaryTranscriptAnnotation</a></li>
-<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">9</span> Differential expression analysis</a>
+<li><a href="#primarytranscriptannotation" id="toc-primarytranscriptannotation"><span class="toc-section-number">9</span> primaryTranscriptAnnotation</a></li>
+<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis"><span class="toc-section-number">10</span> Differential expression analysis</a>
 <ul>
-<li><a href="#deseq2-analysis-and-ma-plot-fig.-3a" id="toc-deseq2-analysis-and-ma-plot-fig.-3a"><span class="toc-section-number">9.1</span> DESeq2 analysis and MA plot (Fig. 3A):</a></li>
+<li><a href="#deseq2-analysis-and-ma-plot-fig.-3a" id="toc-deseq2-analysis-and-ma-plot-fig.-3a"><span class="toc-section-number">10.1</span> DESeq2 analysis and MA plot (Fig. 3A):</a></li>
 </ul></li>
-<li><a href="#make-integrated-ucsc-tracks-for-genome-browser-viewing" id="toc-make-integrated-ucsc-tracks-for-genome-browser-viewing"><span class="toc-section-number">10</span> Make integrated UCSC tracks for genome browser viewing</a></li>
-<li><a href="#infer-regulatory-elements-using-bidirectional-txn" id="toc-infer-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">11</span> Infer regulatory elements using bidirectional TXN</a></li>
-<li><a href="#detour-to-chip-seq-analysis" id="toc-detour-to-chip-seq-analysis"><span class="toc-section-number">12</span> Detour to ChIP-seq analysis</a></li>
-<li><a href="#make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b" id="toc-make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b"><span class="toc-section-number">13</span> Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)</a></li>
-<li><a href="#deeptools-heatmap-fig.-3c" id="toc-deeptools-heatmap-fig.-3c"><span class="toc-section-number">14</span> deepTools heatmap (Fig. 3C)</a></li>
-<li><a href="#compartment-modeling-fig.-3d" id="toc-compartment-modeling-fig.-3d"><span class="toc-section-number">15</span> Compartment modeling (Fig. 3D)</a></li>
-<li><a href="#identifying-shifting-tsss" id="toc-identifying-shifting-tsss"><span class="toc-section-number">16</span> Identifying shifting TSSs</a>
+<li><a href="#make-integrated-ucsc-tracks-for-genome-browser-viewing" id="toc-make-integrated-ucsc-tracks-for-genome-browser-viewing"><span class="toc-section-number">11</span> Make integrated UCSC tracks for genome browser viewing</a></li>
+<li><a href="#infer-regulatory-elements-using-bidirectional-txn" id="toc-infer-regulatory-elements-using-bidirectional-txn"><span class="toc-section-number">12</span> Infer regulatory elements using bidirectional TXN</a></li>
+<li><a href="#detour-to-chip-seq-analysis" id="toc-detour-to-chip-seq-analysis"><span class="toc-section-number">13</span> Detour to ChIP-seq analysis</a></li>
+<li><a href="#make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b" id="toc-make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b"><span class="toc-section-number">14</span> Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)</a></li>
+<li><a href="#deeptools-heatmap-fig.-3c" id="toc-deeptools-heatmap-fig.-3c"><span class="toc-section-number">15</span> deepTools heatmap (Fig. 3C)</a></li>
+<li><a href="#compartment-modeling-fig.-3d" id="toc-compartment-modeling-fig.-3d"><span class="toc-section-number">16</span> Compartment modeling (Fig. 3D)</a></li>
+<li><a href="#identifying-shifting-tsss" id="toc-identifying-shifting-tsss"><span class="toc-section-number">17</span> Identifying shifting TSSs</a>
 <ul>
-<li><a href="#find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart" id="toc-find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart"><span class="toc-section-number">16.1</span> Find fraction of genes with shifted max TSS locations (Fig. 3E barchart)</a></li>
-<li><a href="#quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f" id="toc-quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f"><span class="toc-section-number">16.2</span> Quantified cTSS and dTSS changes after ZNF143 degradation (Fig. 3F)</a>
+<li><a href="#find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart" id="toc-find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart"><span class="toc-section-number">17.1</span> Find fraction of genes with shifted max TSS locations (Fig. 3E barchart)</a></li>
+<li><a href="#quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f" id="toc-quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f"><span class="toc-section-number">17.2</span> Quantified cTSS and dTSS changes after ZNF143 degradation (Fig. 3F)</a>
 <ul>
-<li><a href="#violin-plot" id="toc-violin-plot"><span class="toc-section-number">16.2.1</span> Violin plot</a></li>
-<li><a href="#barchart" id="toc-barchart"><span class="toc-section-number">16.2.2</span> Barchart</a></li>
+<li><a href="#violin-plot" id="toc-violin-plot"><span class="toc-section-number">17.2.1</span> Violin plot</a></li>
+<li><a href="#barchart" id="toc-barchart"><span class="toc-section-number">17.2.2</span> Barchart</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#heatmaps-of-promoter-enriched-motifs" id="toc-heatmaps-of-promoter-enriched-motifs"><span class="toc-section-number">17</span> Heatmaps of promoter-enriched motifs</a>
+<li><a href="#heatmaps-of-promoter-enriched-motifs" id="toc-heatmaps-of-promoter-enriched-motifs"><span class="toc-section-number">18</span> Heatmaps of promoter-enriched motifs</a>
 <ul>
-<li><a href="#identify-boundaries-of-promoters-with-divergent-tsss" id="toc-identify-boundaries-of-promoters-with-divergent-tsss"><span class="toc-section-number">17.1</span> Identify boundaries of promoters with divergent TSSs</a></li>
-<li><a href="#fimo-of-motifs-fig.-5b-6a-s8" id="toc-fimo-of-motifs-fig.-5b-6a-s8"><span class="toc-section-number">17.2</span> FIMO of motifs (Fig. 5B, 6A, S8)</a></li>
+<li><a href="#identify-boundaries-of-promoters-with-divergent-tsss" id="toc-identify-boundaries-of-promoters-with-divergent-tsss"><span class="toc-section-number">18.1</span> Identify boundaries of promoters with divergent TSSs</a></li>
+<li><a href="#fimo-of-motifs-fig.-5b-6a-s8" id="toc-fimo-of-motifs-fig.-5b-6a-s8"><span class="toc-section-number">18.2</span> FIMO of motifs (Fig. 5B, 6A, S8)</a></li>
 </ul></li>
 </ul>
 </div>
@@ -837,18 +838,24 @@ mv SRR28879489_2.fastq HEK_CloneZD29_30min_dTAGV1_rep1_PE2.fastq
 
 mv SRR28879490_1.fastq HEK_CloneZD29_30min_control_rep4_PE1.fastq
 mv SRR28879490_2.fastq HEK_CloneZD29_30min_control_rep4_PE2.fastq
-
 mv SRR28879491_1.fastq HEK_CloneZD29_30min_control_rep3_PE1.fastq
 mv SRR28879491_2.fastq HEK_CloneZD29_30min_control_rep3_PE2.fastq
-
 mv SRR28879492_1.fastq HEK_CloneZD29_30min_control_rep2_PE1.fastq
 mv SRR28879492_2.fastq HEK_CloneZD29_30min_control_rep2_PE2.fastq
 mv SRR28879493_1.fastq HEK_CloneZD29_30min_control_rep1_PE1.fastq
 mv SRR28879493_2.fastq HEK_CloneZD29_30min_control_rep1_PE2.fastq
 </code></pre>
 </div>
-<div id="pro-seq-analysis" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> PRO-seq analysis</h1>
+<div id="pro-seq-preparation-for-analysis" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> PRO-seq preparation for analysis</h1>
+<p>Use seqOutBias to compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position.
+This is the most time-consuming step of the seqOutBias command but only needs to be completed once before processing the sequencing data. The files can be reused for future samples if the read size is the same.</p>
+<p>Install from source, if you have issues: <a href="mailto:guertin@uchc.edu" class="email">guertin@uchc.edu</a></p>
+<pre class="bash"><code># installation code here? i just got the binaries from Mike though 
+
+# if seqOutBias is in a directory accessible by PATH, simply call it directly from the command line
+seqOutBias seqtable hg38.fa --read-size=47
+</code></pre>
 <p>Load modules, pre-run seqOutBias, and parse the hg38 annotation file:</p>
 <pre class="bash"><code>module load bowtie2/2.5.0
 module load genometools/1.5.10
@@ -856,7 +863,10 @@ module load bedtools/2.29.0
 module load ucsc_genome/2012.05.22
 module load rust 
 
-release=109
+# Download executables and scripts 
+cd /scratch/jdong/ZNF143dTAG/
+mkdir software
+cd software
 
 wget https://raw.githubusercontent.com/guertinlab/fqComplexity/main/fqComplexity
 wget https://raw.githubusercontent.com/guertinlab/fqComplexity/main/complexity_pro.R
@@ -888,22 +898,28 @@ tar -xvf v1.0.0.tar
 cd fqdedup-1.0.0/ 
 cargo build --release
 
+# Build index for reference human genome
+mkdir ../human38/
+cd ../human38/
 wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.gz
 gunzip hg38.fa.gz
 bowtie2-build hg38.fa hg38
 
+# Build index for reference human rDNA
+mkdir ../hum_rDNA/
+cd ../hum_rDNA/
 wget https://github.com/databio/ref_decoy/raw/master/human_rDNA.fa.gz
 gunzip human_rDNA.fa.gz
 bowtie2-build human_rDNA.fa human_rDNA
 
-#Compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position
-#This is the most time-consuming step of the seqOutBias command but can be completed once before processing the sequencing data
-#install from source, if you have issues: guertin@uchc.edu
 
-# if seqOutBias is in a directory accessible by PATH, simply call it directly from the command line
-seqOutBias seqtable hg38.fa --read-size=47
+#wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
+# Generate chrom sizes file from hg38 FASTA
+cd ~/human38 
+faToTwoBit hg38.fa hg38.2bit
+twoBitInfo hg38.2bit stdout | sort -k2rn &gt; hg38.chrom.sizes
 
-wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
+release=109
 
 wget http://ftp.ensembl.org/pub/release-${release}/gtf/homo_sapiens/Homo_sapiens.GRCh38.${release}.chr.gtf.gz
 gunzip Homo_sapiens.GRCh38.${release}.chr.gtf.gz
@@ -1260,10 +1276,19 @@ plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO</code></pre>
 <p>This plot is saved as <code>ZNF143_pro_metrics_depth_final.pdf</code> (Figure S1).</p>
 </div>
 </div>
-<div id="prepare-input-for-pta" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Prepare input for pTA</h1>
-<p>Normalize bigWigs from seqOutBias:</p>
-<pre class="bash"><code>PRO_normalization -c hg38.chrom.sizes</code></pre>
+<div id="pro-seq-normalization" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> PRO-seq normalization</h1>
+<p>First, create a text file of the DESeq-generated size factors:</p>
+<p>[UPDATE THIS]</p>
+<pre class="r"><code>dds = DESeq(deseq.df) 
+size.factors = t(t(dds$sizeFactor)) 
+write.table(size.factors, &quot;sizefactorsFile.txt&quot;, sep=&quot;\t&quot;, quote=F, col.names=F)</code></pre>
+<p>Next, run PRO_normalization_sizefactor from Nascent RNA Methods:</p>
+<pre class="bash"><code>PRO_normalization_sizefactor -c hg38.chrom.sizes -z sizefactorsFile.txt
+</code></pre>
+</div>
+<div id="prepare-input-for-pta" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Prepare input for pTA</h1>
 <p>Then merge bigWigs based on strand (control and experimental conditions together):</p>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE1&quot;
@@ -1289,8 +1314,8 @@ rm ${name}_minus${pair}_scaled_sorted.bg
 rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg</code></pre>
 </div>
-<div id="prepare-input-for-tssinference" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Prepare input for TSSinference</h1>
+<div id="prepare-input-for-tssinference" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Prepare input for TSSinference</h1>
 <p>This is basically the same as the above, but for PE2 reads instead of PE1.</p>
 <pre class="bash"><code>reps=8
 pair=&quot;_PE2&quot;
@@ -1315,8 +1340,8 @@ rm ${name}_plus${pair}_scaled_sorted.bg
 rm ${name}_minus${pair}_scaled_sorted.bg
 rm tmpPlus${pair}.bg
 rm tmpMinus${pair}.bg</code></pre>
-<div id="get-gene-annotations" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> Get gene annotations</h2>
+<div id="get-gene-annotations" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> Get gene annotations</h2>
 <p>The starting file for filtering these annotations was obtained from the gencode website here: <a href="https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz">https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.basic.annotation.gtf.gz</a>, specifically the version of basic annotation which contained reference chromosomes only.</p>
 <pre class="r"><code>gunzip gencode.v42.basic.annotation.gtf.gz
 
@@ -1331,8 +1356,8 @@ grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.anno
     tr &quot; &quot; &quot;\t&quot; | tr -d &#39;&quot;&#39; | \
     grep -v &quot;\tENSG&quot; &gt; gencode.hg38.v42.basic.firstExon.latest.filtered.bed</code></pre>
 </div>
-<div id="re-annotating-transcription-units-after-manual-curation" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span> Re-annotating transcription units after manual curation</h2>
+<div id="re-annotating-transcription-units-after-manual-curation" class="section level2" number="7.2">
+<h2><span class="header-section-number">7.2</span> Re-annotating transcription units after manual curation</h2>
 <p>After an initial round of transcription unit (TU) calling with TSSinference and primaryTranscriptAnnotation, we identified differentially expressed genes with DESeq2 (same methods as below) and looked at TU calls for all of the down genes in the UCSC genome browser to verify that all TSSs had been identified for each gene. We noticed some gene annotations were missing true TSSs, so they were adjusted to match the data. These are the gene annotations that were adjusted, along with accompanying browser sessions:</p>
 <p>Plus strand genes:
 - <em>MATR3</em>: TSS should be more upstream because exon1 window missed annotations with more upstream exons. (<a href="https://genome.ucsc.edu/s/jhdong/MATR3_TU" class="uri">https://genome.ucsc.edu/s/jhdong/MATR3_TU</a>)
@@ -1405,11 +1430,11 @@ write.table(oldExon1, file=&quot;gencode_exon1_parsed_updated.bed&quot;,sep=&quo
 <p>The following code represents what was done with the latest gene annotations after the manual curation.</p>
 </div>
 </div>
-<div id="tssinference" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> TSSInference</h1>
+<div id="tssinference" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> TSSInference</h1>
 <p>The <code>TSSinference.R</code> script can be found at: <a href="https://github.com/guertinlab/TSSinference">https://github.com/guertinlab/TSSinference</a>.</p>
-<div id="control-called-tsss" class="section level2" number="7.1">
-<h2><span class="header-section-number">7.1</span> Control-called TSSs</h2>
+<div id="control-called-tsss" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> Control-called TSSs</h2>
 <p>For differential gene expression analysis, call TSSs from the control data only.</p>
 <pre class="r"><code>library(bigWig)
 # source TSSinference functions
@@ -1436,8 +1461,8 @@ These coordinates were chosen manually by selecting the read peak closest to the
 <pre class="r"><code>controlTSSmaxH[grepl(&quot;ABCB1&quot;,controlTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,controlTSSmaxH$chrom),]$start = 87600883
 controlTSSmaxH[grepl(&quot;ABCB1&quot;,controlTSSmaxH$gene) &amp; grepl(&quot;chr7&quot;,controlTSSmaxH$chrom),]$end = 87600884</code></pre>
 </div>
-<div id="dtag-called-tsss" class="section level2" number="7.2">
-<h2><span class="header-section-number">7.2</span> dTAG-called TSSs</h2>
+<div id="dtag-called-tsss" class="section level2" number="8.2">
+<h2><span class="header-section-number">8.2</span> dTAG-called TSSs</h2>
 <p>For later analysis, also call TSSs from the ZNF143-dTAG-only data.</p>
 <pre class="r"><code>bw.minus=&#39;HEK_CloneZD29_30min_dTAGV1_plus_PE2_scaled.bigWig&#39;
 bw.plus=&#39;HEK_CloneZD29_30min_dTAGV1_minus_PE2_scaled.bigWig&#39;
@@ -1449,8 +1474,8 @@ dTAGtssAllmaxH = do.call(rbind, lapply( split(temp2, as.factor(temp2$gene)), fun
 dim(dTAGtssAllmaxH) # [1] 15609     9</code></pre>
 </div>
 </div>
-<div id="primarytranscriptannotation" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> primaryTranscriptAnnotation</h1>
+<div id="primarytranscriptannotation" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> primaryTranscriptAnnotation</h1>
 <p>Prepare specific annotations:</p>
 <pre class="bash"><code>grep &#39;transcript_type &quot;protein_coding&quot;&#39; gencode.v42.basic.annotation.gtf | \
    awk &#39;{if($3==&quot;exon&quot;){print $0}}&#39; | \
@@ -1571,8 +1596,8 @@ dim(final.coords) # [1] 13276     6
 
 write.table(final.coords, file=&quot;HEK_ZNF143_infcoords_contrTU_20240219.bed&quot;, sep=&quot;\t&quot;, row.names=FALSE, col.names=FALSE, quote=FALSE)</code></pre>
 </div>
-<div id="differential-expression-analysis" class="section level1" number="9">
-<h1><span class="header-section-number">9</span> Differential expression analysis</h1>
+<div id="differential-expression-analysis" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Differential expression analysis</h1>
 <p>Setup and get functions:</p>
 <pre class="r"><code>library(bigWig)
 library(lattice)
@@ -1676,8 +1701,8 @@ plotPCAlattice &lt;- function(df, file = &#39;PCA_lattice.pdf&#39;) {
                col = colpal))
   dev.off()
 }</code></pre>
-<div id="deseq2-analysis-and-ma-plot-fig.-3a" class="section level2" number="9.1">
-<h2><span class="header-section-number">9.1</span> DESeq2 analysis and MA plot (Fig. 3A):</h2>
+<div id="deseq2-analysis-and-ma-plot-fig.-3a" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> DESeq2 analysis and MA plot (Fig. 3A):</h2>
 <pre class="r"><code>inferred.coords = final.coords
 
 # use unnormalized bigWigs and get size factors from DESeq2
@@ -1788,15 +1813,15 @@ xyplot(deseqAll$log2FoldChangeRS ~ log(deseqAll$baseMeanRS, base=10),
 dev.off()</code></pre>
 </div>
 </div>
-<div id="make-integrated-ucsc-tracks-for-genome-browser-viewing" class="section level1" number="10">
-<h1><span class="header-section-number">10</span> Make integrated UCSC tracks for genome browser viewing</h1>
+<div id="make-integrated-ucsc-tracks-for-genome-browser-viewing" class="section level1" number="11">
+<h1><span class="header-section-number">11</span> Make integrated UCSC tracks for genome browser viewing</h1>
 <p>For easier viewing, create genome browser tracks with signals integrated along the entire read:</p>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc.sh</a>
 <a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/pro_ucsc_2.sh</a></p>
 <p>The resulting PRO-seq tracks are available on our trackhub, available on the UCSC genome browser by connecting to: <code>http://guertinlab.cam.uchc.edu/ znf143_hub/hub.txt</code>.</p>
 </div>
-<div id="infer-regulatory-elements-using-bidirectional-txn" class="section level1" number="11">
-<h1><span class="header-section-number">11</span> Infer regulatory elements using bidirectional TXN</h1>
+<div id="infer-regulatory-elements-using-bidirectional-txn" class="section level1" number="12">
+<h1><span class="header-section-number">12</span> Infer regulatory elements using bidirectional TXN</h1>
 <p>Regulatory regions were inferred with dREG’s web portal (<a href="https://dreg.js2.scigap.org" class="uri">https://dreg.js2.scigap.org</a>).
 The output was analyzed according to the following script:</p>
 <p><a href="https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/dREG/ZNF143_dREG_analysis.R" class="uri">https://raw.githubusercontent.com/guertinlab/znf143_degron/main/PRO_analysis/dREG/ZNF143_dREG_analysis.R</a></p>
@@ -1804,12 +1829,12 @@ The output was analyzed according to the following script:</p>
 awk &#39;{OFS=&quot;\t&quot;;} {print $1,$6,$3}&#39; ZNF143_total.dREG.peak.full.bed &gt; ZNF143_total.dREG.peak.plus.bed
 </code></pre>
 </div>
-<div id="detour-to-chip-seq-analysis" class="section level1" number="12">
-<h1><span class="header-section-number">12</span> Detour to ChIP-seq analysis</h1>
+<div id="detour-to-chip-seq-analysis" class="section level1" number="13">
+<h1><span class="header-section-number">13</span> Detour to ChIP-seq analysis</h1>
 <p>Please see ChIP-seq analysis vignette (<a href="https://guertinlab.github.io/znf143_degron/ChIP_analysis/Sathyan_ChIP_analysis.html" class="uri">https://guertinlab.github.io/znf143_degron/ChIP_analysis/Sathyan_ChIP_analysis.html</a>) for processing of ZNF143-dTAG ChIP-seq samples and identification of functional ZNF143 binding sites.</p>
 </div>
-<div id="make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b" class="section level1" number="13">
-<h1><span class="header-section-number">13</span> Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)</h1>
+<div id="make-cdf-of-znf143-binding-sites-vs.-updown-genes-fig.-3b" class="section level1" number="14">
+<h1><span class="header-section-number">14</span> Make CDF of ZNF143 binding sites vs. up/down genes (Fig. 3B)</h1>
 <p>Uses the previously identified ZNF143 binding sites and plots their distance to up and down genes in a cumulative distribution function.</p>
 <p>Key inputs:</p>
 <ul>
@@ -1926,8 +1951,8 @@ ecdfplot(~log(abs(disMOTIFcTSS), base = 10), groups = cdfCAT,
     })
 dev.off()</code></pre>
 </div>
-<div id="deeptools-heatmap-fig.-3c" class="section level1" number="14">
-<h1><span class="header-section-number">14</span> deepTools heatmap (Fig. 3C)</h1>
+<div id="deeptools-heatmap-fig.-3c" class="section level1" number="15">
+<h1><span class="header-section-number">15</span> deepTools heatmap (Fig. 3C)</h1>
 <pre class="bash"><code># Generate input bigWigs
 awk &#39;{OFS=&quot;\t&quot;;} {print $1,$2,$3,$5}&#39; ZNF143strict_comp29_inferredSites_peakIntensities_unique.bed &gt; ZNF143strict_comp29_inferredSites_peakIntensities_unique.bedGraph
 sizes=/Users/jinhongdong/fileRef/human38/hg38.chrom.sizes
@@ -1947,8 +1972,8 @@ plotHeatmap -m matrix_HA_ChIP_ZNF143_peaks_diffExp_TSS_20240328.gz -out heatmap_
     --samplesLabel &quot;ZNF143 motif locations&quot; --colorList ${customBright} --whatToShow &quot;heatmap and colorbar&quot;
 </code></pre>
 </div>
-<div id="compartment-modeling-fig.-3d" class="section level1" number="15">
-<h1><span class="header-section-number">15</span> Compartment modeling (Fig. 3D)</h1>
+<div id="compartment-modeling-fig.-3d" class="section level1" number="16">
+<h1><span class="header-section-number">16</span> Compartment modeling (Fig. 3D)</h1>
 <p>For the scripts mentioned in this section, please see the repository for our updated compartment model, which contains a vignette and functions <a href="https://github.com/guertinlab/compartment_model">https://github.com/guertinlab/compartment_model</a>. The vignette was followed to create Fig. 3D in the ZNF143 manuscript.</p>
 <p>The following code is to generate the inputs for the compartment model:</p>
 <pre class="r"><code>source(&quot;pause_workflow_funcs_v2.R&quot;) # from guertinlab/compartment_model/R/ on Github
@@ -2016,8 +2041,8 @@ ggplot(summary.combined_df) +
              theme_bw() + fontTheme
 ggsave(&quot;ZNF143_median_foldchange.pdf&quot;) # Fig 3D</code></pre>
 </div>
-<div id="identifying-shifting-tsss" class="section level1" number="16">
-<h1><span class="header-section-number">16</span> Identifying shifting TSSs</h1>
+<div id="identifying-shifting-tsss" class="section level1" number="17">
+<h1><span class="header-section-number">17</span> Identifying shifting TSSs</h1>
 <pre class="r"><code># Add control-called TSSs (cTSS) and dTAG-called TSSs (dTSS) into 
 # the table with all DESeq results and gene categorizations
 colnames(dTAGtssAllmaxH) = c(&quot;dTSSchr&quot;,&quot;dTSSstart&quot;,&quot;dTSSend&quot;,&quot;gene&quot;,&quot;misc&quot;,&quot;strand&quot;,&quot;dTSSheight&quot;,&quot;dTSSupDens&quot;,&quot;dTSSdownDens&quot;)
@@ -2064,8 +2089,8 @@ colnames(distances) = c(&quot;dTSSchr&quot;,&quot;dTSSstart&quot;, &quot;dTSSend
 
 # Merge back into giant table
 znf143genesDF = merge(deseqAlldistTSSconds,distances[,c(&quot;gene&quot;,&quot;chrMotifDT&quot;, &quot;startMotifDT&quot;,&quot;endMotifDT&quot;,&quot;motifDT&quot;, &quot;peakIntensDT&quot;, &quot;strandMotifDT&quot;,&quot;disMOTIFdTSS&quot;)],by=&quot;gene&quot;, all.x=TRUE)</code></pre>
-<div id="find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart" class="section level2" number="16.1">
-<h2><span class="header-section-number">16.1</span> Find fraction of genes with shifted max TSS locations (Fig. 3E barchart)</h2>
+<div id="find-fraction-of-genes-with-shifted-max-tss-locations-fig.-3e-barchart" class="section level2" number="17.1">
+<h2><span class="header-section-number">17.1</span> Find fraction of genes with shifted max TSS locations (Fig. 3E barchart)</h2>
 <pre class="r"><code># Create coords cols for cTSS and dTSS 
 znf143genesDF$cTSScoords = paste0(znf143genesDF$cTSSchr,&quot;:&quot;,znf143genesDF$cTSSstart,&quot;-&quot;,znf143genesDF$cTSSend)
 znf143genesDF$dTSScoords = paste0(znf143genesDF$dTSSchr,&quot;:&quot;,znf143genesDF$dTSSstart,&quot;-&quot;,znf143genesDF$dTSSend)
@@ -2147,10 +2172,10 @@ barDF
 colors = c(&quot;orange&quot;,&quot;grey&quot;)
 plot.barchart(barDF,cols=colors,filename=&quot;barchart_downPromo_TSSshifts_20240326.pdf&quot;)</code></pre>
 </div>
-<div id="quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f" class="section level2" number="16.2">
-<h2><span class="header-section-number">16.2</span> Quantified cTSS and dTSS changes after ZNF143 degradation (Fig. 3F)</h2>
-<div id="violin-plot" class="section level3" number="16.2.1">
-<h3><span class="header-section-number">16.2.1</span> Violin plot</h3>
+<div id="quantified-ctss-and-dtss-changes-after-znf143-degradation-fig.-3f" class="section level2" number="17.2">
+<h2><span class="header-section-number">17.2</span> Quantified cTSS and dTSS changes after ZNF143 degradation (Fig. 3F)</h2>
+<div id="violin-plot" class="section level3" number="17.2.1">
+<h3><span class="header-section-number">17.2.1</span> Violin plot</h3>
 <pre class="r"><code>library(reshape2)
 
 # Add read counts at cTSS positions in the dTAG condition to the giant table
@@ -2211,8 +2236,8 @@ ggplot(downPromoShiftsOnlyClean, aes(x = dTAGcondition,y=log(as.numeric(TSSheigh
         axis.line = element_line(color = &quot;black&quot;))
 dev.off()</code></pre>
 </div>
-<div id="barchart" class="section level3" number="16.2.2">
-<h3><span class="header-section-number">16.2.2</span> Barchart</h3>
+<div id="barchart" class="section level3" number="17.2.2">
+<h3><span class="header-section-number">17.2.2</span> Barchart</h3>
 <pre class="r"><code># control TSS increased: 4
 length(unique(downPromoAllByShift[downPromoAllByShift$TSStype == &quot;Control TSS&quot; &amp; downPromoAllByShift$cTSSinc == TRUE,&quot;gene&quot;]))
 # control TSS decreased: 115 (total 119)
@@ -2250,10 +2275,10 @@ plot.barchart(barDF,cols=colors,filename=&quot;barchart_downPromo_TSSshiftIncrea
 </div>
 </div>
 </div>
-<div id="heatmaps-of-promoter-enriched-motifs" class="section level1" number="17">
-<h1><span class="header-section-number">17</span> Heatmaps of promoter-enriched motifs</h1>
-<div id="identify-boundaries-of-promoters-with-divergent-tsss" class="section level2" number="17.1">
-<h2><span class="header-section-number">17.1</span> Identify boundaries of promoters with divergent TSSs</h2>
+<div id="heatmaps-of-promoter-enriched-motifs" class="section level1" number="18">
+<h1><span class="header-section-number">18</span> Heatmaps of promoter-enriched motifs</h1>
+<div id="identify-boundaries-of-promoters-with-divergent-tsss" class="section level2" number="18.1">
+<h2><span class="header-section-number">18.1</span> Identify boundaries of promoters with divergent TSSs</h2>
 <pre class="r"><code>library(bigWig)
 # Identify sense TSSs
 # Note the order of the bigWig files--this is necessary for using PE2 files to identify sense-direction TSSs for genes
@@ -2345,8 +2370,8 @@ draw.heatmap.both.pro.overlap(compObject[[2]], file = &#39;uaTSS_sTSS_decreasing
                               width.vp = 2, height.vp = 4, colors.ramp = c(&quot;#ffffff00&quot;,&quot;#FF0000FF&quot;, &quot;#590000FF&quot;, &quot;#510000FF&quot;, &quot;#2F0000FF&quot;, &quot;#2d0101FF&quot;,&quot;#2E0000FF&quot;),
                               colors.ramp.2 = c(&quot;#ffffff00&quot;,&quot;#0000FF80&quot;, &quot;#00105980&quot;, &quot;#00115180&quot;, &quot;#00072F80&quot;, &quot;#00072E80&quot;, &quot;#01072d80&quot;))</code></pre>
 </div>
-<div id="fimo-of-motifs-fig.-5b-6a-s8" class="section level2" number="17.2">
-<h2><span class="header-section-number">17.2</span> FIMO of motifs (Fig. 5B, 6A, S8)</h2>
+<div id="fimo-of-motifs-fig.-5b-6a-s8" class="section level2" number="18.2">
+<h2><span class="header-section-number">18.2</span> FIMO of motifs (Fig. 5B, 6A, S8)</h2>
 <p>This loop runs through all the mentioned motifs used in the paper and looks for matches in the entire hg38 reference genome. Motifs queried (JASPAR database version):</p>
 <ul>
 <li>MA0506.2 Nrf1</li>
