@@ -109,10 +109,8 @@ mv SRR28879489_2.fastq HEK_CloneZD29_30min_dTAGV1_rep1_PE2.fastq
 
 mv SRR28879490_1.fastq HEK_CloneZD29_30min_control_rep4_PE1.fastq
 mv SRR28879490_2.fastq HEK_CloneZD29_30min_control_rep4_PE2.fastq
-
 mv SRR28879491_1.fastq HEK_CloneZD29_30min_control_rep3_PE1.fastq
 mv SRR28879491_2.fastq HEK_CloneZD29_30min_control_rep3_PE2.fastq
-
 mv SRR28879492_1.fastq HEK_CloneZD29_30min_control_rep2_PE1.fastq
 mv SRR28879492_2.fastq HEK_CloneZD29_30min_control_rep2_PE2.fastq
 mv SRR28879493_1.fastq HEK_CloneZD29_30min_control_rep1_PE1.fastq
@@ -121,7 +119,21 @@ mv SRR28879493_2.fastq HEK_CloneZD29_30min_control_rep1_PE2.fastq
 ```
 
 
-# PRO-seq analysis
+# PRO-seq preparation for analysis
+
+Use seqOutBias to compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position.
+This is the most time-consuming step of the seqOutBias command but only needs to be completed once before processing the sequencing data. The files can be reused for future samples if the read size is the same.
+
+Install from source, if you have issues: guertin@uchc.edu
+
+```{r engine='bash', eval=F, echo=TRUE}
+# installation code here? i just got the binaries from Mike though 
+
+# if seqOutBias is in a directory accessible by PATH, simply call it directly from the command line
+seqOutBias seqtable hg38.fa --read-size=47
+
+
+```
 
 Load modules, pre-run seqOutBias, and parse the hg38 annotation file:
 
@@ -132,7 +144,10 @@ module load bedtools/2.29.0
 module load ucsc_genome/2012.05.22
 module load rust 
 
-release=109
+# Download executables and scripts 
+cd /scratch/jdong/ZNF143dTAG/
+mkdir software
+cd software
 
 wget https://raw.githubusercontent.com/guertinlab/fqComplexity/main/fqComplexity
 wget https://raw.githubusercontent.com/guertinlab/fqComplexity/main/complexity_pro.R
@@ -164,22 +179,28 @@ tar -xvf v1.0.0.tar
 cd fqdedup-1.0.0/ 
 cargo build --release
 
+# Build index for reference human genome
+mkdir ../human38/
+cd ../human38/
 wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.gz
 gunzip hg38.fa.gz
 bowtie2-build hg38.fa hg38
 
+# Build index for reference human rDNA
+mkdir ../hum_rDNA/
+cd ../hum_rDNA/
 wget https://github.com/databio/ref_decoy/raw/master/human_rDNA.fa.gz
 gunzip human_rDNA.fa.gz
 bowtie2-build human_rDNA.fa human_rDNA
 
-#Compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position
-#This is the most time-consuming step of the seqOutBias command but can be completed once before processing the sequencing data
-#install from source, if you have issues: guertin@uchc.edu
 
-# if seqOutBias is in a directory accessible by PATH, simply call it directly from the command line
-seqOutBias seqtable hg38.fa --read-size=47
+#wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
+# Generate chrom sizes file from hg38 FASTA
+cd ~/human38 
+faToTwoBit hg38.fa hg38.2bit
+twoBitInfo hg38.2bit stdout | sort -k2rn > hg38.chrom.sizes
 
-wget https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes
+release=109
 
 wget http://ftp.ensembl.org/pub/release-${release}/gtf/homo_sapiens/Homo_sapiens.GRCh38.${release}.chr.gtf.gz
 gunzip Homo_sapiens.GRCh38.${release}.chr.gtf.gz
@@ -570,13 +591,28 @@ plot_all_metrics.R project_QC_metrics.txt ZNF143_degron_PRO
 
 This plot is saved as `ZNF143_pro_metrics_depth_final.pdf` (Figure S1).
 
+# PRO-seq normalization 
+
+First, create a text file of the DESeq-generated size factors:
+
+[UPDATE THIS]
+
+```{r engine='R', eval=F, echo=TRUE}
+dds = DESeq(deseq.df) 
+size.factors = t(t(dds$sizeFactor)) 
+write.table(size.factors, "sizefactorsFile.txt", sep="\t", quote=F, col.names=F)
+```
+
+Next, run PRO_normalization_sizefactor from Nascent RNA Methods:
+
+```{r engine='bash', eval=F, echo=TRUE}
+PRO_normalization_sizefactor -c hg38.chrom.sizes -z sizefactorsFile.txt
+
+```
+
+
 
 # Prepare input for pTA
-
-Normalize bigWigs from seqOutBias:
-```{r engine='bash', eval=F, echo=TRUE}
-PRO_normalization -c hg38.chrom.sizes
-```
 
 Then merge bigWigs based on strand (control and experimental conditions together):
 ```{r engine='bash', eval=F, echo=TRUE}
