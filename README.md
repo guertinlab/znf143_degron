@@ -8,6 +8,6 @@ ZNF143 dTAG13 degradation PRO-seq analysis
 
 https://guertinlab.github.io/znf143_degron/PRO_analysis/Sathyan_PRO_analysis.html
 
-ZNF143 dTAG degradation ATAC-sec analysis
+ZNF143 dTAG degradation ATAC-seq analysis
 
 https://guertinlab.github.io/znf143_degron/ATAC_analysis/ATAC_analysis.html
