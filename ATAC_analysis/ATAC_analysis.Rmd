@@ -35,6 +35,10 @@ pre[class] {
 }
 ```
 
+# Introduction
+
+This vignette contains the ATAC-seq analysis for the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). The analysis follows the published figures, which may differ from the preprint figures in labeling and content. This vignette is copied largely from the ATAC-seq vignette for the GeneX course (https://github.com/guertinlab/genex/tree/main).
+
 # ATAC-seq experiments
 
 ATAC-seq is an assay that measures chromatin accessibility. In short,
@@ -107,36 +111,203 @@ found here: [ATAC experimental workflow](https://genome.cshlp.org/content/33/3/3
 
 In this vignette, grey code chunks are performed in bash, blue code chunks are performed in R, and red code chunks are not to be run by you (either we already ran them or will run them using all samples).
 
-## Renaming (ignore this)
 
-```{r engine='bash', class.source="bg-danger", eval=F, echo=TRUE}
-mkdir -p ~/genex_ATAC
-cd ~/genex_ATAC
-for i in *_R1_001.fastq.gz
-do
-	name=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_S" '{print $1}')
-	echo $name
-	mv ${name}_S*_R1_001.fastq.gz ${name}_PE1.fastq.gz
-	mv ${name}_S*_R2_001.fastq.gz ${name}_PE2.fastq.gz
-done
+## Download samples from GEO
+
+Log into the high-performance cluster, start an interactive node, set up the directories, and get the files from GEO accession record GSE266489 for ChIP-seq files. 
+
+```{r engine='bash', eval=F, echo=TRUE} 
+# Connect to the cluster
+# ssh jdong@xanadu-submit-ext.cam.uchc.edu 
+
+# Start interactive node
+srun --partition=general --qos=general --mem=2G -N 1 -n 1 -c 1 --pty bash
+
+# Make and change to analysis directories
+mkdir /scratch/jdong/ZNF143dTAG/
+cd /scratch/jdong/ZNF143dTAG/
+mkdir ATAC
+cd ATAC
+mkdir FASTQ
+cd FASTQ
+
 ```
-## Download your samples
 
-We already named the experiments with the trailing name being `PE1` or `PE2` for paired end data. You can retrieve the files by substituting you group number (1-8) for `X` in the code below. Actually I don't think these links work / we'll skip the steps you already performed in the ChIP-seq analysis and start with the differential accessibility analysis in R below.
+Get the files from GEO accession record GSE266490 for ATAC-seq files. 
+
+"get_SRA_template_ATAC_SRR288795.sh":
 
 ```{r engine='bash', eval=F, echo=TRUE}
-#Make a variable for your group number
-rep=X
+#! /usr/bin/bash
 
-#Make and navigate to the class directory (the -p means don't overwrite it if it already exists
-mkdir -p ~/genex_ATAC/
-cd ~/genex_ATAC/
+#SBATCH --job-name=get_ATAC_SRA_SRR288795XXX
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -c 10
+#SBATCH -p general
+#SBATCH --qos=general
+#SBATCH --mem=12G
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
 
-#Download the data
-wget http://guertinlab.cam.uchc.edu/HEK293T_ATAC_DMSO_rep${rep}_PE1.fastq.gz
-wget http://guertinlab.cam.uchc.edu/HEK293T_ATAC_DMSO_rep${rep}_PE2.fastq.gz
-wget http://guertinlab.cam.uchc.edu/HEK293T_ATAC_DTAG_rep${rep}_PE1.fastq.gz
-wget http://guertinlab.cam.uchc.edu/HEK293T_ATAC_DTAG_rep${rep}_PE2.fastq.gz
+export TMPDIR=/scratch/jdong/
+cd /scratch/jdong/ZNF143dTAG/ATAC/FASTQ 
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+module load sratoolkit/3.0.5 # latest version on Xanadu
+
+fasterq-dump SRR288795XXX 
+
+echo "Script finished:" $(date '+%a %Y-%m-%d %H:%M:%S %Z')
+
+```
+
+"get_SRA_template_ATAC_SRR302751.sh":
+
+```{r engine='bash', eval=F, echo=TRUE}
+#! /usr/bin/bash
+
+#SBATCH --job-name=get_ATAC_SRA_SRR302751XXX
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -c 10
+#SBATCH -p general
+#SBATCH --qos=general
+#SBATCH --mem=12G
+#SBATCH --mail-type=ALL 
+#SBATCH --mail-user=jdong@uchc.edu
+#SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
+#SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
+
+export TMPDIR=/scratch/jdong/
+cd /scratch/jdong/ZNF143dTAG/ATAC/FASTQ 
+echo "Current wd:" $(pwd)
+echo "Current node:" $(hostname)
+
+module load sratoolkit/3.0.5 # latest version on Xanadu
+
+fasterq-dump SRR302751XXX 
+
+echo "Script finished:" $(date '+%a %Y-%m-%d %H:%M:%S %Z')
+
+```
+
+Make individual scripts for each SRA run.
+
+```{r engine='bash', eval=F, echo=TRUE}
+# first set of files
+file=/home/FCAM/jdong/script_templates/get_SRA_template_ATAC_SRR288795.sh
+
+# create scripts
+for i in {30..45}
+do
+  echo $i
+  sed -e "s/XXX/${i}/g" "$file" > get_ATAC_SRR288795${i}.sh
+  grep fasterq get_ATAC_SRR288795${i}.sh
+done
+
+# Submit jobs 
+for i in get_ATAC_SRR288795${i}.sh
+do
+    echo $i
+    sbatch $i
+done
+
+# second set of files
+file=/home/FCAM/jdong/script_templates/get_SRA_template_ATAC_SRR302751.sh
+
+# create scripts
+for i in {46..61}
+do
+  echo $i
+  sed -e "s/XXX/${i}/g" "$file" > get_ATAC_SRR302751${i}.sh
+  grep fasterq get_ATAC_SRR302751${i}.sh
+done
+
+# Submit jobs 
+for i in get_ATAC_SRR302751${i}.sh
+do
+    echo $i
+    sbatch $i
+done
+
+```
+
+
+Rename files:
+
+```{r engine='bash', eval=F, echo=TRUE}
+mv SRR28879530_1.fastq HEK293T_DTAG_ATAC_rep8_PE1.fastq
+mv SRR28879530_2.fastq HEK293T_DTAG_ATAC_rep8_PE2.fastq
+mv SRR28879531_1.fastq HEK293T_DTAG_ATAC_rep7_PE1.fastq
+mv SRR28879531_2.fastq HEK293T_DTAG_ATAC_rep7_PE2.fastq
+mv SRR28879532_1.fastq HEK293T_DTAG_ATAC_rep6_PE1.fastq
+mv SRR28879532_2.fastq HEK293T_DTAG_ATAC_rep6_PE2.fastq
+mv SRR28879533_1.fastq HEK293T_DTAG_ATAC_rep5_PE1.fastq
+mv SRR28879533_2.fastq HEK293T_DTAG_ATAC_rep5_PE2.fastq
+mv SRR28879534_1.fastq HEK293T_DTAG_ATAC_rep4_PE1.fastq
+mv SRR28879534_2.fastq HEK293T_DTAG_ATAC_rep4_PE2.fastq
+mv SRR28879535_1.fastq HEK293T_DTAG_ATAC_rep3_PE1.fastq
+mv SRR28879535_2.fastq HEK293T_DTAG_ATAC_rep3_PE2.fastq
+mv SRR28879536_1.fastq HEK293T_DTAG_ATAC_rep2_PE1.fastq
+mv SRR28879536_2.fastq HEK293T_DTAG_ATAC_rep2_PE2.fastq
+mv SRR28879537_1.fastq HEK293T_DTAG_ATAC_rep1_PE1.fastq
+mv SRR28879537_2.fastq HEK293T_DTAG_ATAC_rep1_PE2.fastq
+
+mv SRR28879538_1.fastq HEK293T_DMSO_ATAC_rep8_PE1.fastq
+mv SRR28879538_2.fastq HEK293T_DMSO_ATAC_rep8_PE2.fastq
+mv SRR28879539_1.fastq HEK293T_DMSO_ATAC_rep7_PE1.fastq
+mv SRR28879539_2.fastq HEK293T_DMSO_ATAC_rep7_PE2.fastq
+mv SRR28879540_1.fastq HEK293T_DMSO_ATAC_rep6_PE1.fastq
+mv SRR28879540_2.fastq HEK293T_DMSO_ATAC_rep6_PE2.fastq
+mv SRR28879541_1.fastq HEK293T_DMSO_ATAC_rep5_PE1.fastq
+mv SRR28879541_2.fastq HEK293T_DMSO_ATAC_rep5_PE2.fastq
+mv SRR28879542_1.fastq HEK293T_DMSO_ATAC_rep4_PE1.fastq
+mv SRR28879542_2.fastq HEK293T_DMSO_ATAC_rep4_PE2.fastq
+mv SRR28879543_1.fastq HEK293T_DMSO_ATAC_rep3_PE1.fastq
+mv SRR28879543_2.fastq HEK293T_DMSO_ATAC_rep3_PE2.fastq
+mv SRR28879544_1.fastq HEK293T_DMSO_ATAC_rep2_PE1.fastq
+mv SRR28879544_2.fastq HEK293T_DMSO_ATAC_rep2_PE2.fastq
+mv SRR28879545_1.fastq HEK293T_DMSO_ATAC_rep1_PE1.fastq
+mv SRR28879545_2.fastq HEK293T_DMSO_ATAC_rep1_PE2.fastq
+
+mv SRR30275146_1.fastq HEK293T_DTAG_ATAC_rep16_PE1.fastq
+mv SRR30275146_2.fastq HEK293T_DTAG_ATAC_rep16_PE2.fastq
+mv SRR30275147_1.fastq HEK293T_DTAG_ATAC_rep15_PE1.fastq
+mv SRR30275147_2.fastq HEK293T_DTAG_ATAC_rep15_PE2.fastq
+mv SRR30275148_1.fastq HEK293T_DTAG_ATAC_rep14_PE1.fastq
+mv SRR30275148_2.fastq HEK293T_DTAG_ATAC_rep14_PE2.fastq
+mv SRR30275149_1.fastq HEK293T_DTAG_ATAC_rep13_PE1.fastq
+mv SRR30275149_2.fastq HEK293T_DTAG_ATAC_rep13_PE2.fastq
+mv SRR30275150_1.fastq HEK293T_DTAG_ATAC_rep12_PE1.fastq
+mv SRR30275150_2.fastq HEK293T_DTAG_ATAC_rep12_PE2.fastq
+mv SRR30275151_1.fastq HEK293T_DTAG_ATAC_rep11_PE1.fastq
+mv SRR30275151_2.fastq HEK293T_DTAG_ATAC_rep11_PE2.fastq
+mv SRR30275152_1.fastq HEK293T_DTAG_ATAC_rep10_PE1.fastq
+mv SRR30275152_2.fastq HEK293T_DTAG_ATAC_rep10_PE2.fastq
+mv SRR30275153_1.fastq HEK293T_DTAG_ATAC_rep9_PE1.fastq
+mv SRR30275153_2.fastq HEK293T_DTAG_ATAC_rep9_PE2.fastq
+
+mv SRR30275154_1.fastq HEK293T_DMSO_ATAC_rep16_PE1.fastq
+mv SRR30275154_2.fastq HEK293T_DMSO_ATAC_rep16_PE2.fastq
+mv SRR30275155_1.fastq HEK293T_DMSO_ATAC_rep15_PE1.fastq
+mv SRR30275155_2.fastq HEK293T_DMSO_ATAC_rep15_PE2.fastq
+mv SRR30275156_1.fastq HEK293T_DMSO_ATAC_rep14_PE1.fastq
+mv SRR30275156_2.fastq HEK293T_DMSO_ATAC_rep14_PE2.fastq
+mv SRR30275157_1.fastq HEK293T_DMSO_ATAC_rep13_PE1.fastq
+mv SRR30275157_2.fastq HEK293T_DMSO_ATAC_rep13_PE2.fastq
+mv SRR30275158_1.fastq HEK293T_DMSO_ATAC_rep12_PE1.fastq
+mv SRR30275158_2.fastq HEK293T_DMSO_ATAC_rep12_PE2.fastq
+mv SRR30275159_1.fastq HEK293T_DMSO_ATAC_rep11_PE1.fastq
+mv SRR30275159_2.fastq HEK293T_DMSO_ATAC_rep11_PE2.fastq
+mv SRR30275160_1.fastq HEK293T_DMSO_ATAC_rep10_PE1.fastq
+mv SRR30275160_2.fastq HEK293T_DMSO_ATAC_rep10_PE2.fastq
+mv SRR30275161_1.fastq HEK293T_DMSO_ATAC_rep9_PE1.fastq
+mv SRR30275161_2.fastq HEK293T_DMSO_ATAC_rep9_PE2.fastq
+
 ```
 
 ## Cut off the adapter with `cutadapt`
@@ -346,14 +517,7 @@ echo -e "chr\tstart\tend\tname\tqvalue" | cat - $peaks | paste -d'\t' - *peak_co
 #rm *_not_scaled.bed
 ```
 
-# Differential accessibility (START HERE)
-
-## Download the counts table
-```{r engine='bash', eval=F, echo=TRUE}
-mkdir -p ~/genex_ATAC
-cd ~/genex_ATAC
-wget https://raw.githubusercontent.com/guertinlab/genex/main/ATAC_analysis/Combined_ATAC_peak_counts.txt
-```
+# Differential accessibility 
 
 ## Running `DESeq2` with ATAC data
 

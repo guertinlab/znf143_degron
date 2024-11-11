@@ -466,15 +466,15 @@ Interpreting results:
 ```{r engine='bash', eval=F, echo=TRUE}
 grep -i "alignment rate" Z143_UMI_test_clipped_stderr.txt 
 65.72% overall alignment rate # 0 bases trimmed
-74.20% overall alignment rate # 1
-78.63% overall alignment rate # 2
-82.87% overall alignment rate # 3
-84.89% overall alignment rate # 4
-86.72% overall alignment rate # 5
-89.22% overall alignment rate # 6
-74.36% overall alignment rate # 7
-95.84% overall alignment rate # 8 -- spike
-96.61% overall alignment rate # 9 
+74.17% overall alignment rate # 1
+78.61% overall alignment rate # 2
+82.83% overall alignment rate # 3
+84.85% overall alignment rate # 4
+86.66% overall alignment rate # 5
+89.18% overall alignment rate # 6
+74.31% overall alignment rate # 7
+95.83% overall alignment rate # 8 -- spike
+96.61% overall alignment rate # 9
 ```
 
 Note the large spike in alignment rate when 8 bases are trimmed--this is another point in favor of the UMI length = 8. 
@@ -691,8 +691,8 @@ Re-zip raw sequencing files:
 
 ```{r engine='bash', eval=F, echo=TRUE}
 # check wildcards first
-gzip *_PE1_final.fastq
-gzip *_PE2_final.fastq
+gzip *_PE1.fastq
+gzip *_PE2.fastq
 ```
 
 Combine all QC metrics and plot:
