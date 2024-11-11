@@ -64,7 +64,7 @@ knitr::include_graphics("ATAC_seq_CPMB.png")
 
 Chromatin accessibility genomics data is analyzed much like ChIP-seq
 data, but it does not measure transcription factor binding or histone
-modification abundance directly. Chromatin accessibility correlates
+modification abundance directly.  Chromatin accessibility correlates
 with gene expression levels, but if you want to use chromatin
 accessibility to tell you anything about gene expression you are
 better off just measuring RNA levels directly. Chromatin accessibility
