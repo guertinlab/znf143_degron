@@ -514,7 +514,7 @@ do
 done
 
 echo -e "chr\tstart\tend\tname\tqvalue" | cat - $peaks | paste -d'\t' - *peak_counts.txt > Combined_ATAC_peak_counts.txt
-
+# Combined ATAC 2023 is replicates 1-8
 #rm *_not_scaled.bed
 ```
 
