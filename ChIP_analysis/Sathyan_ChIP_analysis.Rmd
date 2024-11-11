@@ -303,10 +303,10 @@ Template script "chip_cutadapt_align_template.sh":
 #SBATCH --job-name=chip_adapt_align_XXXXXXX.sh     # name for job
 #SBATCH -N 1                  
 #SBATCH -n 1                 
-#SBATCH -c 40                 
+#SBATCH -c 8                 
 #SBATCH -p general           
 #SBATCH --qos=general       
-#SBATCH --mem=32G               
+#SBATCH --mem=30G               
 #SBATCH --mail-type=ALL 
 #SBATCH --mail-user=jdong@uchc.edu
 #SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
@@ -328,7 +328,7 @@ module load bedtools
 sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
 genome=/home/FCAM/jdong/human38/hg38.fa
 genome_index=/home/FCAM/jdong/human38/hg38
-ncore=40
+ncore=8
 
 echo "Removing adapters" $(date '+%a %Y-%m-%d %H:%M:%S %Z')
 cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --cores=$ncore -m 10 -O 1 -o ${name}_PE1_no_adapt.fastq -p ${name}_PE2_no_adapt.fastq ${name}_PE1.fastq ${name}_PE2.fastq 2>&1 | tee ${name}_cutadapt.log
