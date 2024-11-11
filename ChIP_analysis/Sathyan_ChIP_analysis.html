@@ -54,7 +54,7 @@ h4 {font-size: 18px;}
 h5 {font-size: 16px;}
 h6 {font-size: 12px;}
 code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
-</style>
+pre:not([class]) { background-color: white }</style>
 <script>
 
 /**
@@ -510,10 +510,6 @@ code > span.paren { color: #000000;}
 padding-left: 65px;
 }
 
-.references {
-padding-right: 150px;
-}
-
 .margin-toggle {
 display: none;
 }
@@ -527,8 +523,6 @@ width: auto;
 p {
 padding-left: 0;
 padding-right: 0;
-}
-.references { padding-right: 0;
 }
 h1, h2, h3, h4, h5, h6 {
 width: 100%;
@@ -738,20 +732,25 @@ function toggle_visibility(id1) {
 <li><a href="#defining-29bp-znf143-functional-binding-sites" id="toc-defining-29bp-znf143-functional-binding-sites"><span class="toc-section-number">7.4</span> Defining 29bp ZNF143 functional binding sites</a></li>
 <li><a href="#chip-intensity-heatmaps-fig.-1b-and-s5b" id="toc-chip-intensity-heatmaps-fig.-1b-and-s5b"><span class="toc-section-number">7.5</span> ChIP intensity heatmaps (Fig. 1B and S5B)</a></li>
 </ul></li>
-<li><a href="#znf143-chip-intensity-in-up-genes" id="toc-znf143-chip-intensity-in-up-genes"><span class="toc-section-number">8</span> ZNF143 ChIP intensity in Up genes</a></li>
+<li><a href="#znf143-chip-intensity-in-up-genes" id="toc-znf143-chip-intensity-in-up-genes"><span class="toc-section-number">8</span> ZNF143 ChIP intensity in Up genes</a>
+<ul>
+<li><a href="#r-setup" id="toc-r-setup"><span class="toc-section-number">8.1</span> R setup</a></li>
+<li><a href="#up-genes-with-znf143-binding-over-tss-fig.-4b" id="toc-up-genes-with-znf143-binding-over-tss-fig.-4b"><span class="toc-section-number">8.2</span> Up genes with ZNF143 binding over TSS (Fig. 4B)</a></li>
+<li><a href="#up-genes-with-znf143-binding-in-gene-body-fig.-4f-and-4h" id="toc-up-genes-with-znf143-binding-in-gene-body-fig.-4f-and-4h"><span class="toc-section-number">8.3</span> Up genes with ZNF143 binding in gene body (Fig. 4F and 4H)</a></li>
+</ul></li>
 <li><a href="#finding-overlaps-of-promoter-enriched-motifs-with-znf143" id="toc-finding-overlaps-of-promoter-enriched-motifs-with-znf143"><span class="toc-section-number">9</span> Finding overlaps of promoter-enriched motifs with ZNF143</a>
 <ul>
 <li><a href="#fig.-s9a-motif-overlap-dot-plot" id="toc-fig.-s9a-motif-overlap-dot-plot"><span class="toc-section-number">9.1</span> Fig. S9A Motif overlap dot plot</a></li>
 </ul></li>
 <li><a href="#sp1-chip-seq-analysis" id="toc-sp1-chip-seq-analysis"><span class="toc-section-number">10</span> SP1 ChIP-seq analysis</a>
 <ul>
-<li><a href="#subsections" id="toc-subsections"><span class="toc-section-number">10.1</span> subsection(s)</a></li>
-<li><a href="#differential-binding-analysis" id="toc-differential-binding-analysis"><span class="toc-section-number">10.2</span> Differential binding analysis</a></li>
+<li><a href="#sp1-znf143-overlap-in-increased-bidirectional-regions-fig-s7d-and-e" id="toc-sp1-znf143-overlap-in-increased-bidirectional-regions-fig-s7d-and-e"><span class="toc-section-number">10.1</span> SP1-ZNF143 overlap in increased bidirectional regions (Fig S7D and E)</a></li>
+<li><a href="#sp1-znf143-overlap-in-up-genes-with-promoter-znf143-binding" id="toc-sp1-znf143-overlap-in-up-genes-with-promoter-znf143-binding"><span class="toc-section-number">10.2</span> SP1-ZNF143 overlap in Up genes with promoter ZNF143 binding</a></li>
 </ul></li>
 <li><a href="#nrf1-chip-seq-analysis" id="toc-nrf1-chip-seq-analysis"><span class="toc-section-number">11</span> Nrf1 ChIP-seq analysis</a>
 <ul>
-<li><a href="#subsections-1" id="toc-subsections-1"><span class="toc-section-number">11.1</span> subsection(s)</a></li>
-<li><a href="#differential-binding-analysis-1" id="toc-differential-binding-analysis-1"><span class="toc-section-number">11.2</span> Differential binding analysis</a></li>
+<li><a href="#re-normalization-and-nrf1-binding-in-up-genes-with-nrf1-znf143-overlap" id="toc-re-normalization-and-nrf1-binding-in-up-genes-with-nrf1-znf143-overlap"><span class="toc-section-number">11.1</span> Re-normalization and Nrf1 binding in Up Genes with Nrf1-ZNF143 overlap</a></li>
+<li><a href="#nrf1-in-increased-bidirectional-regions-with-nrf1-znf143-overlap" id="toc-nrf1-in-increased-bidirectional-regions-with-nrf1-znf143-overlap"><span class="toc-section-number">11.2</span> Nrf1 in increased bidirectional regions with Nrf1-ZNF143 overlap</a></li>
 </ul></li>
 </ul>
 </div>
@@ -2062,29 +2061,1221 @@ plotHeatmap -m matrix_500bp_HA_ChIP_ZNF143_peaks_q7.gz -out heatmap_HA_ChIP_ZNF1
 </div>
 <div id="znf143-chip-intensity-in-up-genes" class="section level1" number="8">
 <h1><span class="header-section-number">8</span> ZNF143 ChIP intensity in Up genes</h1>
+<p>For genes that increase after ZNF143 degradation (Up genes), plot their corresponding ZNF143 ChIP intensities and compare to matched unchanged genes and similar Down genes. The categorized genes in the data frame <code>znf143genesDF</code> were categorized in the PRO-seq analysis vignette.</p>
+<div id="r-setup" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> R setup</h2>
+<pre class="r"><code>library(latticeExtra)
+library(grid)
+
+panel.violin.hack &lt;-
+function (x, y, box.ratio = 1, box.width = box.ratio/(1 + box.ratio),
+     horizontal = TRUE, alpha = plot.polygon$alpha, border =  
+plot.polygon$border,
+     lty = plot.polygon$lty, lwd = plot.polygon$lwd, col = plot.polygon 
+$col,
+     varwidth = FALSE, bw = NULL, adjust = NULL, kernel = NULL,
+     window = NULL, width = NULL, n = 50, from = NULL, to = NULL,
+     cut = NULL, na.rm = TRUE, ...)
+{
+     if (all(is.na(x) | is.na(y)))
+         return()
+     x &lt;- as.numeric(x)
+     y &lt;- as.numeric(y)
+     plot.polygon &lt;- trellis.par.get(&quot;plot.polygon&quot;)
+     darg &lt;- list()
+     darg$bw &lt;- bw
+     darg$adjust &lt;- adjust
+     darg$kernel &lt;- kernel
+     darg$window &lt;- window
+     darg$width &lt;- width
+     darg$n &lt;- n
+     darg$from &lt;- from
+     darg$to &lt;- to
+     darg$cut &lt;- cut
+     darg$na.rm &lt;- na.rm
+     my.density &lt;- function(x) {
+         ans &lt;- try(do.call(&quot;density&quot;, c(list(x = x), darg)),
+             silent = TRUE)
+         if (inherits(ans, &quot;try-error&quot;))
+             list(x = rep(x[1], 3), y = c(0, 1, 0))
+         else ans
+     }
+     numeric.list &lt;- if (horizontal)
+         split(x, factor(y))
+     else split(y, factor(x))
+     levels.fos &lt;- as.numeric(names(numeric.list))
+     d.list &lt;- lapply(numeric.list, my.density)
+     dx.list &lt;- lapply(d.list, &quot;[[&quot;, &quot;x&quot;)
+     dy.list &lt;- lapply(d.list, &quot;[[&quot;, &quot;y&quot;)
+     max.d &lt;- sapply(dy.list, max)
+     if (varwidth)
+         max.d[] &lt;- max(max.d)
+     xscale &lt;- current.panel.limits()$xlim
+     yscale &lt;- current.panel.limits()$ylim
+     height &lt;- box.width
+     if (horizontal) {
+         for (i in seq_along(levels.fos)) {
+             if (is.finite(max.d[i])) {
+                 pushViewport(viewport(y = unit(levels.fos[i],
+                   &quot;native&quot;), height = unit(height, &quot;native&quot;),
+                   yscale = c(max.d[i] * c(-1, 1)), xscale = xscale))
+                 grid.polygon(x = c(dx.list[[i]], rev(dx.list[[i]])),
+                   y = c(dy.list[[i]], -rev(dy.list[[i]])),  
+default.units = &quot;native&quot;,
+# this is the point at which the index is added
+                   gp = gpar(fill = col[i], col = border, lty = lty,
+                     lwd = lwd, alpha = alpha))
+                 popViewport()
+             }
+         }
+     }
+     else {
+         for (i in seq_along(levels.fos)) {
+             if (is.finite(max.d[i])) {
+                 pushViewport(viewport(x = unit(levels.fos[i],
+                   &quot;native&quot;), width = unit(height, &quot;native&quot;),
+                   xscale = c(max.d[i] * c(-1, 1)), yscale = yscale))
+                 grid.polygon(y = c(dx.list[[i]], rev(dx.list[[i]])),
+                   x = c(dy.list[[i]], -rev(dy.list[[i]])),  
+default.units = &quot;native&quot;,
+# this is the point at which the index is added
+                   gp = gpar(fill = col[i], col = border, lty = lty,
+                     lwd = lwd, alpha = alpha))
+                 popViewport()
+             }
+         }
+     }
+     invisible()
+} </code></pre>
+</div>
+<div id="up-genes-with-znf143-binding-over-tss-fig.-4b" class="section level2" number="8.2">
+<h2><span class="header-section-number">8.2</span> Up genes with ZNF143 binding over TSS (Fig. 4B)</h2>
+<pre class="r"><code>upOnCTSS = znf143genesDF[(znf143genesDF$catRS == &quot;Up&quot;) &amp; (znf143genesDF$disMOTIFcTSS == 0),]
+upOnDTSS = znf143genesDF[(znf143genesDF$catRS == &quot;Up&quot;) &amp; (znf143genesDF$disMOTIFdTSS == 0),]
+
+upON = znf143genesDF[znf143genesDF$upRScatDetail %in% c(&quot;onCTSS&quot;,&quot;onDTSS&quot;),] 
+upON$plotcat = &quot;Up&quot;
+
+downOnTSS = znf143genesDF[(znf143genesDF$catRS == &quot;Down&quot;) &amp; (znf143genesDF$disMOTIFcTSS == 0 | znf143genesDF$disMOTIFdTSS == 0),]
+downOnTSS$plotcat = &quot;Down&quot;
+
+unchanged = znf143genesDF[znf143genesDF$catRS == &quot;Other&quot;,]
+unchanged$treatment = 0
+up500 = znf143genesDF[znf143genesDF$catRS == &quot;Up&quot; &amp; (abs(znf143genesDF$disMOTIFdTSS) &lt; 500),]
+up500$treatment = 1
+df.deseq.effects.lattice = rbind(unchanged, up500)
+out = matchit(treatment ~ baseMeanRS, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
+unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
+unchanged$treatment = NULL 
+unchanged$plotcat = &quot;Matched to Up&quot;
+
+violplotUpON = rbind(upON,unchanged,downOnTSS)
+violplotUpON$plotcat = factor(violplotUpON$plotcat,levels=c(&quot;Up&quot;,&quot;Matched to Up&quot;,&quot;Down&quot;),labels = c(&quot;Up (5)&quot;, &quot;Matched to Up (61)&quot;,&quot;Down (51)&quot;))
+
+pdf(file = &quot;violin_upOnTSS_peakIntens_matched_down.pdf&quot; ,width=5,height=3.5)
+trellis.par.set(box.umbrella = list(lty = 1, col=&quot;black&quot;, lwd=1),
+                box.rectangle = list(col = &#39;black&#39;, lwd=1), plot.symbol = list(col=&#39;blue&#39;, lwd=1, pch =&#39;.&#39;))
+print(
+    bwplot(peakIntens ~ plotcat,
+         data=violplotUpON, #subset=(abs(Lat)&lt;60),
+           xlab=&#39;Gene Response&#39;,
+           ylab=&#39;ChIP Intensity&#39;,
+         #main = &#39;Changes in Rates&#39;,
+         ylim = c(0,12000),
+           aspect = 1.0, 
+           horizontal=FALSE,
+           between=list(y=0.7, x=0.7),
+           scales=list(x=list(alternating=c(1,1,1,0,0,0),rot=30, font = 1, cex=0.8),
+               y=list(alternating=c(1,1))),
+           panel = function(..., box.ratio) {
+               
+                panel.violin.hack(..., col = c(&quot;#ce228e&quot;,&quot;grey95&quot;,&quot;#2290cf&quot;),
+                            varwidth = FALSE, box.ratio = 10)
+               panel.abline(h=1, lty =2)
+               panel.bwplot(..., col=&#39;red&#39;,
+                            cex=0.8, pch=&#39;|&#39;, fill=&#39;transparent&#39;, box.ratio = .2, do.out = FALSE)
+           panel.stripplot(..., col=&#39;#b3b3b3CC&#39;, do.out=FALSE, jitter.data=TRUE, amount = 0.2, pch = 16, cex = 0.3)
+           },
+           par.settings = list(box.rectangle=list(col=&#39;black&#39;),
+               strip.background=list(col=&quot;grey90&quot;),
+               plot.symbol = list(pch=&#39;.&#39;, cex = 0.1))
+           )
+           )
+dev.off()</code></pre>
+</div>
+<div id="up-genes-with-znf143-binding-in-gene-body-fig.-4f-and-4h" class="section level2" number="8.3">
+<h2><span class="header-section-number">8.3</span> Up genes with ZNF143 binding in gene body (Fig. 4F and 4H)</h2>
+<pre class="r"><code># categorize the rest of the up genes relative to the CONTROL-CALLED max TSS 
+upPromoCTSS = znf143genesDF[(znf143genesDF$catRS == &quot;Up&quot;) &amp; !(znf143genesDF$gene %in% upOnTSS$gene) &amp; (abs(znf143genesDF$disMOTIFcTSS) &lt; 500) &amp; (znf143genesDF$disMOTIFcTSS &lt; 0),]
+upBodyCTSS = znf143genesDF[(znf143genesDF$catRS == &quot;Up&quot;) &amp; !(znf143genesDF$gene %in% upOnTSS$gene) &amp; (abs(znf143genesDF$disMOTIFcTSS) &lt; 500) &amp; (znf143genesDF$disMOTIFcTSS &gt; 0),] 
+upPromoDTSS = znf143genesDF[(znf143genesDF$catRS == &quot;Up&quot;) &amp; !(znf143genesDF$gene %in% upOnTSS$gene) &amp; (abs(znf143genesDF$disMOTIFdTSS) &lt; 500) &amp; (znf143genesDF$disMOTIFdTSS &lt; 0),]
+upBodyDTSS = znf143genesDF[(znf143genesDF$catRS == &quot;Up&quot;) &amp; !(znf143genesDF$gene %in% upOnTSS$gene) &amp; (abs(znf143genesDF$disMOTIFdTSS) &lt; 500) &amp; (znf143genesDF$disMOTIFdTSS &gt; 0),]
+upSpecialGenes = as.list(upPromoCTSS$gene[!(upPromoCTSS$gene %in% upPromoDTSS$gene)])
+znf143genesDF$upRScatDetail = znf143genesDF$catRS 
+znf143genesDF$upRScatDetail[znf143genesDF$gene %in% c(&quot;FIS1&quot;,&quot;ZNF219&quot;)] = &quot;onCTSS&quot;
+znf143genesDF$upRScatDetail[znf143genesDF$gene %in% c(&quot;BOLA1&quot;,&quot;PAF1&quot;,&quot;ZNF133&quot;)] = &quot;onDTSS&quot;
+znf143genesDF$upRScatDetail[znf143genesDF$gene %in% upPromoCTSS$gene] = &quot;upPromo&quot;
+znf143genesDF$upRScatDetail[znf143genesDF$gene %in% upBodyDTSS$gene] = &quot;upBody&quot;
+znf143genesDF$upRScatDetail[znf143genesDF$gene %in% c(&quot;GMPR2&quot;,&quot;LYSMD1&quot;,&quot;ZNF583&quot;,&quot;NAA38&quot;)] = &quot;special&quot;
+
+upBody = znf143genesDF[znf143genesDF$upRScatDetail == &quot;upBody&quot;,]
+upBody$plotcat = &quot;Up&quot;
+
+# remove genes that were previously cat&#39;d as &quot;on TSS&quot; for down 
+downintermediate = znf143genesDF[(znf143genesDF$catRS == &quot;Down&quot;) &amp; !(znf143genesDF$gene %in% downOnTSS$gene),] # 315 genes 
+downBody = downintermediate[(downintermediate$disMOTIFcTSS &gt; 0) &amp; (downintermediate$disMOTIFdTSS &gt; 0),] # 33 genes 
+downBodyplot = downBody[downBody$disMOTIFcTSS &lt; 500 &amp; downBody$disMOTIFdTSS &lt; 500,] # 25 genes 
+downBodyplot$plotcat = &quot;Down&quot;
+
+# make new matched controls 
+unchanged = znf143genesDF[!is.na(znf143genesDF$disMOTIFdTSS) &amp; znf143genesDF$catRS == &quot;Other&quot; &amp; (znf143genesDF$disMOTIFcTSS &gt; 0) &amp; (znf143genesDF$disMOTIFdTSS &gt; 0) &amp; ((abs(znf143genesDF$disMOTIFcTSS) &lt; 500) &amp; (abs(znf143genesDF$disMOTIFdTSS) &lt; 500)),]
+unchanged$treatment = 0
+up500 = znf143genesDF[znf143genesDF$upRScatDetail == &quot;upBody&quot;,]
+up500$treatment = 1
+df.deseq.effects.lattice = rbind(unchanged, up500)
+out = matchit(treatment ~ baseMeanRS, data = df.deseq.effects.lattice, method = &quot;optimal&quot;, ratio = 1)
+unchanged = df.deseq.effects.lattice[rownames(df.deseq.effects.lattice) %in% out$match.matrix,]
+unchanged$treatment = NULL 
+unchanged$plotcat = &quot;Matched to Up&quot;
+
+violplot = rbind(upBody,unchanged,downBodyplot)
+violplot$plotcat = factor(violplot$plotcat,levels=c(&quot;Up&quot;,&quot;Matched to Up&quot;,&quot;Down&quot;),labels=c(&quot;Up (28)&quot;, &quot;Matched to Up (28)&quot;,&quot;Down (25)&quot;))
+
+save(violplot,file=&quot;violplot.Rdata&quot;)
+
+pdf(file = &quot;violin_upBodyZNF143_peakIntens_matched_down.pdf&quot; ,width=5,height=3.5)
+trellis.par.set(box.umbrella = list(lty = 1, col=&quot;black&quot;, lwd=1),
+                box.rectangle = list(col = &#39;black&#39;, lwd=1), plot.symbol = list(col=&#39;blue&#39;, lwd=1, pch =&#39;.&#39;))
+print(
+    bwplot(peakIntens ~ plotcat,
+         data=violplot, #subset=(abs(Lat)&lt;60),
+           xlab=&#39;Gene Response&#39;,
+           ylab=&#39;ChIP Intensity&#39;,
+           #main = &#39;Changes in Rates&#39;,
+           ylim = c(0,25000),
+           aspect = 1.0, 
+           horizontal=FALSE,
+           between=list(y=0.7, x=0.7),
+           scales=list(x=list(alternating=c(1,1,1,0,0,0),rot=30, font = 1, cex=0.8),
+               y=list(alternating=c(1,1))),
+           panel = function(..., box.ratio) {
+               
+                panel.violin.hack(..., col = c(&quot;#ce228e&quot;,&quot;grey95&quot;,&quot;#2290cf&quot;),
+                            varwidth = FALSE, box.ratio = 10)
+               panel.abline(h=1, lty =2)
+               panel.bwplot(..., col=&#39;red&#39;,
+                            cex=0.8, pch=&#39;|&#39;, fill=&#39;transparent&#39;, box.ratio = .2, do.out = FALSE)
+           panel.stripplot(..., col=&#39;#b3b3b3CC&#39;, do.out=FALSE, jitter.data=TRUE, amount = 0.2, pch = 16, cex = 0.3)
+           },
+           par.settings = list(box.rectangle=list(col=&#39;black&#39;),
+               strip.background=list(col=&quot;grey90&quot;),
+               plot.symbol = list(pch=&#39;.&#39;, cex = 0.1))
+           )
+           )
+dev.off()
+
+actDownMatchedRepDown = violplot[,c(&quot;chrRS&quot;,&quot;startRS&quot;,&quot;endRS&quot;,&quot;gene&quot;,&quot;baseMeanRS&quot;,&quot;strand&quot;,&quot;plotcat&quot;,&quot;chrMotif&quot;,&quot;startMotif&quot;,&quot;endMotif&quot;,&quot;motif&quot;,&quot;peakIntens&quot;,&quot;strandMotif&quot;)]
+colnames(actDownMatchedRepDown) = c(&quot;chrRS&quot;,&quot;startRS&quot;,&quot;endRS&quot;,&quot;gene&quot;,&quot;baseMeanRS&quot;,&quot;strand&quot;,&quot;status&quot;,&quot;chrMotif&quot;,&quot;startMotif&quot;,&quot;endMotif&quot;,&quot;motif&quot;,&quot;peakIntens&quot;,&quot;strandMotif&quot;)
+
+# Incorporating significantly decreased genic bidirectional regions:
+
+actDownMatchedRepDown$status = as.character(actDownMatchedRepDown$status)
+
+actDownMatchedRepDown$status[actDownMatchedRepDown$status == &quot;Up&quot;] = &quot;Up (21)&quot;
+actDownMatchedRepDown$status[actDownMatchedRepDown$startMotif %in% c(64987191, 58392820, 90331691, 120742307, 45340501, 30744380, 144950632)] = &quot;Up (7)&quot;
+actDownMatchedRepDown$status[actDownMatchedRepDown$status == &quot;Matched to Up&quot;] = &quot;Matched to Up (28)&quot;
+# head(actDownMatchedRepDown[actDownMatchedRepDown$status == &quot;Up (21)&quot;,])
+# head(actDownMatchedRepDown[actDownMatchedRepDown$status == &quot;Up (7)&quot;,])
+
+# plot nothing, taking place of Down genes
+actDownMatchedRepDown$status[actDownMatchedRepDown$status == &quot;Down&quot;] = &quot;Matched to Up (0)&quot;
+actDownMatchedRepDown$peakIntens[actDownMatchedRepDown$status == &quot;Matched to Up (0)&quot;] = NA
+
+desired_order &lt;- c(&quot;Up (21)&quot;, &quot;Up (7)&quot;, &quot;Matched to Up (28)&quot;, &quot;Matched to Up (0)&quot;)
+actDownMatchedRepDown$status &lt;- factor(actDownMatchedRepDown$status, levels = desired_order)
+
+actDownMatchedRepDown$peakIntens &lt;- actDownMatchedRepDown$peakIntens/100
+
+pdf(file = &quot;Violin_BWplot_downstream_keynote_subset_matched_20240402.pdf&quot;, width=4, height=3.5)
+
+trellis.par.set(box.umbrella = list(lty = 1, col=&quot;black&quot;, lwd=1),
+                box.rectangle = list(col = &#39;black&#39;, lwd=1), plot.symbol = list(col=&#39;blue&#39;, lwd=1, pch =&#39;.&#39;))
+print(
+    bwplot(peakIntens ~ status,
+        data=actDownMatchedRepDown, #subset=(abs(Lat)&lt;60),
+        xlab=&#39;Gene Response&#39;,
+        ylab=&#39;ChIP Intensity&#39;,
+        #main = &#39;Changes in Rates&#39;,
+        ylim = c(0,250),
+        aspect = 1.0, 
+        horizontal=FALSE,
+        between=list(y=0.7, x=0.7),
+        scales=list(x=list(alternating=c(1,1,1,0,0,0),rot=30, font = 1, cex=0.8),
+                    y=list(alternating=c(1,1))),
+        lattice.options = modifyList(lattice.options(),list(skip.boundary.labels = 0)),
+        panel = function(..., box.ratio) {
+            panel.violin.hack(..., col = c(&quot;#ce228e&quot;, &quot;#ce228e&quot; , &quot;grey95&quot;,  &quot;#2290cf&quot;, &quot;#2290cf&quot;),
+                              varwidth = FALSE, box.ratio = 10)
+            #panel.abline(h=1, lty =2)
+            panel.bwplot(..., col=&#39;red&#39;,
+                         cex=0.8, pch=&#39;|&#39;, fill=&#39;transparent&#39;, box.ratio = .2, do.out = FALSE)
+            panel.stripplot(..., col=&#39;#b3b3b3CC&#39;, do.out=FALSE, jitter.data=TRUE, amount = 0.2, pch = 16, cex = 0.3)
+        },
+        par.settings = list(box.rectangle=list(col=&#39;black&#39;),
+                            strip.background=list(col=&quot;grey90&quot;),
+                            plot.symbol = list(pch=&#39;.&#39;, cex = 0.1))
+    )
+)
+dev.off()</code></pre>
+</div>
 </div>
 <div id="finding-overlaps-of-promoter-enriched-motifs-with-znf143" class="section level1" number="9">
 <h1><span class="header-section-number">9</span> Finding overlaps of promoter-enriched motifs with ZNF143</h1>
 <div id="fig.-s9a-motif-overlap-dot-plot" class="section level2" number="9.1">
 <h2><span class="header-section-number">9.1</span> Fig. S9A Motif overlap dot plot</h2>
+<p>MAST motifs of promoter-enriched transcription factors against Up genes with ZNF143 binding in the promoter:</p>
+<pre class="bash"><code># NFYA (MA0060.3)
+# awk &#39;{OFS=&quot;\t&quot;;} {print $3, $4, $5, $1&quot;_&quot;$2, $7, $6}&#39; /Users/jinhongdong/Desktop/TSSinference/fimo/fimo_out/MA0060.3_NFYA_fimo_out.txt | sort -k 1,1 -k2,2n &gt; MA0060.3_NFYA_fimo.bed
+# mast # -mt 0.0005 zero hits
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0060.3.meme upPromo_ZNF143motif_center_48bp.fasta &gt; mast_MA0060.3_NFYA_upPromo_ZNF143flank_48bp.txt # one hit 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0060.3_NFYA_upPromo_ZNF143flank_48bp.txt 1
+# browser: https://genome.ucsc.edu/s/jhdong/NFY_Z143_upPromo_overlap
+# Amount of overlap:
+intersectBed -wao -a mast_MA0060.3_NFYA_upPromo_ZNF143flank_48bp.bed -b upPromo_ZNF143motif_sites.bed &gt; MA0060.3_NFYA_ZNF143_upPromo_overlaps.bed
+
+# ELK4 (MA0076.2)
+# awk &#39;{OFS=&quot;\t&quot;;} {print $3, $4, $5, $1&quot;_&quot;$2, $7, $6}&#39; /Users/jinhongdong/Desktop/TSSinference/fimo/fimo_out/MA0076.2_ELK4_fimo_out.txt | sort -k 1,1 -k2,2n &gt; MA0076.2_ELK4_fimo.bed
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0076.2.meme upPromo_ZNF143motif_center_48bp.fasta &gt; mast_MA0076.2_ELK4_upPromo_ZNF143flank_48bp.txt # 16 hits with 4 under -mt 0.0005 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0076.2_ELK4_upPromo_ZNF143flank_48bp.txt 1
+# browser of best one: https://genome.ucsc.edu/s/jhdong/ELK4_Z143_upPromo_overlap 
+intersectBed -wao -a mast_MA0076.2_ELK4_upPromo_ZNF143flank_48bp.bed -b upPromo_ZNF143motif_sites.bed &gt; MA0076.2_ELK4_ZNF143_upPromo_overlaps.bed
+
+# mast MA0506.2_Nrf1
+# awk &#39;{OFS=&quot;\t&quot;;} {print $3, $4, $5, $1&quot;_&quot;$2, $7, $6}&#39; /Users/jinhongdong/Desktop/TSSinference/fimo/fimo_out/MA0506.2_Nrf1_fimo_out.txt | sort -k 1,1 -k2,2n &gt; MA0506.2_Nrf1_fimo.bed
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0506.2.meme upPromo_ZNF143motif_center_48bp.fasta &gt; mast_MA0506.2_Nrf1_upPromo_ZNF143flank_48bp.txt # 17 hits, 4 under -mt 0.0005 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0506.2_Nrf1_upPromo_ZNF143flank_48bp.txt 1
+intersectBed -wao -a mast_MA0506.2_Nrf1_upPromo_ZNF143flank_48bp.bed -b upPromo_ZNF143motif_sites.bed &gt; MA0506.2_Nrf1_ZNF143_upPromo_overlaps.bed 
+
+# mast MA0605.2_ATF3
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0605.2.meme upPromo_ZNF143motif_center_48bp.fasta &gt; mast_MA0605.2_ATF3_upPromo_ZNF143flank_48bp.txt # no hits 
+
+# mast MA0750.2_ZBTB7A
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0750.2.meme upPromo_ZNF143motif_center_48bp.fasta &gt; mast_MA0750.2_ZBTB7A_upPromo_ZNF143flank_48bp.txt # 18 hits, 9 under -mt 0.0005 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0750.2_ZBTB7A_upPromo_ZNF143flank_48bp.txt 1
+intersectBed -wao -a mast_MA0750.2_ZBTB7A_upPromo_ZNF143flank_48bp.bed -b upPromo_ZNF143motif_sites.bed &gt; MA0750.2_ZBTB7A_ZNF143_upPromo_overlaps.bed
+
+# mast FOSL2::JUND (MA1145.1)
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA1145.1.meme upPromo_ZNF143motif_center_48bp.fasta &gt; mast_MA1145.1_FOSL2_JUND_upPromo_ZNF143flank_48bp.txt # 3 matches on the order of 1e-03
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA1145.1_FOSL2_JUND_upPromo_ZNF143flank_48bp.txt 1
+intersectBed -wao -a mast_MA1145.1_FOSL2_JUND_upPromo_ZNF143flank_48bp.bed -b upPromo_ZNF143motif_sites.bed &gt; MA1145.1_FOSL2_JUND_ZNF143_upPromo_overlaps.bed
+
+# finally, also with the good SP1 motif:
+mast -mt 0.005 -hit_list -best SP_repressed.txt upPromo_ZNF143motif_center_48bp.fasta &gt; mast_SP_11mer_upPromo_ZNF143flank_48bp.txt # 19 matches, 9 under -mt 0.0005
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_SP_11mer_upPromo_ZNF143flank_48bp.txt 1
+intersectBed -wao -a mast_SP_11mer_upPromo_ZNF143flank_48bp.bed -b upPromo_ZNF143motif_sites.bed &gt; SP_11mer_upPromo_overlaps.bed
+</code></pre>
+<p>Get random 1 million regions of same length as ZNF143 flank regions, then MAST in those to see if the scores/p-values change based on number of input regions. About 5% of the sequences are just a string of N’s, but out of a million it should be okay. The MAST scores/pvalues don’t change with the number of input sequences anyway.</p>
+<pre class="bash"><code>bedtools random -g $sizes -l 48 -seed 92840 &gt; randomBed_92840.bed 
+fastaFromBed -fi $genome -bed randomBed_92840.bed -fo randomBed_92840.fasta
+# 49896 sequences that are just &quot;N&quot; though--I don&#39;t want that to affect my scores
+
+# let&#39;s just see how often this happens
+bedtools random -g $sizes -l 48 &gt; random2.bed
+bedtools random -g $sizes -l 48 &gt; random3.bed
+bedtools random -g $sizes -l 48 &gt; random4.bed
+bedtools random -g $sizes -l 48 &gt; random5.bed
+
+fastaFromBed -fi $genome -bed random2.bed -fo random2.fasta
+fastaFromBed -fi $genome -bed random3.bed -fo random3.fasta
+fastaFromBed -fi $genome -bed random4.bed -fo random4.fasta
+fastaFromBed -fi $genome -bed random5.bed -fo random5.fasta
+
+grep -c ^N random*fasta
+# random2.fasta:50025
+# random3.fasta:50078
+# random4.fasta:49618
+# random5.fasta:49865
+# randomBed_92840.fasta:49896 
+# Always around 5%...
+
+# trying a MAST anyway
+# mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0506.2.meme upPromo_ZNF143motif_center_48bp.fasta &gt; mast_MA0506.2_Nrf1_upPromo_ZNF143flank_48bp.txt
+cat randomBed_92840.fasta upPromo_ZNF143motif_center_48bp.fasta &gt; random_upPromoZflanks.fasta
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0506.2.meme random_upPromoZflanks.fasta &gt; mast_MA0506.2_Nrf1_randomBed_48bp.txt
+
+grep 77457626 mast_MA0506.2_Nrf1_randomBed_48bp.txt
+# chr14:77457626-77457674 +1 MA0506.2 Nrf1 12 26   439.46 5.61e-04
+grep 77457626 mast_MA0506.2_Nrf1_upPromo_ZNF143flank_48bp.txt
+# chr14:77457626-77457674 +1 MA0506.2 Nrf1 12 26   439.46 5.61e-04
+
+grep 70688481 mast_MA0506.2_Nrf1_randomBed_48bp.txt
+# chr4:70688481-70688529 +1 MA0506.2 Nrf1 12 26   349.44 8.15e-04
+grep 70688481 mast_MA0506.2_Nrf1_upPromo_ZNF143flank_48bp.txt
+# chr4:70688481-70688529 +1 MA0506.2 Nrf1 12 26   349.44 8.15e-04
+
+# It looks like MAST scores are independent of number of input regions
+
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0506.2_Nrf1_randomBed_48bp.txt 1
+wc -l mast_MA0506.2_Nrf1_randomBed_48bp.bed #   165366 mast_MA0506.2_Nrf1_randomBed_48bp.bed
+
+
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0506.2.meme random2.fasta &gt; mast_MA0506.2_Nrf1_randomBed2_48bp.txt
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0506.2_Nrf1_randomBed2_48bp.txt 1
+wc -l mast_MA0506.2_Nrf1_randomBed2_48bp.bed # 165330
+
+# Now the other three motifs 
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0750.2.meme random_upPromoZflanks.fasta &gt;  mast_MA0750.2_ZBTB7A_randomBed_48bp.txt
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0750.2_ZBTB7A_randomBed_48bp.txt 1
+wc -l mast_MA0750.2_ZBTB7A_randomBed_48bp.bed # 260460
+
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA1145.1.meme random_upPromoZflanks.fasta &gt; mast_MA1145.1_FOSL2_JUND_randomBed_48bp.txt 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA1145.1_FOSL2_JUND_randomBed_48bp.txt 1
+wc -l mast_MA1145.1_FOSL2_JUND_randomBed_48bp.bed # 177084
+
+mast -mt 0.005 -hit_list -best SP_repressed.txt random_upPromoZflanks.fasta &gt; mast_SP_11mer_randomBed_48bp.txt
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_SP_11mer_randomBed_48bp.txt 1
+wc -l mast_SP_11mer_randomBed_48bp.bed # 278596
+
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0060.3.meme random_upPromoZflanks.fasta &gt; mast_MA0060.3_NFYA_randomBed_48bp.txt 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0060.3_NFYA_randomBed_48bp.txt 1
+wc -l mast_MA0060.3_NFYA_randomBed_48bp.bed # 258655</code></pre>
+<p>Put data into R and plot amount of overlap with ZNF143 and quantile of MAST score:</p>
+<pre class="r"><code>nfyaUpPromoZoverlap = read.table(file=&quot;MA0060.3_NFYA_ZNF143_upPromo_overlaps.bed&quot;,sep=&quot;\t&quot;)
+nfyaUpPromoZoverlap$motifName = &quot;NFYA&quot;
+elk4UpPromoZoverlap = read.table(file=&quot;MA0076.2_ELK4_ZNF143_upPromo_overlaps.bed&quot;,sep=&quot;\t&quot;)
+elk4UpPromoZoverlap$motifName = &quot;ELK4&quot;
+nrf1UpPtomoZoverlap = read.table(file=&quot;MA0506.2_Nrf1_ZNF143_upPromo_overlaps.bed&quot;,sep=&quot;\t&quot;) 
+nrf1UpPtomoZoverlap$motifName = &quot;Nrf1&quot;
+zbtb7aUpPtomoZoverlap = read.table(file=&quot;MA0750.2_ZBTB7A_ZNF143_upPromo_overlaps.bed&quot;,sep=&quot;\t&quot;) 
+zbtb7aUpPtomoZoverlap$motifName = &quot;ZBTB7A&quot;
+fosl2jundUpPtomoZoverlap = read.table(file=&quot;MA1145.1_FOSL2_JUND_ZNF143_upPromo_overlaps.bed&quot;,sep=&quot;\t&quot;) 
+fosl2jundUpPtomoZoverlap$motifName = &quot;FOSL2_JUND&quot;
+sp1upPromoZoverlap = read.table(file=&quot;SP_11mer_upPromo_overlaps.bed&quot;,sep=&quot;\t&quot;)
+sp1upPromoZoverlap$motifName=&quot;SP1&quot;
+
+otherMotifUpPromoZoverlaps = rbind(nfyaUpPromoZoverlap,elk4UpPromoZoverlap,nrf1UpPtomoZoverlap,zbtb7aUpPtomoZoverlap,fosl2jundUpPtomoZoverlap,sp1upPromoZoverlap)
+otherMotifUpPromoZoverlaps$V7 = NULL
+names(otherMotifUpPromoZoverlaps) = c(&quot;chrMotif&quot;,&quot;startMotif&quot;,&quot;endMotif&quot;,&quot;MASTscore&quot;,&quot;MASTpval&quot;,&quot;motifStrand&quot;,&quot;chrZNF143&quot;,&quot;startZNF143&quot;,&quot;endZNF143&quot;,&quot;ZNFmotif&quot;,&quot;ZNF143peakIntens&quot;,&quot;ZNF143strand&quot;,&quot;overlap&quot;,&quot;motifName&quot;)
+
+
+# Make quantiles of MAST scores:
+nrf1random = read.table(file=&quot;mast_MA0506.2_Nrf1_randomBed_48bp.bed&quot;,sep=&quot;\t&quot;)
+nrf1randomQuants = quantile(nrf1random$V4, probs = seq(.1, 1.00, by = .1))
+nrf1random2 = read.table(file=&quot;mast_MA0506.2_Nrf1_randomBed2_48bp.bed&quot;,sep=&quot;\t&quot;)
+nrf1random2Quants = quantile(nrf1random2$V4, probs = seq(.1, 1.00, by = .1))
+nrf1random2Quants
+    # 10%     20%     30%     40%     50%     60%     70%     80%     90%    100% 
+# -108.16  -70.66  -25.64   19.37   79.38  146.89  221.91  304.43  469.47 2119.84 
+nrf1randomQuants
+#     10%     20%     30%     40%     50%     60%     70%     80%     90%    100% 
+# -108.16  -70.66  -25.64   26.87   79.38  146.89  221.91  304.43  476.97 2157.35
+
+# from just two runs, the quantile cutoffs seem similar enough
+ETSfactRandom = read.table(file=&quot;mast_MA0750.2_ZBTB7A_randomBed_48bp.bed&quot;,sep=&quot;\t&quot;)
+ETSquants = quantile(ETSfactRandom$V4, probs = seq(.1, 1.00, by = .1))
+bZIPrandom = read.table(file=&quot;mast_MA1145.1_FOSL2_JUND_randomBed_48bp.bed&quot;,sep=&quot;\t&quot;)
+bZIPquants = quantile(bZIPrandom$V4, probs = seq(.1, 1.00, by = .1))
+sp1random = read.table(file=&quot;mast_SP_11mer_randomBed_48bp.bed&quot;,sep=&quot;\t&quot;)
+sp1quants = quantile(sp1random$V4, probs = seq(.1, 1.00, by = .1))
+ETSquants
+#     10%     20%     30%     40%     50%     60%     70%     80%     90%    100% 
+#  193.71  228.54  270.32  312.11  367.83  423.55  493.20  583.74  723.03 1732.91 
+bZIPquants
+#     10%     20%     30%     40%     50%     60%     70%     80%     90%    100% 
+#  149.61  186.31  223.00  267.04  311.07  369.79  443.18  531.25  685.38 1859.66 
+sp1quants
+#     10%     20%     30%     40%     50%     60%     70%     80%     90%    100% 
+#  -42.89   35.12  113.14  206.76  300.39  409.61  550.04  737.29 1002.55 2250.83 
+nfyaRandom = read.table(file=&quot;mast_MA0060.3_NFYA_randomBed_48bp.bed&quot;,sep=&quot;\t&quot;)
+nfyaquants = quantile(nfyaRandom$V4, probs = seq(.1, 1.00, by = .1))
+
+# how do I make a column showing each instance&#39;s quantile category for that motif? 
+otherMotifUpPromoZoverlaps$MSquant = 0 
+# otherMotifUpPromoZoverlaps$MSquant[otherMotifUpPromoZoverlaps$motifName == &quot;Nrf1&quot; &amp; otherMotifUpPromoZoverlaps$MASTscore &gt; -108.16 &amp; otherMotifUpPromoZoverlaps$MASTscore &lt;= -70.66] = 0.2
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in nrf1randomQuants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifUpPromoZoverlaps$MSquant[otherMotifUpPromoZoverlaps$motifName == &quot;Nrf1&quot; &amp; otherMotifUpPromoZoverlaps$MASTscore &gt; j &amp; otherMotifUpPromoZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in ETSquants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifUpPromoZoverlaps$MSquant[otherMotifUpPromoZoverlaps$motifName == &quot;ZBTB7A&quot; &amp; otherMotifUpPromoZoverlaps$MASTscore &gt; j &amp; otherMotifUpPromoZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in bZIPquants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifUpPromoZoverlaps$MSquant[otherMotifUpPromoZoverlaps$motifName == &quot;FOSL2_JUND&quot; &amp; otherMotifUpPromoZoverlaps$MASTscore &gt; j &amp; otherMotifUpPromoZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in sp1quants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifUpPromoZoverlaps$MSquant[otherMotifUpPromoZoverlaps$motifName == &quot;SP1&quot; &amp; otherMotifUpPromoZoverlaps$MASTscore &gt; j &amp; otherMotifUpPromoZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+# add the missing upPromo gene that doesn&#39;t have any other motif overlaps at MAST -mt 0.005
+allupPromoOverlapInfo = rbind(otherMotifUpPromoZoverlaps,c(rep(NA,5),NA,rep(NA,7),NA,&quot;Nrf1&quot;,&quot;TSNAXIP1&quot;,NA,NA,NA))
+
+pdf(&quot;gg2_bubbleHeatmap_upPromoZ143flankMotifOverlapsTest_quantileColors.pdf&quot;, useDingbats = FALSE, width=12, height=4)
+ggplot(data = allupPromoOverlapInfo[!(allupPromoOverlapInfo$motifName %in% c(&quot;NFYA&quot;,&quot;ELK4&quot;)),], aes(x = gene, y = factor(motifName,levels=c(&quot;Nrf1&quot;,&quot;ZBTB7A&quot;,&quot;SP1&quot;,&quot;FOSL2_JUND&quot;,&quot;NFYA&quot;,&quot;ELK4&quot;),labels=c(&quot;Nrf1&quot;,&quot;ETS \nfactor&quot;,&quot;SP1&quot;,&quot;bZIP&quot;,&quot;NFYA&quot;,&quot;ELK4&quot;)), size = as.numeric(overlap), color = as.numeric(MSquant))) +
+    geom_point() +
+    scale_size(range=c(1,15), name=&quot;Overlap with\nZNF143 (bp)&quot;) +
+    scale_color_gradientn(colours=viridis(10)) +
+    labs(x=&quot;Up genes with promoter ZNF143 binding&quot;,y=&quot;Motif&quot;,color=&quot;MAST score quantile&quot;) +
+    theme(panel.background = element_rect(fill=&quot;transparent&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill=&quot;transparent&quot;, color=NA),
+        legend.background = element_rect(fill=&quot;transparent&quot;),
+        legend.box.background = element_rect(fill=&quot;transparent&quot;),
+        legend.key = element_rect(fill=NA),
+        axis.line = element_line(color = &quot;black&quot;),
+        legend.position = &quot;top&quot;,
+        axis.text.x=element_text(color = &quot;black&quot;, angle=30, vjust=.8, hjust=0.8,size=17),
+        axis.title.x=element_text(size=13),
+        axis.title.y=element_text(size=13),
+        axis.text.y=element_text(color = &quot;black&quot;, size=13))
+dev.off()</code></pre>
+<p>Now do the same for regions with significantly increased bidrectional transcription:</p>
+<pre class="bash"><code>slopBed -b 10 -i bidirectionals_ZNF143sites.bed -g $sizes &gt; bidirectionals_ZNF143sites_48bp.bed
+fastaFromBed -fi $genome -bed bidirectionals_ZNF143sites_48bp.bed -fo bidirectionals_ZNF143sites_48bp.fasta
+
+# NFYA
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0060.3.meme bidirectionals_ZNF143sites_48bp.fasta &gt; mast_MA0060.3_NFYA_bidir_48bp.txt
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0060.3_NFYA_bidir_48bp.txt 1
+# 2 hits
+intersectBed -wao -a mast_MA0060.3_NFYA_bidir_48bp.bed -b bidirectionals_ZNF143sites.bed &gt; MA0060.3_NFYA_ZNF143_bidir_overlaps.bed
+
+# ELK4 (don&#39;t need???)
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0076.2.meme bidirectionals_ZNF143sites_48bp.fasta &gt; mast_MA0076.2_ELK4_bidir_48bp.txt
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0076.2_ELK4_bidir_48bp.txt 1
+wc -l mast_MA0076.2_ELK4_bidir_48bp.bed
+# 13 hits
+intersectBed -wao -a mast_MA0076.2_ELK4_bidir_48bp.bed -b bidirectionals_ZNF143sites.bed &gt; mast_MA0076.2_ELK4_bidir_overlaps.bed
+
+# Nrf1 
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0506.2.meme bidirectionals_ZNF143sites_48bp.fasta &gt; mast_MA0506.2_Nrf1_bidir_48bp.txt 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0506.2_Nrf1_bidir_48bp.txt 1
+wc -l  mast_MA0506.2_Nrf1_bidir_48bp.bed
+# 17 hits
+intersectBed -wao -a mast_MA0506.2_Nrf1_bidir_48bp.bed -b bidirectionals_ZNF143sites.bed &gt; mast_MA0506.2_Nrf1_bidir_overlaps.bed
+
+# ATF3 (still zero matches)
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0605.2.meme bidirectionals_ZNF143sites_48bp.fasta &gt; mast_MA0605.2_ATF3_bidir_48bp.txt 
+
+# ZBTB7A (ETS factor)
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA0750.2.meme bidirectionals_ZNF143sites_48bp.fasta &gt; mast_MA0750.2_ZBTB7A_bidir_48bp.txt
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA0750.2_ZBTB7A_bidir_48bp.txt 1
+wc -l mast_MA0750.2_ZBTB7A_bidir_48bp.bed
+# 17 hits 
+intersectBed -wao -a mast_MA0750.2_ZBTB7A_bidir_48bp.bed -b bidirectionals_ZNF143sites.bed &gt; mast_MA0750.2_ZBTB7A_bidir_overlaps.bed
+
+# bZIP (FOSL2_JUND)
+mast -mt 0.005 -hit_list -best /Users/jinhongdong/Desktop/TSSinference/fimo/MA1145.1.meme bidirectionals_ZNF143sites_48bp.fasta &gt; mast_MA1145.1_FOSL2_JUND_bidir_48bp.txt
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_MA1145.1_FOSL2_JUND_bidir_48bp.txt 1
+wc -l mast_MA1145.1_FOSL2_JUND_bidir_48bp.bed
+# 1 hit 
+intersectBed -wao -a mast_MA1145.1_FOSL2_JUND_bidir_48bp.bed -b bidirectionals_ZNF143sites.bed &gt; mast_MA1145.1_FOSL2_JUND_bidir_overlaps.bed</code></pre>
+<pre class="r"><code>nfyaBIDIRoverlap = read.table(file=&quot;MA0060.3_NFYA_ZNF143_bidir_overlaps.bed&quot;,sep=&quot;\t&quot;)
+nfyaBIDIRoverlap$motifName = &quot;NFYA&quot;
+nrf1BIDIRoverlap = read.table(file=&quot;mast_MA0506.2_Nrf1_bidir_overlaps.bed&quot;,sep=&quot;\t&quot;) 
+nrf1BIDIRoverlap$motifName = &quot;Nrf1&quot;
+zbtb7BIDIRZoverlap = read.table(file=&quot;mast_MA0750.2_ZBTB7A_bidir_overlaps.bed&quot;,sep=&quot;\t&quot;) 
+zbtb7BIDIRZoverlap$motifName = &quot;ZBTB7A&quot;
+fosl2jundBIDIRZoverlap = read.table(file=&quot;mast_MA1145.1_FOSL2_JUND_bidir_overlaps.bed&quot;,sep=&quot;\t&quot;) 
+fosl2jundBIDIRZoverlap$motifName = &quot;FOSL2_JUND&quot;
+sp1bidiroverlap = read.table(file=&quot;SP_11mer_ZNF143_motifs_activated_dREG_overlaps.bed&quot;,sep=&quot;\t&quot;)
+sp1bidiroverlap$motifName=&quot;SP1&quot;
+
+otherMotifBIDIRZoverlaps = rbind(nfyaBIDIRoverlap,nrf1BIDIRoverlap,zbtb7BIDIRZoverlap,fosl2jundBIDIRZoverlap,sp1bidiroverlap)
+otherMotifBIDIRZoverlaps$V7 = NULL 
+otherMotifBIDIRZoverlaps$otherMotifCoords = paste0(otherMotifBIDIRZoverlaps$V1,&quot;:&quot;,otherMotifBIDIRZoverlaps$V2,&quot;-&quot;,
+otherMotifBIDIRZoverlaps$V3)
+temp = otherMotifBIDIRZoverlaps
+otherMotifBIDIRZoverlaps[otherMotifBIDIRZoverlaps$otherMotifCoords == &quot;chr19:49850668-49850678&quot;,] # row 45 is the SP motif without SP peak jsyk 
+otherMotifBIDIRZoverlaps = otherMotifBIDIRZoverlaps[c(1:44,46:57),]
+otherMotifBIDIRZoverlaps$ZCoords = paste0(otherMotifBIDIRZoverlaps$V8,&quot;:&quot;,otherMotifBIDIRZoverlaps$V9,&quot;-&quot;,
+otherMotifBIDIRZoverlaps$V10)
+
+names(otherMotifBIDIRZoverlaps)[names(otherMotifBIDIRZoverlaps) == &quot;V5&quot;] = &quot;MASTpval&quot;
+names(otherMotifBIDIRZoverlaps)[names(otherMotifBIDIRZoverlaps) == &quot;V4&quot;] = &quot;MASTscore&quot;
+names(otherMotifBIDIRZoverlaps)[names(otherMotifBIDIRZoverlaps) == &quot;V14&quot;] = &quot;Zoverlap&quot;
+otherMotifBIDIRZoverlaps$Zmid = paste0(otherMotifBIDIRZoverlaps$V8,&quot;:&quot;,otherMotifBIDIRZoverlaps$V9 + 14)
+
+
+
+# assign quantiles 
+otherMotifBIDIRZoverlaps$MSquant = 0
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in nfyaquants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifBIDIRZoverlaps$MSquant[otherMotifBIDIRZoverlaps$motifName == &quot;NFYA&quot; &amp; otherMotifBIDIRZoverlaps$MASTscore &gt; j &amp; otherMotifBIDIRZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in nrf1randomQuants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifBIDIRZoverlaps$MSquant[otherMotifBIDIRZoverlaps$motifName == &quot;Nrf1&quot; &amp; otherMotifBIDIRZoverlaps$MASTscore &gt; j &amp; otherMotifBIDIRZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in ETSquants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifBIDIRZoverlaps$MSquant[otherMotifBIDIRZoverlaps$motifName == &quot;ZBTB7A&quot; &amp; otherMotifBIDIRZoverlaps$MASTscore &gt; j &amp; otherMotifBIDIRZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in bZIPquants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifBIDIRZoverlaps$MSquant[otherMotifBIDIRZoverlaps$motifName == &quot;FOSL2_JUND&quot; &amp; otherMotifBIDIRZoverlaps$MASTscore &gt; j &amp; otherMotifBIDIRZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+j=0 
+q=seq(0, 1.00, by = .1)
+count=1
+for (i in sp1quants) {
+    count = count +1
+    prev=as.character(q[count])
+
+    otherMotifBIDIRZoverlaps$MSquant[otherMotifBIDIRZoverlaps$motifName == &quot;SP1&quot; &amp; otherMotifBIDIRZoverlaps$MASTscore &gt; j &amp; otherMotifBIDIRZoverlaps$MASTscore &lt;= i] = prev
+
+    j = i
+}
+
+# pLOT bubble maps 
+
+pdf(&quot;gg2_bubbleHeatmap_bidirZ143flankMotifOverlaps_quantileColors.pdf&quot;, useDingbats = FALSE, width=12, height=4)
+ggplot(data = otherMotifBIDIRZoverlaps[!otherMotifBIDIRZoverlaps$motifName %in% c(&quot;NFYA&quot;,&quot;FOSL2_JUND&quot;),], aes(x = Zmid, y = factor(motifName,levels=c(&quot;Nrf1&quot;,&quot;ZBTB7A&quot;,&quot;SP1&quot;,&quot;FOSL2_JUND&quot;,&quot;NFYA&quot;),labels=c(&quot;Nrf1&quot;,&quot;ETS \nfactor&quot;,&quot;SP1&quot;,&quot;bZIP&quot;,&quot;NFYA&quot;)), size = as.numeric(Zoverlap), color = as.numeric(MSquant))) +
+    geom_point() +
+    scale_size(range=c(1,15), name=&quot;Overlap with\nZNF143 (bp)&quot;) +
+    scale_color_gradientn(colours=viridis(10)) +
+    labs(x=&quot;Increasing bidirectional regions (Fig 5D)&quot;,y=&quot;Motif&quot;,color=&quot;MAST score quantile&quot;) +
+    theme(panel.background = element_rect(fill=&quot;transparent&quot;),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill=&quot;transparent&quot;, color=NA),
+        legend.background = element_rect(fill=&quot;transparent&quot;),
+        legend.box.background = element_rect(fill=&quot;transparent&quot;),
+        legend.key = element_rect(fill=NA),
+        axis.line = element_line(color = &quot;black&quot;),
+        legend.position = &quot;top&quot;,
+        axis.text.x=element_text(color = &quot;black&quot;, angle=60, vjust=.8, hjust=0.8,size=13),
+        axis.title.x=element_text(size=13),
+        axis.title.y=element_text(size=13),
+        axis.text.y=element_text(color = &quot;black&quot;, size=13))
+dev.off()</code></pre>
 </div>
 </div>
 <div id="sp1-chip-seq-analysis" class="section level1" number="10">
 <h1><span class="header-section-number">10</span> SP1 ChIP-seq analysis</h1>
-<div id="subsections" class="section level2" number="10.1">
-<h2><span class="header-section-number">10.1</span> subsection(s)</h2>
+<p>Define SP1 binding sites with a 11-mer consensus from work done for Dutta et al. 2023 (Genome Res).</p>
+<pre class="bash"><code># working directory: /Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023 
+
+# all SP1 peaks, with normalized peak intensity (counts in peaks, normalized by DESeq size factors, mean of the 4 control samples)
+wc -l sp1_normCounts_summits.bed  #   121581 SP1ChIP/sp1_normCounts_summits.bed
+# sp1_normCounts_peaks_400bp.bed is same thing but in 401bp windows
+# sp1_normCounts_peaks_400bp.fasta is the same thing but with DNA sequences
+
+
+mast -mt 0.0005 -hit_list -best SP_repressed.txt sp1_normCounts_peaks_400bp.fasta &gt; mast_SP1_11mer_in_peaks.txt 
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_SP1_11mer_in_peaks.txt 1
+wc -l mast_SP1_11mer_in_peaks.bed #    70086 mast_SP1_11mer_in_peaks.bed</code></pre>
+<p>Connect MAST results with peak intensities</p>
+<pre class="r"><code># these are the exact SP1 binding coordinates 
+spMastMotifCoords = read.table(file=&quot;mast_SP1_11mer_in_peaks.bed&quot;,sep=&quot;\t&quot;)
+dim(spMastMotifCoords) # [1] 70086     7
+colnames(spMastMotifCoords) = c(&quot;chrSPmast&quot;,&quot;startSPmast&quot;,&quot;endSPmast&quot;,&quot;SPmastScore&quot;,&quot;SPmastPval&quot;,&quot;SPmotifStrand&quot;,&quot;misc&quot;)
+spMastMotifCoords$misc = NULL
+spMastMotifCoords$SPmastCoords = paste0(spMastMotifCoords$chrSPmast,&quot;:&quot;,spMastMotifCoords$startSPmast,&quot;-&quot;,spMastMotifCoords$endSPmast)
+
+# these are the 401bp peaks that contained MAST matches
+spMastCoords = read.table(file=&quot;mast_SP1_11mer_in_peaks.txt&quot;,comment.char = &quot;#&quot;)
+dim(spMastCoords) # [1] 70086     8
+names(spMastCoords)[names(spMastCoords) == &quot;V1&quot;] = &quot;coords&quot;
+
+# they should be in the same order, so just cbind them together
+identical(spMastMotifCoords$SPmastScore,spMastCoords$V7) # TRUE
+spMastInfo = cbind(spMastMotifCoords,spMastCoords)
+dim(spMastInfo) # [1] 70086    15
+
+# get ALL the peak intensities 
+allSPeaks = read.table(file=&quot;./SP1ChIP/sp1_normCounts_peaks_400bp.bed&quot;,sep=&quot;\t&quot;)
+allSPeaks$coords = paste0(allSPeaks$V1,&quot;:&quot;,allSPeaks$V2,&quot;-&quot;,allSPeaks$V3)
+colnames(allSPeaks) = c(&quot;chrSPeak&quot;,&quot;startSPeak&quot;,&quot;endSPeak&quot;,&quot;SPeakIntContr&quot;,&quot;coords&quot;)
+dim(allSPeaks) # [1] 121581      4
+
+# merge on 401bp coordinates 
+withSPmotif1 = merge(spMastInfo,allSPeaks,by = &quot;coords&quot;)
+dim(withSPmotif1) # [1] 70086/121581 = 58%
+
+woSPmotif1 = allSPeaks[!(allSPeaks$coords %in% withSPmotif1$coords),]
+dim(woSPmotif1) # [1] 51495/121581 = 42%
+
+write.table(withSPmotif1[,c(&quot;chrSPmast&quot;,&quot;startSPmast&quot;,&quot;endSPmast&quot;,&quot;SPeakIntContr&quot;)],file=&quot;SP1_11mer_mast_sites_peakIntensity_SP1ChIP.bed&quot;,quote=F,row.names=F,col.names=F,sep=&quot;\t&quot;)
+
+# browser with track of SP1 motif locations: https://genome.ucsc.edu/s/jhdong/newSP1motifs 
+
+# big table for plotting
+allSPeaks$withMotif = allSPeaks$coords %in% withSPmotif1$coords
+sum(allSPeaks$withMotif) # [1] 70086
+allSPeaks$withMotif[allSPeaks$withMotif == TRUE] = &quot;Yes&quot;
+allSPeaks$withMotif[allSPeaks$withMotif == FALSE] = &quot;No&quot;</code></pre>
+<div id="sp1-znf143-overlap-in-increased-bidirectional-regions-fig-s7d-and-e" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> SP1-ZNF143 overlap in increased bidirectional regions (Fig S7D and E)</h2>
+<pre class="bash"><code>slopBed -b 10 -i ZNF143_motifs_activated_dREG.bed -g $sizes &gt; ZNF143_motifs_activated_dREG_48bp.bed
+fastaFromBed -fi $genome -bed ZNF143_motifs_activated_dREG_48bp.bed -fo ZNF143_motifs_activated_dREG_48bp.fasta
+
+# MAST with good SP motif in area flanking these ZNF143 motifs 
+mast -mt 0.0005 -hit_list -best SP_repressed.txt ZNF143_motifs_activated_dREG_48bp.fasta &gt; mast_SP_11mer_ZNF143_motifs_activated_dREG_flank_48bp.txt # 20 hits
+Rscript ./motif_analysis_201/parse_mast_to_coordinates.R mast_SP_11mer_ZNF143_motifs_activated_dREG_flank_48bp.txt 1
+
+# do they overlap ZNF143 motifs?
+intersectBed -wao -a mast_SP_11mer_ZNF143_motifs_activated_dREG_flank_48bp.bed -b ZNF143_motifs_activated_dREG.bed &gt; SP_11mer_ZNF143_motifs_activated_dREG_overlaps.bed
+# all have at least 1 bp of overlap, with 10 fully overlapped SP motifs 
+</code></pre>
+<pre class="r"><code># get corresponding SP peak intensities 
+dRactZSPoverlap = read.table(file=&quot;SP_11mer_ZNF143_motifs_activated_dREG_overlaps.bed&quot;,sep=&quot;\t&quot;,)
+
+bedTools.closest &lt;- function(functionstring=&quot;/usr/local/bin/bedtools2-2.31.0/bin/closestBed&quot;,bed1,bed2,opt.string=&quot;&quot;,distLabel = &quot;dis&quot;) {
+  
+  options(scipen =99) # not to use scientific notation when writing out
+  
+  #write bed formatted dataframes to tempfile
+  write.table(bed1,file= &#39;a.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  write.table(bed2,file= &#39;b.file.bed&#39;, quote=F,sep=&quot;\t&quot;,col.names=F,row.names=F)
+  
+  # create the command string and call the command using system()
+  command1=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;a.file.bed&#39;, &#39;&gt; a.file.sorted.bed&#39;)
+  cat(command1,&quot;\n&quot;)
+  try(system(command1))
+  command2=paste(&#39;sort -k1,1 -k2,2n&#39;, &#39;b.file.bed&#39;, &#39;&gt; b.file.sorted.bed&#39;)
+  cat(command2,&quot;\n&quot;)
+  try(system(command2))
+  
+  # use opt.string argument to add options for closestBed
+  command=paste(functionstring,opt.string,&quot;-a&quot;,&#39;a.file.sorted.bed&#39;,&quot;-b&quot;,&#39;b.file.sorted.bed&#39;,&quot;&gt;&quot;,&#39;out.file.bed&#39;,sep=&quot; &quot;)
+  cat(command,&quot;\n&quot;)
+  try(system(command))
+  
+  res=read.table(&#39;out.file.bed&#39;,sep =&quot;\t&quot;, header=F, comment.char=&#39;&#39;)
+  
+  command3=paste(&#39;rm&#39;, &#39;a.file.bed&#39;, &#39;b.file.bed&#39;, &#39;a.file.sorted.bed&#39;, &#39;b.file.sorted.bed&#39;, &#39;out.file.bed&#39;)
+  cat(command3,&quot;\n&quot;)
+  try(system(command3))
+  
+  colnames(res) = c(colnames(bed1), colnames(bed2), distLabel )
+  return(res)
+}
+allSPeaksCounts = merge(allSPeaks,normCountsSP1, by.x=&quot;coords&quot;,by.y=&quot;SPcoords&quot;,all.x=TRUE)
+dRactZSPeaks400 = bedTools.closest(bed2=allSPeaksCounts[,c(2:5,1)],bed1=dRactZSPoverlap[,1:3],opt.string=&#39;-D a&#39;,distLabel=&quot;disSPmotifToPeak&quot;)
+# there is one SP hit that isn&#39;t in a previously called peak... exclude bc it&#39;s outside the peak! 
+
+# - make bar chart showing 19/99 inc dREG regions w/ZNF143 also have SP overlap 
+num = c(19,80)
+totals = c(99,99)
+group = c(&quot;a&quot;,&quot;b&quot;)
+factor = c(&quot;Regions of increased bidirectional txn\nwith ZNF143 binding sites&quot;,&quot;Regions of increased bidirectional txn\nwith ZNF143 binding sites&quot;)
+barDF = as.data.frame(cbind(num,totals,group,factor))
+barDF$fraction = as.numeric(barDF$num)/as.numeric(barDF$totals)
+barDF
+#   num totals group  fraction
+# 1  19     99     a 0.1919192
+# 2  80     99     b 0.8080808
+
+colors = c(&quot;forestgreen&quot;,&quot;grey&quot;)
+
+
+plot.barchart(barDF,cols=colors,filename=&quot;barchart_inc_dREG_ZNF143_motif_with_SP_overlap_20240418.pdf&quot;)
+
+# - make column(s) to track amount of median &quot;peak change&quot; (inc/dec) after dTAG for the 19 remaining peaks 
+violinDF = allSPeaksCounts[(allSPeaksCounts$coords %in% dRactZSPeaks400$coords) &amp; (allSPeaksCounts$withZmotif == &quot;has Zmotif&quot;),]
+violinDF$medSPcontr = apply(violinDF[,7:10],1,function(x) {median(as.numeric(x))})
+violinDF$medSPdtag = apply(violinDF[,11:14],1,function(x) {median(as.numeric(x))})
+violinDF$medSPchange = violinDF$medSPdtag - violinDF$medSPcontr
+violinDF$medSPfc = (violinDF$medSPdtag - violinDF$medSPcontr)/violinDF$medSPcontr
+
+# - order (in plot) by decreasing (or increasingly negative) median peak change 
+violinDF = violinDF[order(violinDF$medSPfc, decreasing=TRUE),]
+violinDF$peakID = seq(1,nrow(violinDF))
+violinDF$Zmid = paste0(violinDF$chrMotif,&quot;:&quot;,&quot;\n&quot;,violinDF$startMotif+14)
+violinDF$peakID = factor(violinDF$peakID, levels=seq(1,nrow(violinDF)), labels = violinDF$Zmid)
+violinDF$peakIDnum = seq(1,nrow(violinDF))
+
+# - plot it 
+spMelted0min = violinDF[,c(&quot;peakIDnum&quot;,&quot;antiSP1-control-rep1.seqOut&quot;,&quot;antiSP1-control-rep2.seqOut&quot;,&quot;antiSP1-control-rep3.seqOut&quot;,&quot;antiSP1-control-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!peakIDnum,names_to=&quot;Sample&quot;,values_to = &quot;SPeakIntens&quot;)
+spMelted0min$treatment = &quot;0 min&quot;
+
+spMelted30min = violinDF[,c(&quot;peakIDnum&quot;,&quot;antiSP1-dTAG-rep1.seqOut&quot;,&quot;antiSP1-dTAG-rep2.seqOut&quot;,&quot;antiSP1-dTAG-rep3.seqOut&quot;,&quot;antiSP1-dTAG-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!peakIDnum,names_to=&quot;Sample&quot;,values_to = &quot;SPeakIntens&quot;)
+spMelted30min$treatment = &quot;30 min&quot;
+spMelted = rbind(spMelted0min,spMelted30min)
+# spMelted$peakID = as.character(spMelted$peakID)
+# spMelted$peakID = factor(spMelted$peakID, levels=as.character(seq(1,nrow(violinDF))), labels = paste0(rep(&quot;Peak &quot;,19),seq(1,19)))
+
+spMelted0min2 = violinDF[,c(&quot;Zmid&quot;,&quot;antiSP1-control-rep1.seqOut&quot;,&quot;antiSP1-control-rep2.seqOut&quot;,&quot;antiSP1-control-rep3.seqOut&quot;,&quot;antiSP1-control-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!Zmid,names_to=&quot;Sample&quot;,values_to = &quot;SPeakIntens&quot;)
+spMelted0min2$treatment = &quot;0 min&quot;
+
+spMelted30min2 = violinDF[,c(&quot;Zmid&quot;,&quot;antiSP1-dTAG-rep1.seqOut&quot;,&quot;antiSP1-dTAG-rep2.seqOut&quot;,&quot;antiSP1-dTAG-rep3.seqOut&quot;,&quot;antiSP1-dTAG-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!Zmid,names_to=&quot;Sample&quot;,values_to = &quot;SPeakIntens&quot;)
+spMelted30min2$treatment = &quot;30 min&quot;
+spMelted2 = rbind(spMelted0min2,spMelted30min2)
+
+ZmidTemp = violinDF[,c(&quot;Zmid&quot;,&quot;peakIDnum&quot;)]
+ZmidTemp = ZmidTemp[order(ZmidTemp$Zmid),]
+ZmidTemp$alphaNum = seq(1,nrow(ZmidTemp))
+ZmidTemp = ZmidTemp[order(ZmidTemp$peakIDnum),]
+
+pdf(file = &quot;violin_dREGincZNF143flank_SPmotifOverlap_SP1chipIntens_foldChangeOrder.pdf&quot; ,width=8,height=3)
+trellis.par.set(box.umbrella = list(lty = 1, col=&quot;black&quot;, lwd=1),
+                box.rectangle = list(col = &#39;black&#39;, lwd=1), plot.symbol = list(col=&#39;blue&#39;, lwd=1, pch =&#39;.&#39;))
+print(
+    bwplot(SPeakIntens ~ treatment|Zmid, # y ~ x will be plotted for every group
+        data=spMelted2,
+        xlab=list(label=&#39;ZNF143 dTAG treatment&#39;,cex=0.8),
+        ylab=list(label=&#39;SP1 ChIP Intensity&#39;,cex=0.8),
+        aspect = 2.5,
+        horizontal=FALSE,
+        between=list(y=0.3, x=-0.2), # increase to increase space between group plots 
+        layout=c(10,2),
+        index.cond=list(ZmidTemp$alphaNum), # update this
+        scales=list(x=list(alternating=c(1,1,1,1,1),rot=30, font = 1, cex=0.5),
+                    y=list(alternating=c(1,1,1,1), relation=&quot;free&quot;,rot=0,cex=0.4),
+                    axs=&quot;i&quot;,tck=0.5),
+        lattice.options = list(default.args = list(as.table = TRUE),skip.boundary.labels = 0),
+        panel = function(..., box.ratio) {
+            panel.violin.hack(..., col = c(&quot;#A689BF&quot;,&quot;#A689BF&quot;), lwd=0.5,
+                              varwidth = FALSE, box.ratio = 5)
+            #panel.abline(h=1, lty =2)
+            panel.bwplot(..., col=&#39;red&#39;, cex=0.8, pch=&#39;|&#39;, fill=&#39;transparent&#39;, box.ratio = .2, do.out = FALSE)
+            panel.stripplot(..., col=&#39;#b3b3b3CC&#39;, do.out=FALSE, jitter.data=TRUE, amount = 0.2, pch = 16, cex = 0.5)
+        },
+        prepanel = function(x,y,...) { 
+            # set dynamic y-axis limits for each group
+            list(ylim=c(0,max(y)*1.2))
+        },
+        par.settings = list(box.rectangle=list(col=&#39;black&#39;),
+                            strip.background=list(col=&#39;transparent&#39;),
+                            strip.shingle=list(col=&#39;transparent&#39;),
+                            plot.symbol=list(pch=&#39;.&#39;, cex = 0.1),
+                            axis.components=list(left=list(pad1=0.3)) # adjust padding between y-axis tick and label
+                            ),
+        par.strip.text = list(cex=0.5) # adjust size of text in group labels 
+    )
+)
+dev.off()</code></pre>
 </div>
-<div id="differential-binding-analysis" class="section level2" number="10.2">
-<h2><span class="header-section-number">10.2</span> Differential binding analysis</h2>
+<div id="sp1-znf143-overlap-in-up-genes-with-promoter-znf143-binding" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> SP1-ZNF143 overlap in Up genes with promoter ZNF143 binding</h2>
+<pre class="r"><code>spZoverlaps = otherMotifUpPromoZoverlaps[otherMotifUpPromoZoverlaps$motifName == &quot;SP1&quot;,]
+
+# get 401 SP peak coords
+spZoverlapsSPeakDis = bedTools.closest(bed2=allSPeaksCounts[,c(2:5,1)],bed1=spZoverlaps[,c(2:5,16)],opt.string=&#39;-D a&#39;,distLabel=&quot;disSPmotif2ToPeak&quot;) # hmm two SP motifs are not in an SP peak...looks like bc the SP binding there is just so low. There is a big increase though.
+# THAP11&#39;s row is also duplicated (bc allSPeaksCounts has duplicates...bc this peak has 2 ZNF143 motifs associated with it in allSPeaksZmotifDis) Doesn&#39;t change the fact that the numbers don&#39;t match the visuals on the track browser. But it looks correct for ZNF688, and 
+
+# get SP peak intensities 
+try = merge(spZoverlapsSPeakDis[!duplicated(spZoverlapsSPeakDis$gene),],allSPeaksCounts[,c(1,6:14,22)],by=&quot;coords&quot;,all.x=TRUE)
+try = try[!duplicated(try$gene),] 
+try2 = merge(spZoverlaps,try[,c(1,6:21)],by=&quot;gene&quot;,all.x=TRUE)
+spZoverlapsInfo = try2
+save(spZoverlapsInfo,file=&quot;spZoverlapsInfo.Rdata&quot;)
+
+write.table(spZoverlapsInfo[,c(3:5,16,7,8)],file=&quot;SP_Z143overlaps_in_upPromo_ZNF143_flanks.bed&quot;,quote=F,row.names=F,col.names=F,sep=&quot;\t&quot;) 
+# throw on genome browser: https://genome.ucsc.edu/s/jhdong/SP_overlap_upPromoZ143flank
+
+saved = spZoverlapsInfo
+
+spZoverlapsInfo = spZoverlapsInfo[spZoverlapsInfo$gene != &quot;SLC50A1&quot;,]
+spZoverlapsInfo$medSPcontr = apply(spZoverlapsInfo[,24:27],1,function(x) {median(as.numeric(x))})
+spZoverlapsInfo$medSPdtag = apply(spZoverlapsInfo[,28:31],1,function(x) {median(as.numeric(x))})
+spZoverlapsInfo$medSPchange = spZoverlapsInfo$medSPdtag - spZoverlapsInfo$medSPcontr
+spZoverlapsInfo$medSPfc = (spZoverlapsInfo$medSPdtag - spZoverlapsInfo$medSPcontr)/spZoverlapsInfo$medSPcontr
+spZoverlapsInfo = spZoverlapsInfo[order(spZoverlapsInfo$medSPfc, decreasing=TRUE),]
+spZoverlapsInfo$peakOrder = seq(1,nrow(spZoverlapsInfo))
+
+spZoverlapsInfo = spZoverlapsInfo[order(spZoverlapsInfo$gene),] 
+spZoverlapsInfo$alphOrder = seq(1,nrow(spZoverlapsInfo))
+spZoverlapsInfo = spZoverlapsInfo[order(spZoverlapsInfo$peakOrder),]
+
+
+spMelt0min = melt(plotme[,c(&quot;gene&quot;,&quot;antiSP1-control-rep1.seqOut&quot;,&quot;antiSP1-control-rep2.seqOut&quot;,&quot;antiSP1-control-rep3.seqOut&quot;,&quot;antiSP1-control-rep4.seqOut&quot;)], id.vars=c(&quot;gene&quot;), variable.name=&quot;Sample&quot;, value.name=&quot;SPeakIntens&quot;)
+spMelt0min$treatment = &quot;0 min&quot;
+
+spMelt30min = melt(plotme[,c(&quot;gene&quot;,&quot;antiSP1-dTAG-rep1.seqOut&quot;,&quot;antiSP1-dTAG-rep2.seqOut&quot;,&quot;antiSP1-dTAG-rep3.seqOut&quot;,&quot;antiSP1-dTAG-rep4.seqOut&quot;)], id.vars=c(&quot;gene&quot;), variable.name=&quot;Sample&quot;, value.name=&quot;SPeakIntens&quot;)
+spMelt30min$treatment = &quot;30 min&quot;
+
+spMeltCombo = rbind(spMelt0min,spMelt30min)
+
+# spZoverlapsInfo$alphOrder
+ [1] 15 12 13  7  2  4 11  8 16  3  6  1  9 14 10  5 # order for if you want decreasing fold change of median peak intens. 
+
+pdf(file = &quot;violin_upPromoZ143flank_SPZNF143motifOverlap_SP1chipIntens_all.pdf&quot; ,width=8,height=4)
+trellis.par.set(box.umbrella = list(lty = 1, col=&quot;black&quot;, lwd=1),
+                box.rectangle = list(col = &#39;black&#39;, lwd=1), plot.symbol = list(col=&#39;blue&#39;, lwd=1, pch =&#39;.&#39;))
+print(
+    bwplot(SPeakIntens ~ treatment|gene,
+        data=spMeltCombo,
+        xlab=&#39;dTAG treatment&#39;,
+        ylab=&#39;SP1 ChIP Intensity&#39;,
+        aspect = 3.0,
+        horizontal=FALSE,
+        between=list(y=0.2, x=-0.2),
+        index.cond=list(spZoverlapsInfo$alphOrder),
+        # layout=c(5,1),
+        scales=list(x=list(alternating=c(1,1,1,1,1),rot=30, font = 1, cex=0.6),
+                    y=list(alternating=c(1,1),relation=&quot;free&quot;,cex=0.3,rot=0),axs=&quot;i&quot;,tck=0.2),
+        lattice.options = list(default.args = list(as.table = TRUE),skip.boundary.labels = 0),
+        panel = function(..., box.ratio) {
+            panel.violin.hack(..., col = c(&quot;grey95&quot;,&quot;#ce228e&quot;),
+                              varwidth = FALSE, box.ratio = 2)
+            #panel.abline(h=1, lty =2)
+            panel.bwplot(..., col=&#39;red&#39;, cex=0.8, pch=&#39;|&#39;, fill=&#39;transparent&#39;, box.ratio = .2, do.out = FALSE)
+            panel.stripplot(..., col=&#39;#b3b3b3CC&#39;, do.out=FALSE, jitter.data=TRUE, amount = 0.2, pch = 16, cex = 0.5)
+        },
+        prepanel = function(x,y,...) { 
+            # set dynamic y-axis limits for each group
+            list(ylim=c(0,max(y)*1.2))
+        },
+        par.settings = list(box.rectangle=list(col=&#39;black&#39;),
+                            strip.background=list(col=&quot;transparent&quot;),
+                            plot.symbol = list(pch=&#39;.&#39;, cex = 0.1),
+                            axis.components=list(left=list(pad1=0.3))),
+        par.strip.text = list(cex=0.7)
+    )
+)
+dev.off()</code></pre>
 </div>
 </div>
 <div id="nrf1-chip-seq-analysis" class="section level1" number="11">
 <h1><span class="header-section-number">11</span> Nrf1 ChIP-seq analysis</h1>
-<div id="subsections-1" class="section level2" number="11.1">
-<h2><span class="header-section-number">11.1</span> subsection(s)</h2>
+<p>Nrf1 DESeq analysis required manual curation of the genes in order to get accurate normalization, since the MA plot was showing a strange bias towards “increased” binding.
+Looking at the first few MA plots I made, with and without various quantile cutoffs, we got rid of all the peaks with log10baseMean &lt; 2.0 (or baseMean &lt; 100) to get rid of the low-intensity peaks.</p>
+<div id="re-normalization-and-nrf1-binding-in-up-genes-with-nrf1-znf143-overlap" class="section level2" number="11.1">
+<h2><span class="header-section-number">11.1</span> Re-normalization and Nrf1 binding in Up Genes with Nrf1-ZNF143 overlap</h2>
+<pre class="r"><code>nrf1Res = results(nrf1.dds) 
+nrf1Res$peakCoords = rownames(nrf1Res)
+nrf1Res = as.data.frame(nrf1Res)
+nrf1all = merge(nrf1Res,normCountsNrf1sorted,by=&quot;peakCoords&quot;, all.x=TRUE)
+
+nrf1BMover100 = nrf1all[nrf1all$log10baseMean &gt; 2.0,] # 3688 peaks
+nrf1BMover100counts = nrf1.counts.df[rownames(nrf1.counts.df) %in% nrf1BMover100$peakCoords,]
+
+sample.conditions = factor(sapply(strsplit(colnames(nrf1BMover100counts), &#39;-rep&#39;), &#39;[&#39;, 1))
+sample.conditions = factor(gsub(&quot;-&quot;,&quot;_&quot;,sample.conditions))
+sample.conditions
+
+deseq.counts.table = DESeqDataSetFromMatrix(countData = nrf1BMover100counts,
+                colData = as.data.frame(sample.conditions),
+                design = ~ sample.conditions)
+nrf1.dds &lt;- DESeq(deseq.counts.table)
+nrf1.dds$sizeFactor
+# antiNrf1-control-rep1.seqOut antiNrf1-control-rep2.seqOut antiNrf1-control-rep3.seqOut antiNrf1-control-rep4.seqOut    antiNrf1-dTAG-rep1.seqOut 
+#                    0.4179072                    0.6248150                    0.6741800                    0.5255689                    1.8506696 
+#    antiNrf1-dTAG-rep2.seqOut    antiNrf1-dTAG-rep3.seqOut    antiNrf1-dTAG-rep4.seqOut 
+#                    2.0278180                    1.6286477                    1.8058610 
+
+nrf1BMover100res = results(nrf1.dds) 
+sum(is.na(nrf1BMover100res$padj)) # 0
+
+nrf1BMover100resCat = deseqQuickCategorize(nrf1BMover100res, padjLimit = 0.1, unchangedLog2FClimit = 0.01)
+# [1] &quot;Number of up: 499&quot;
+# [1] &quot;Number of down: 533&quot;
+# [1] &quot;Number of unchanged: 180&quot;
+
+pdf(&quot;MAplot_deseq_Nrf1chip_BMover100_renormalized_ZNF143dTAG.pdf&quot;, useDingbats = FALSE, width=3.83, height=3.83)
+xyplot(nrf1BMover100resCat$log2FoldChange ~ log(nrf1BMover100resCat$baseMean, base=10),
+    groups=nrf1BMover100resCat$cat,
+    col=c(&quot;grey90&quot;,&quot;grey30&quot;,&quot;#ce228e&quot; ,&quot;#2290cf&quot;),
+    main=&quot;Differential Expression\nrep + sample.condition&quot;, scales=&quot;free&quot;, aspect=1, pch=20, cex=0.5,
+    ylab=expression(&quot;log&quot;[2]~&quot;Nrf1 ChIP-seq fold change&quot;), 
+    xlab=expression(&quot;log&quot;[10]~&quot;Mean of Normalized Counts&quot;),
+    par.settings=list(par.xlab.text=list(cex=1.1,font=2), 
+                        par.ylab.text=list(cex=1.1,font=2)))
+dev.off()
+# this looks good, at any rate. 
+
+# Delete peaks that overlap the 15 Nrf1 motifs.
+# first add a column that categorizes the Nrf1 motifs into &quot;real&quot; or &quot;not real&quot; or something to that effect 
+# I can only do this manually because I was looking at each motif + Nrf1 ChIP track in the genome browser 
+
+nrf1ZmotifSummitdis$biological = c(&quot;No&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;No&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;,&quot;Yes&quot;)
+# all of these are within 400bp of a Nrf1 peak summit, so I&#39;ll use those coordinates to get the 401bp coordinates for these peaks and remove them from the already-trimmed data frame. 
+
+nrf1ZmotifSummitdis$start401 = nrf1ZmotifSummitdis$summitStart - 200
+nrf1ZmotifSummitdis$end401 = nrf1ZmotifSummitdis$summitEnd + 200
+nrf1ZmotifSummitdis$peakCoords = paste0(nrf1ZmotifSummitdis$chr,&quot;:&quot;,nrf1ZmotifSummitdis$start401,&quot;-&quot;,nrf1ZmotifSummitdis$end401)
+
+nrf1BMover100trimmed = nrf1BMover100[!(nrf1BMover100$peakCoords %in% nrf1ZmotifSummitdis$peakCoords), ]
+# uh this didn&#39;t quite work so I&#39;m going to have to use closestBed or something 
+
+# expand the 401 coordinates into separate columns 
+nrf1BMover100bed = cbind(str_split_fixed(nrf1BMover100$peakCoords,&quot;[:-]&quot;, 3))
+nrf1BMover100bed = as.data.frame(nrf1BMover100bed)
+
+nrf1BMover100dis = bedTools.closest.local(bed2 = nrf1ZmotifSummitdis[nrf1ZmotifSummitdis$biological == &quot;Yes&quot;,c(&quot;chrMotif&quot;,&quot;startMotif&quot;,&quot;endMotif&quot;,&quot;MASTscore&quot;)], bed1 = nrf1BMover100bed, opt.string = &#39;-D a&#39;,distanceLabel=&quot;disMotifToPeak&quot;)
+# there are 5 peaks that overlap my real Nrf1 locations
+
+nrf1BMover100dis = nrf1BMover100dis[abs(nrf1BMover100dis$disMotifToPeak) &gt; 0,]
+dim(nrf1BMover100dis) # [1] 3683    8
+
+# add new coordinates centered on the Nrf1 motif that overlaps ZNF143 
+# Q: my motif length is 14, but I can&#39;t designate one as the &quot;true&quot; center. I guess it&#39;s not that big of a deal if it is one base off for the 400bp window. 
+# actually, it doesn&#39;t matter because I&#39;m expanding to 400 anyway, and I know that the &quot;distance to summit&quot; for these motifs is definitely zero. 
+# nah, to keep it consistent with the other peaks i&#39;ll make it the 8th base. 
+
+nrf1ZmotifSummitdis$startMotifCenter = nrf1ZmotifSummitdis$startMotif + 7
+nrf1ZmotifSummitdis$endMotifCenter = nrf1ZmotifSummitdis$endMotif - 6
+nrf1ZmotifSummitdis$new401start = nrf1ZmotifSummitdis$startMotifCenter - 200
+nrf1ZmotifSummitdis$new401end = nrf1ZmotifSummitdis$endMotifCenter + 200
+
+# make new counts table 
+temp1 = nrf1BMover100dis[,c(1:3)]
+colnames(temp1) = c(&quot;chr&quot;,&quot;start&quot;,&quot;end&quot;)
+temp2 = nrf1ZmotifSummitdis[nrf1ZmotifSummitdis$biological == &quot;Yes&quot;,c(&quot;chrMotif&quot;,&quot;new401start&quot;,&quot;new401end&quot;)]
+colnames(temp2) = c(&quot;chr&quot;,&quot;start&quot;,&quot;end&quot;)
+nrf1Curated = rbind(temp1,temp2)
+dim(nrf1Curated)
+# [1] 3698    3
+
+# re-DESeq, MA plot etc. 
+nrf1CuratedCounts = get.counts.interval(nrf1Curated, &#39;/Users/jinhongdong/Desktop/TSSinference/ZNF143dTag_2023/Nrf1_YY1_ChIP&#39;, file.prefix=&quot;antiNrf1*seqOut&quot;)
+
+sample.conditions = factor(sapply(strsplit(colnames(nrf1CuratedCounts), &#39;-rep&#39;), &#39;[&#39;, 1))
+sample.conditions = factor(gsub(&quot;-&quot;,&quot;_&quot;,sample.conditions))
+sample.conditions
+
+deseq.counts.table = DESeqDataSetFromMatrix(countData = nrf1CuratedCounts,
+                colData = as.data.frame(sample.conditions),
+                design = ~ sample.conditions)
+nrf1.dds &lt;- DESeq(deseq.counts.table)
+nrf1.dds$sizeFactor
+# antiNrf1-control-rep1.seqOut antiNrf1-control-rep2.seqOut antiNrf1-control-rep3.seqOut antiNrf1-control-rep4.seqOut    antiNrf1-dTAG-rep1.seqOut 
+#                    0.4180072                    0.6249615                    0.6743097                    0.5255982                    1.8504602 
+#    antiNrf1-dTAG-rep2.seqOut    antiNrf1-dTAG-rep3.seqOut    antiNrf1-dTAG-rep4.seqOut 
+#                    2.0272501                    1.6284825                    1.8052011
+
+curatedRes = results(nrf1.dds)
+curatedResCat = deseqQuickCategorize(curatedRes, padjLimit = 0.1, unchangedLog2FClimit = 0.01)
+[1] &quot;Number of up: 503&quot;
+[1] &quot;Number of down: 538&quot;
+[1] &quot;Number of unchanged: 186&quot;
+
+pdf(&quot;MAplot_deseq_Nrf1chip_BMover100curated_ZNF143dTAG.pdf&quot;, useDingbats = FALSE, width=3.83, height=3.83)
+xyplot(curatedResCat$log2FoldChange ~ log(curatedResCat$baseMean, base=10),
+    groups=curatedResCat$cat,
+    col=c(&quot;grey90&quot;,&quot;grey30&quot;,&quot;#ce228e&quot; ,&quot;#2290cf&quot;),
+    main=&quot;Differential Expression\nrep + sample.condition&quot;, scales=&quot;free&quot;, aspect=1, pch=20, cex=0.5,
+    ylab=expression(&quot;log&quot;[2]~&quot;Nrf1 ChIP-seq fold change&quot;), 
+    xlab=expression(&quot;log&quot;[10]~&quot;Mean of Normalized Counts&quot;),
+    par.settings=list(par.xlab.text=list(cex=1.1,font=2), 
+                        par.ylab.text=list(cex=1.1,font=2)))
+dev.off()
+
+# hmm the added peaks are much lower intensity than the others and also mostly seem to be decreasing??? 
+
+temp2$peakCoords = paste0(temp2$chr,&quot;:&quot;, temp2$start,&quot;-&quot;, temp2$end)
+nrf1_15curatedRes = curatedResCat[rownames(curatedResCat) %in% temp2$peakCoords,]
+nrf1_15curatedRes = as.data.frame(nrf1_15curatedRes)
+nrf1_15curatedRes$padjBH = p.adjust(nrf1_15curatedRes$pval, method=&quot;BH&quot;)
+# well, at least the two statistically significant &quot;Up&quot; ones were also among the &quot;definitely real&quot; Nrf1-ZNF143 regions. 
+
+# plot the BW plots 
+curatedNormCounts = counts(nrf1.dds, normalized=TRUE)
+nrf1_15normCounts = curatedNormCounts[rownames(curatedNormCounts) %in% nrf1_15curatedRes$nrf1peakCoords,]
+nrf1_15normCounts = as.data.frame(nrf1_15normCounts)
+
+# manually add the gene names 
+nrf1_15normCounts$gene = c(&quot;DPM3&quot;,&quot;LAMTOR2&quot;,&quot;SWT1&quot;,&quot;PYCR2&quot;,&quot;TMED2&quot;,&quot;AHSA1&quot;,&quot;DNAAF8&quot;,&quot;ZNF688&quot;,&quot;LRRC45&quot;,&quot;TMEM147&quot;,&quot;ZNF324B&quot;,&quot;UTP3&quot;,&quot;TRMT10A&quot;,&quot;C4orf46&quot;,&quot;ZKSCAN5&quot;)
+
+nrf1pivot0min = nrf1_15normCounts[,c(&quot;gene&quot;,&quot;antiNrf1-control-rep1.seqOut&quot;,&quot;antiNrf1-control-rep2.seqOut&quot;,&quot;antiNrf1-control-rep3.seqOut&quot;,&quot;antiNrf1-control-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!gene,names_to=&quot;Sample&quot;,values_to = &quot;Nrf1peakIntens&quot;)
+nrf1pivot0min$treatment = &quot;0 min&quot;
+
+nrf1pivot30min = nrf1_15normCounts[,c(&quot;gene&quot;,&quot;antiNrf1-dTAG-rep1.seqOut&quot;,&quot;antiNrf1-dTAG-rep2.seqOut&quot;,&quot;antiNrf1-dTAG-rep3.seqOut&quot;,&quot;antiNrf1-dTAG-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!gene,names_to=&quot;Sample&quot;,values_to = &quot;Nrf1peakIntens&quot;)
+nrf1pivot30min$treatment = &quot;30 min&quot;
+
+nrf1PlotThis = rbind(nrf1pivot0min,nrf1pivot30min)
+
+# Ok cool, but can I rearrange the genes so they&#39;re in order from increased to decreasing? 
+# these are the same row order, I checked 
+identical(rownames(nrf1_15curatedRes),rownames(nrf1_15normCounts))
+# [1] TRUE
+nrf1_15curatedInfo = cbind(nrf1_15curatedRes,nrf1_15normCounts)
+# nrf1_15curatedInfo$index = seq(1,15) # didn&#39;t need this
+
+# sort into alphabetical order bc that&#39;s how lattice plots groups by default
+nrf1_15curatedInfoAlpha = nrf1_15curatedInfo[order(nrf1_15curatedInfo$gene),]
+nrf1_15curatedInfoAlpha$AlphaIdx = seq(1,15)
+# sort into numerical order bc that&#39;s what I want 
+nrf1_15curatedInfoSort = nrf1_15curatedInfoAlpha[order(nrf1_15curatedInfoAlpha$log2FoldChange, decreasing=TRUE),]
+# nrf1_15curatedInfoSort$NumIdx = seq(1,15) # don&#39;t need to reassign indices 
+# nrf1_15curatedInfoForPlot = nrf1_15curatedInfoSort[order(nrf1_15curatedInfoSort$AlphaIdx),]
+
+# final plotting order: nrf1_15curatedInfoSort$AlphaIdx
+
+library(&quot;grid&quot;) # need for panel.violin.hack 
+
+pdf(file = &quot;violin_upPromo_Nrf1ZNF143motifOverlap_curatedPeaksNormalization.pdf&quot; ,width=8,height=4)
+trellis.par.set(box.umbrella = list(lty = 1, col=&quot;black&quot;, lwd=1),
+                box.rectangle = list(col = &#39;black&#39;, lwd=1),
+                strip.background = list(col = &quot;transparent&quot;), # strip = group labels
+                strip.border = list(col = &quot;transparent&quot;))
+print(
+    bwplot(Nrf1peakIntens ~ treatment|gene,
+        data=nrf1PlotThis,
+        xlab=&#39;dTAG treatment&#39;,
+        ylab=&#39;Nrf1 ChIP Intensity&#39;,
+        aspect = 3.0,
+        horizontal=FALSE,
+        between=list(y=0.4, x=-0.2),
+        strip=strip.custom(par.strip.text = list(cex=0.5,lineheight=0.8,strip.padding=0.4)), # adjust look of group labels
+        index.cond=list(nrf1_15curatedInfoSort$AlphaIdx),
+        # layout=c(5,1),
+        scales=list(x=list(alternating=c(1,1,1,1,1),rot=30, font = 1, cex=0.6),
+                    y=list(alternating=c(1,1),relation=&quot;free&quot;,cex=0.5,rot=0),axs=&quot;i&quot;,tck=0.3),
+        lattice.options = list(default.args = list(as.table = TRUE),skip.boundary.labels = 0),
+        panel = function(..., box.ratio) {
+            panel.violin.hack(..., col = c(&quot;grey95&quot;,&quot;#ce228e&quot;),
+                             varwidth = FALSE, box.ratio = 2)
+            #panel.abline(h=1, lty =2)
+            panel.bwplot(..., col=&#39;red&#39;, cex=0.8, pch=&#39;|&#39;, fill=&#39;transparent&#39;, box.ratio = .2, do.out = FALSE)
+            panel.stripplot(..., col=&#39;#b3b3b3CC&#39;, do.out=FALSE, jitter.data=TRUE, amount = 0.2, pch = 16, cex = 0.5)
+        },
+        prepanel = function(x,y,...) { 
+            # set dynamic y-axis limits for each group
+            list(ylim=c(0,max(y)*1.2))
+        },
+        par.settings = list(box.rectangle=list(col=&#39;black&#39;),
+                            plot.symbol = list(pch=&#39;.&#39;, cex = 0.1),
+                            axis.components=list(left=list(pad1=0.3))),
+    )
+)
+dev.off()</code></pre>
 </div>
-<div id="differential-binding-analysis-1" class="section level2" number="11.2">
-<h2><span class="header-section-number">11.2</span> Differential binding analysis</h2>
+<div id="nrf1-in-increased-bidirectional-regions-with-nrf1-znf143-overlap" class="section level2" number="11.2">
+<h2><span class="header-section-number">11.2</span> Nrf1 in increased bidirectional regions with Nrf1-ZNF143 overlap</h2>
+<pre class="r"><code># see if Nrf1 (MAST JASPAR in increased bidirectional regions w/ZNF143) 
+nrf1curatedResCatBed = cbind(str_split_fixed(curatedResCat$nrf1peakCoords,&quot;[:-]&quot;, 3),curatedResCat)
+colnames(nrf1curatedResCatBed) = c(&quot;chr&quot;,&quot;startPeak&quot;,&quot;endPeak&quot;,&quot;baseMean&quot;,&quot;log2FoldChange&quot;,&quot;lfcSE&quot;,&quot;stat&quot;,&quot;pvalue&quot;,&quot;padj&quot;,&quot;nrf1peakCoords&quot;,&quot;cat&quot;)
+
+
+# nrf1BIDIRoverlap does not care about the 15 real Nrf1 sites so can use as-is!
+# Coincidentally, there are also only 17 bidirectional regions of interest. 
+# I am going to be rewriting over old variables bc I don&#39;t need the old numbers 
+
+nrf1bidirChIP = bedTools.closest.local(bed1 = nrf1BIDIRoverlap, bed2 = nrf1curatedResCatBed, opt.string = &#39;-D a&#39;,distanceLabel=&quot;disNrf1BidirChIPpeak&quot;)
+length(which(nrf1bidirChIP$disNrf1BidirChIPpeak == 0)) # 6 bidirectional regions
+
+# merge Nrf1 normalized peak counts table with nrf1bidirChIP 
+curatedNormCounts = as.data.frame(curatedNormCounts)
+curatedNormCounts$peakCoords = rownames(curatedNormCounts)
+nrf1Temp = merge(nrf1bidirChIP[which(nrf1bidirChIP$disNrf1BidirChIPpeak == 0),],curatedNormCounts,by.x=&quot;nrf1peakCoords&quot;,by.y=&quot;peakCoords&quot;, all.x=TRUE, all.y=FALSE)
+# only 2 bidirectionals have increased Nrf1, and only 1 of them is statistically significant 
+
+nrf1Temp$Zmid = paste0(nrf1Temp$chrZ143,&quot;:&quot;,&quot;\n&quot;,nrf1Temp$startZ143+14)
+nrf1bidirChIPinfo = nrf1Temp
+save(nrf1bidirChIPinfo,file=&quot;nrf1bidirChIPinfo.Rdata&quot;)
+
+nrf1pivot0min = nrf1bidirChIPinfo[,c(&quot;Zmid&quot;,&quot;antiNrf1-control-rep1.seqOut&quot;,&quot;antiNrf1-control-rep2.seqOut&quot;,&quot;antiNrf1-control-rep3.seqOut&quot;,&quot;antiNrf1-control-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!Zmid,names_to=&quot;Sample&quot;,values_to = &quot;Nrf1peakIntens&quot;)
+nrf1pivot0min$treatment = &quot;0 min&quot;
+
+nrf1pivot30min = nrf1bidirChIPinfo[,c(&quot;Zmid&quot;,&quot;antiNrf1-dTAG-rep1.seqOut&quot;,&quot;antiNrf1-dTAG-rep2.seqOut&quot;,&quot;antiNrf1-dTAG-rep3.seqOut&quot;,&quot;antiNrf1-dTAG-rep4.seqOut&quot;)] %&gt;% pivot_longer(cols=!Zmid,names_to=&quot;Sample&quot;,values_to = &quot;Nrf1peakIntens&quot;)
+nrf1pivot30min$treatment = &quot;30 min&quot;
+
+nrf1PlotThisBidirs = rbind(nrf1pivot0min,nrf1pivot30min)
+save(nrf1PlotThisBidirs,file=&quot;nrf1PlotThisBidirs.Rdata&quot;)
+
+# put in order of decreasing log2FC 
+nrf1bidirChIPinfoAlpha = nrf1bidirChIPinfo[order(nrf1bidirChIPinfo$Zmid),]
+nrf1bidirChIPinfoAlpha$AlphaIdx = seq(1,6)
+nrf1bidirChIPinfoSort = nrf1bidirChIPinfoAlpha[order(nrf1bidirChIPinfoAlpha$log2FoldChange, decreasing = TRUE),]
+
+pdf(file = &quot;violin_bidir_Nrf1ZNF143motifOverlap_Nrf1chipIntens_renormalized.pdf&quot; ,width=6,height=4)
+trellis.par.set(box.umbrella = list(lty = 1, col=&quot;black&quot;, lwd=1),
+                box.rectangle = list(col = &#39;black&#39;, lwd=1),
+                strip.background = list(col = &quot;transparent&quot;), # strip = group labels
+                strip.border = list(col = &quot;transparent&quot;))
+print(
+    bwplot(Nrf1peakIntens ~ treatment|Zmid,
+        data=nrf1PlotThisBidirs,
+        xlab=&#39;ZNF143 dTAG treatment&#39;,
+        ylab=&#39;Nrf1 ChIP Intensity&#39;,
+        aspect = 3.0,
+        horizontal=FALSE,
+        between=list(y=0.4, x=-0.2),
+        strip=strip.custom(par.strip.text = list(cex=0.6,lineheight=0.8,strip.padding=0.5)),
+        index.cond=list(nrf1bidirChIPinfoSort$AlphaIdx),
+        # layout=c(5,1),
+        scales=list(x=list(alternating=c(1,1,1,1,1),rot=30, font = 1, cex=0.6),
+                    y=list(alternating=c(1,1),relation=&quot;free&quot;,cex=0.5,rot=0),axs=&quot;i&quot;,tck=0.3),
+        lattice.options = list(default.args = list(as.table = TRUE),skip.boundary.labels = 0),
+        panel = function(..., box.ratio) {
+            panel.violin.hack(..., col = c(&quot;grey95&quot;,&quot;#ce228e&quot;),
+                              varwidth = FALSE, box.ratio = 2)
+            #panel.abline(h=1, lty =2)
+            panel.bwplot(..., col=&#39;red&#39;, cex=0.8, pch=&#39;|&#39;, fill=&#39;transparent&#39;, box.ratio = .2, do.out = FALSE)
+            panel.stripplot(..., col=&#39;#b3b3b3CC&#39;, do.out=FALSE, jitter.data=TRUE, amount = 0.2, pch = 16, cex = 0.5)
+        },
+        prepanel = function(x,y,...) { 
+            # set dynamic y-axis limits for each group
+            list(ylim=c(0,max(y)*1.2))
+        },
+        par.settings = list(box.rectangle=list(col=&#39;black&#39;),
+                            plot.symbol = list(pch=&#39;.&#39;, cex = 0.1),
+                            axis.components=list(left=list(pad1=0.3))),
+    )
+)
+dev.off()</code></pre>
 </div>
 </div>
 
