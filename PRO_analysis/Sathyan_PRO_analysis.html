@@ -12,7 +12,7 @@
 <meta name="author" content="Jinhong Dong" />
 <meta name="author" content="Michael J. Guertin" />
 
-<meta name="date" content="2024-11-08" />
+<meta name="date" content="2024-11-11" />
 
 <title>PRO-seq analysis</title>
 
@@ -704,7 +704,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">PRO-seq analysis</h1>
 <p class="author-name">Jinhong Dong and Michael J. Guertin</p>
-<h4 class="date">2024-11-08</h4>
+<h4 class="date">2024-11-11</h4>
 
 </div>
 
@@ -871,9 +871,7 @@ rsync -aP rsync://hgdownload.soe.ucsc.edu/genome/admin/exe/linux.x86_64/twoBitIn
 #SBATCH -e /home/FCAM/jdong/slurm_out/%u_%x_%j.all_out
 
 export TMPDIR=/scratch/jdong/
-cd /scratch/jdong/ZNF143dTAG/
-mkdir human38
-cd human38
+cd /home/FCAM/jdong/human38/
 echo &quot;Current wd:&quot; $(pwd)
 echo &quot;Current node:&quot; $(hostname)
 
@@ -910,9 +908,7 @@ echo &quot;Time script complete:&quot; $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39;
 #SBATCH -e /home/FCAM/jdong/slurm_out/%u_%x_%j.all_out
 
 export TMPDIR=/scratch/jdong/
-cd /scratch/jdong/ZNF143dTAG/
-mkdir hum_rDNA
-cd hum_rDNA
+cd /home/FCAM/jdong/hum_rDNA
 echo &quot;Current wd:&quot; $(pwd)
 echo &quot;Current node:&quot; $(hostname)
 
@@ -929,10 +925,13 @@ echo &quot;Time script complete:&quot; $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39;
 <p>Use seqOutBias (<a href="https://github.com/guertinlab/seqOutBias" class="uri">https://github.com/guertinlab/seqOutBias</a>) to compute mappability for the given read length and the k-mer that corresponds to each possible read alignment position.
 This is the most time-consuming step of the seqOutBias command but only needs to be completed once before processing the sequencing data. The files can be reused for future samples if the read size is the same.</p>
 <p>Install from source following the instructions in the seqOutBias manual; if you have issues: <a href="mailto:guertin@uchc.edu" class="email">guertin@uchc.edu</a></p>
+<p>The following code chunk will generate the following output files for our particular read size:</p>
+<ul>
+<li>tallymer=hg38.tal_${read_size}.gtTxt.gz</li>
+<li>table=hg38_${read_size}.4.2.2.tbl</li>
+</ul>
 <pre class="bash"><code>mkdir /scratch/jdong/ZNF143dTAG/sOBfiles/
 cd /scratch/jdong/ZNF143dTAG/sOBfiles/
-mkdir readSize47
-cd readSize47
 
 # Run seqOutBias in the background with the following script:
 
@@ -951,7 +950,7 @@ cd readSize47
 #SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
 
 export TMPDIR=/scratch/jdong/
-cd /scratch/jdong/ZNF143dTAG/sOBfiles/readSize47
+cd /scratch/jdong/ZNF143dTAG/sOBfiles/
 echo &quot;Current wd:&quot; $(pwd)
 echo &quot;Current node:&quot; $(hostname)
 
@@ -967,14 +966,14 @@ echo &quot;Time start seqOutBias:&quot; $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39
 seqOutBias seqtable $genome --read-size=47
 
 echo &quot;Time script finished:&quot; $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39;)</code></pre>
-<p>Load modules, pre-run seqOutBias, and parse the hg38 annotation file:</p>
+<p>Load modules and parse the hg38 annotation file:</p>
 <pre class="bash"><code>module load bowtie2/2.5.0
 module load genometools/1.5.10
 module load bedtools/2.29.0
 module load ucsc_genome/2012.05.22
 module load rust 
 
-# Download executables and scripts 
+# Download executables and scripts into a directory in your $PATH variable
 cd /scratch/jdong/ZNF143dTAG/software
 
 wget https://raw.githubusercontent.com/guertinlab/fqComplexity/main/fqComplexity
@@ -988,6 +987,8 @@ wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/diffe
 wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/PRO_normalization_sizefactor 
 wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/normalization_factor.R
 wget https://raw.githubusercontent.com/guertinlab/Nascent_RNA_Methods/main/normalize_bedGraph_v2.py
+
+wget https://raw.githubusercontent.com/guertinlab/TSSinference/refs/heads/master/TSSinference.R 
 
 chmod +x insert_size.R
 chmod +x fqComplexity
@@ -1006,6 +1007,9 @@ gunzip v1.0.0.tar.gz
 tar -xvf v1.0.0.tar
 cd fqdedup-1.0.0/ 
 cargo build --release
+
+mkdir /scratch/jdong/ZNF143dTAG/PRO/gene_annotations
+cd /scratch/jdong/ZNF143dTAG/PRO/gene_annotations
 
 # Get and parse gene annotation file
 release=109
@@ -1070,11 +1074,11 @@ subtractBed -s -a Homo_sapiens.GRCh38.${release}.bed -b Homo_sapiens.GRCh38.${re
 <div id="confirming-umi-length" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Confirming UMI length</h2>
 <p>This is important for removing adapter steps later. Even if you know this number from your experimental protocol it doesn’t hurt to confirm it in your data. Before doing any tests, subset some reads from any one of your FASTQs so these tests don’t take forever to run. Make sure you are subsetting from a PE1 file!</p>
-<pre class="bash"><code># get 4 million reads
-zcat HEK_CloneZD29_30min_control_rep4_PE1_final.fastq.gz | head -n 40000000 &gt; Z143_UMI_test.fastq
+<pre class="bash"><code>cd /scratch/jdong/ZNF143dTAG/PRO/FASTQ
 
-# do this in an interactive node
-srun --partition=general --qos=general --mem=36G -N 1 -n 1 -c 12 --pty bash</code></pre>
+# get 4 million reads
+cat HEK_CloneZD29_30min_control_rep4_PE1.fastq | head -n 16000000 &gt; Z143_UMI_test.fastq
+</code></pre>
 <p><strong>Interpreting cutadapt output</strong></p>
 <pre class="bash"><code>module load cutadapt
 
@@ -1083,20 +1087,20 @@ srun --partition=general --qos=general --mem=36G -N 1 -n 1 -c 12 --pty bash</cod
 # -O : [capital letter o] minimum overlap length between adapter and read
 # -a : adapter sequence ligated to 3&#39; end, or of the first read in paired data
 # -o : [lowercase o] name of output file, which is a FASTQ with trimmed reads
-cutadapt --cores=12 -m 1 -O 1 -a TGGAATTCTCGGGTGCCAAGG Z143_UMI_test.fastq \
+cutadapt --cores=1 -m 1 -O 1 -a TGGAATTCTCGGGTGCCAAGG Z143_UMI_test.fastq \
   -o Z143_UMI_test_noadapt.fastq &gt; Z143_UMI_test_cutadapt.txt
 
 tail Z143_UMI_test_cutadapt.txt
-# 38  32011 0.0 2 28256 3368 387
-# 39  1976282 0.0 2 1842220 117943 16119
-# 40  81301 0.0 2 67815 12434 1052
-# 41  56103 0.0 2 50968 3886 1249
-# 42  45902 0.0 2 42491 2676 735
-# 43  41906 0.0 2 38847 2339 720
-# 44  38556 0.0 2 35661 2301 594
-# 45  37035 0.0 2 34420 2048 567
-# 46  43034 0.0 2 40439 2117 478
-# 47  45296 0.0 2 41996 2565 735</code></pre>
+# 38    12929   0.0 2   11405 1378 146
+# 39    790549  0.0 2   734089 49734 6726
+# 40    32720   0.0 2   27144 5117 459
+# 41    22664   0.0 2   20571 1569 524
+# 42    18347   0.0 2   16929 1113 305
+# 43    17051   0.0 2   15752 1023 276
+# 44    15301   0.0 2   14121 948 232
+# 45    14804   0.0 2   13762 796 246
+# 46    17343   0.0 2   16280 866 197
+# 47    18093   0.0 2   16797 1005 291</code></pre>
 <p>Counting how many sequences follow the spike in counts (at length 39, last column): UMI length = 8.</p>
 <p><strong>Trim and Align</strong></p>
 <p>Another method to confirm UMI length is to trim the PE1 reads from the 5’ end, one base at a time, and see when a spike in alignment rate to the human genome takes place.</p>
@@ -1136,17 +1140,16 @@ head -2 Z143_UMI_test_clipped_trim2.fastq
 #SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
 
 module load bowtie2
-genome_index=/home/FCAM/jdong/human38/hg38
-directory=/labs/Guertin/ZNF143_PRO
-cd $directory
+genome_index=/scratch/jdong/ZNF143dTAG/human38/hg38
+cd /scratch/jdong/ZNF143dTAG/PRO/FASTQ
 
 # simple alignment with bowtie2
 for x in Z143_UMI_test_clipped*.fastq
-    do
-    name=$(echo $x | awk -F &quot;.fastq&quot; &#39;{print $1}&#39;)
-    echo &quot;Now aligning $name&quot;
-    bowtie2 -p 24 -t -x ${genome_index} -U ${x} -S ${name}.sam
-    done 2&gt; Z143_UMI_test_clipped_stderr.txt</code></pre>
+do
+  name=$(echo $x | awk -F &quot;.fastq&quot; &#39;{print $1}&#39;)
+  echo &quot;Now aligning $name&quot;
+  bowtie2 -p 24 -t -x ${genome_index} -U ${x} -S ${name}.sam
+done 2&gt; Z143_UMI_test_clipped_stderr.txt</code></pre>
 <p>Interpreting results:</p>
 <pre class="bash"><code>grep -i &quot;alignment rate&quot; Z143_UMI_test_clipped_stderr.txt 
 65.72% overall alignment rate # 0 bases trimmed
@@ -1167,7 +1170,7 @@ for x in Z143_UMI_test_clipped*.fastq
 <p>The following code chunk was run as “pro_processing.sh” and generally follows the PEPPRO method (<a href="https://doi.org/10.1186/s13059-021-02349-4" class="uri">https://doi.org/10.1186/s13059-021-02349-4</a>) for PRO-seq processing and quality control assessment.</p>
 <pre class="bash"><code>#! /usr/bin/bash
 
-#SBATCH --job-name=pro_processing_XXXXXXX.sh
+#SBATCH --job-name=pro_processing_XXXXXXX
 #SBATCH -N 1                  
 #SBATCH -n 1                 
 #SBATCH -c 24                  
@@ -1179,17 +1182,17 @@ for x in Z143_UMI_test_clipped*.fastq
 #SBATCH -o /home/FCAM/jdong/slurm_out/%x_%j.all_out
 #SBATCH -e /home/FCAM/jdong/slurm_out/%x_%j.all_out
 
-cd /labs/Guertin/ZNF143_PRO
-
+export TMPDIR=/scratch/jdong/
+cd /scratch/jdong/ZNF143dTAG/PRO/FASTQ
 echo &quot;Current wd:&quot; $(pwd)
-echo &quot;Current node:&quot; $(hostname)
+echo &quot;Current node:&quot; $(hostname) $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39;)
 
 name=XXXXXXX
-
+SOFTdir=/scratch/jdong/ZNF143dTAG/software
 module load cutadapt/3.5
 module load seqtk/1.3
 seqOutBias=/home/FCAM/jdong/software/seqOutBias #version 1.4.0
-fqdedup=/home/FCAM/jdong/software/fqdedup
+fqdedup=/scratch/jdong/ZNF143dTAG/software/fqdedup
 flash=/home/FCAM/jdong/software/flash
 module load fastq-pair/1.0
 module load samtools/1.16.1
@@ -1199,19 +1202,16 @@ module load rust
 module load bowtie2
 module load bedtools
 
-sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
-annotation_prefix=/home/FCAM/jdong/ZNF143_PRO_2023/Homo_sapiens.GRCh38.109 
+sizes=/scratch/jdong/ZNF143dTAG/human38/hg38.chrom.sizes
+annotation_prefix=/scratch/jdong/ZNF143dTAG/PRO/gene_annotations/Homo_sapiens.GRCh38.109 
 UMI_length=8
 read_size=47
 cores=24
-genome=/home/FCAM/jdong/human38/hg38.fa
-genome_index=/home/FCAM/jdong/human38/hg38
-prealign_rdna_index=/home/FCAM/jdong/hum_rDNA
-tallymer=/home/FCAM/jdong/ZNF143_PRO_2023/hg38.tal_${read_size}.gtTxt.gz
-table=/home/FCAM/jdong/ZNF143_PRO_2023/hg38_${read_size}.4.2.2.tbl
-
-gunzip ${name}_PE1_final.fastq.gz
-gunzip ${name}_PE2_final.fastq.gz
+genome=/scratch/jdong/ZNF143dTAG/human38/hg38.fa
+genome_index=/scratch/jdong/ZNF143dTAG/human38/hg38
+prealign_rdna_index=/scratch/jdong/ZNF143dTAG/hum_rDNA
+tallymer=/scratch/jdong/ZNF143dTAG/sOBfiles/hg38.tal_${read_size}.gtTxt.gz
+table=/scratch/jdong/ZNF143dTAG/sOBfiles/hg38_${read_size}.4.2.2.tbl
 
 echo &#39;removing dual adapter ligations and calculating the fraction of adapter/adapters in&#39; $name
 cutadapt --cores=$cores -m $((UMI_length+2)) -O 1 -a TGGAATTCTCGGGTGCCAAGG ${name}_PE1_final.fastq \
@@ -1318,7 +1318,29 @@ mapBed -null &quot;0&quot; -s -a $annotation_prefix.no.first.exons.named.bed \
 
 exon_intron_ratio.R ${name}_exon_counts.bed ${name}_intron_counts.bed
 
-echo &#39;removing intermediate files&#39;
+echo &#39;script complete&#39; $(date &#39;+%a %Y-%m-%d %H:%M:%S %Z&#39;)</code></pre>
+<div id="run-the-previous-chunk-in-parallel-fig-s1" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Run the previous chunk in parallel (Fig S1)</h2>
+<pre class="bash"><code>
+file=/scratch/jdong/ZNF143dTAG/pro_processing.sh
+
+for i in *_PE1.fastq
+do
+    nm=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_PE1.fastq&quot; &#39;{print $1}&#39;)
+    echo $nm
+    sed -e &quot;s/XXXXXXX/${nm}/g&quot; &quot;$file&quot; &gt; pro_processing_${nm}.sh
+    sleep 1
+done
+
+# check if scripts were populated correctly, then run
+for i in pro_processing_*rep*.sh
+do
+    echo $i
+    sbatch $i
+done
+</code></pre>
+<p>After checking if outputs were produced correctly, remove intermediate files:</p>
+<pre class="bash"><code>echo &#39;removing intermediate files&#39;
 rm ${name}_PE1_short.fastq
 rm ${name}_PE2_short.fastq
 rm ${name}_PE1_noadap.fastq
@@ -1337,23 +1359,7 @@ rm ${name}_PE2_processed.fastq.paired.fq
 rm ${name}_PE2_processed.fastq.single.fq
 rm ${name}.extendedFrags.fastq.gz
 rm ${name}.notCombined_1.fastq.gz
-rm ${name}.notCombined_2.fastq.gz
-
-echo &#39;script complete&#39;</code></pre>
-<div id="run-the-previous-chunk-in-parallel-fig-s1" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Run the previous chunk in parallel (Fig S1)</h2>
-<pre class="bash"><code>
-file=pro_processing.sh
-
-for i in *_PE1_final.fastq.gz
-do
-    nm=$(echo $i | awk -F&quot;/&quot; &#39;{print $NF}&#39; | awk -F&quot;_PE1_final.fastq.gz&quot; &#39;{print $1}&#39;)
-    echo $nm
-    sed -e &quot;s/XXXXXXX/${nm}/g&quot; &quot;$file&quot; &gt; pro_processing_${nm}.sh
-    sbatch pro_processing_${nm}.sh
-    sleep 1
-done
-</code></pre>
+rm ${name}.notCombined_2.fastq.gz</code></pre>
 <p>Re-zip raw sequencing files:</p>
 <pre class="bash"><code># check wildcards first
 gzip *_PE1_final.fastq
