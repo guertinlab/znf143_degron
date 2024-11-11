@@ -674,7 +674,7 @@ The normalized bigWigs are available in our trackhub which is available by linki
 
 # Calculating peak intensities 
 
-After peak calling, we use DESeq2 to calculate normalized peak intensities. For ZNF143-ChIP, we use the manually calculated size factors based on read depth of the control samples, since the +dTAGV-1 ChIP samples have so little signal. For the other ChIPs, we use DESeq2-generated size factors. 
+After peak calling, we use DESeq2 to calculate normalized peak intensities. For ZNF143-ChIP (see "ZNF143 ChIP peak intensities" below), we use the manually calculated size factors based on read depth of the control samples, since the +dTAGV-1 ChIP samples have so little signal. For the other ChIPs, we use DESeq2-generated size factors. 
 
 ```{r engine='R', eval=F, echo=TRUE}
 library(bigWig)
@@ -811,20 +811,36 @@ bedTools.closest <- function(functionstring="/usr/local/bin/bedtools2-2.31.0/bin
   return(res)
 }
 
+# SP1 
+sp1.counts.df = get.counts.interval(y, '/scratch/jdong/ZNF143dTAG/ChIP/FASTQ', file.prefix="*SP1*seqOut")
+sp1.analysis.regions=sp1.counts.df[,grepl("SP1",colnames(sp1.counts.df))]
+sample.conditions = factor(sapply(strsplit(colnames(sp1.analysis.regions), '_rep'), '[', 1))
 
-# ZNF143
+deseq.counts.table = DESeqDataSetFromMatrix(countData = sp1.analysis.regions,
+                colData = as.data.frame(sample.conditions),
+                design = ~ sample.conditions)
+sp1.dds <- DESeq(deseq.counts.table)
+sp1Res = results(sp1.dds) 
+sp1Res = sp1Res[!(is.na(sp1Res$padj)),]
 
+normCountsSP1 = counts(sp1.dds, normalized=TRUE)
+peak.intensities = rowMeans(normCountsSP1[,1:4]) # get peak intensities from control peaks 
+names(peak.intensities) = rownames(normCountsSP1)
+peak.intensNoZero = peak.intensities[which(peak.intensities != 0)]
 
+chr = sapply(strsplit(names(peak.intensNoZero), ":"), "[", 1)
+rnge = sapply(strsplit(names(peak.intensNoZero), ":"), "[", 2)
+start = as.numeric(sapply(strsplit(rnge, "-"), "[", 1)) + 200
+end = as.numeric(sapply(strsplit(rnge, "-"), "[", 2)) - 200
 
-# SP1
-
+normCountsSP1df = as.data.frame(cbind(chr,start,end,peak.intensNoZero))
+write.table(normCountsSP1df, file = 'sp1_normCounts_summits.bed', sep = '\t', quote=FALSE, col.names=FALSE, row.names=FALSE)
 
 
 # Nrf1
 nrf1peaks401 = read.table('antiNrf1_ChIP_peaks_401bp.bed', sep = "\t", header=FALSE)
 nrf1.counts.df = get.counts.interval(nrf1peaks401, '/scratch/jdong/ZNF143dTAG/ChIP/FASTQ', file.prefix="*Nrf1*seqOut")
-sample.conditions = factor(sapply(strsplit(colnames(nrf1.counts.df), '-rep'), '[', 1))
-sample.conditions = factor(gsub("-","_",sample.conditions))
+sample.conditions = factor(sapply(strsplit(colnames(nrf1.counts.df), '_rep'), '[', 1))
 deseq.counts.table = DESeqDataSetFromMatrix(countData = nrf1.counts.df,
                 colData = as.data.frame(sample.conditions),
                 design = ~ sample.conditions)
@@ -832,7 +848,6 @@ nrf1.dds <- DESeq(deseq.counts.table)
 normCountsNrf1 = counts(nrf1.dds, normalized=TRUE)
 nrf1Peaks = tighten_summit_window(normCountsNrf1)
 normCountsNrf1 = cbind(nrf1Peaks,normCountsNrf1)
-
 
 nrf1peakIntensSort = sort(nrf1peakIntens, decreasing=TRUE)
 
@@ -858,7 +873,7 @@ We do de novo motif analysis after peak calling to verify if our target antibodi
 # search for motif in 100bp window (101 total)
 sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
 
-cat antiSP1_ChIP_summits.bed | sort -rn -k5 | head -1000 > antiSP1_top1kPeaks.bed
+cat sp1_normCounts_summits.bed | sort -rn -k4 | head -1000 > antiSP1_top1kPeaks.bed
 slopBed -b 50 -i antiSP1_top1kPeaks.bed -g $sizes  | sort -k1,1 -k2,2n > antiSP1_top1kPeaks_101window.bed
 genome=/home/FCAM/jdong/human38/hg38.fa
 fastaFromBed -fi $genome -bed antiSP1_top1kPeaks_101window.bed -fo antiSP1_top1kPeaks_101window.fasta
@@ -889,18 +904,235 @@ knitr::include_graphics("Nrf1logo_rc1.png")
 
 # ZNF143 ChIP-seq analysis 
 
+## ZNF143 ChIP peak intensities
+
+Generate size factors from read depth:
+
+```{r engine='bash', eval=F, echo=TRUE}
+module load samtools
+
+for i in antiZNF143
+do
+    echo $i
+    > ${i}_header.txt
+    > ${i}_reads.txt
+
+    for j in antiZNF143*.sorted.bam
+    do 
+        echo $j
+        name=$(echo $j | awk -F".sorted.bam" '{print $1}')
+        echo $name | paste ${i}_header.txt - > ${i}_tmp.txt 
+        mv ${i}_tmp.txt ${i}_header.txt
+        # count the number of reads that are paired and mapped in proper pair (0x3)
+        reads=`samtools view -c -f 0x3 $j`
+        echo $reads | paste ${i}_reads.txt - > ${i}_tmp.txt
+        mv ${i}_tmp.txt ${i}_reads.txt
+    done
+
+    cat ${i}_header.txt ${i}_reads.txt > ${i}_tmp.txt
+    mv ${i}_tmp.txt ${i}_reads.txt 
+    rm ${i}_header.txt
+done
+
+# output file: antiZNF143_reads.txt
+
+```
+
+Use manual size factors to get normalized counts in peaks:
+
+```{r engine='R', eval=F, echo=TRUE}
+y = read.table('ZNF143_ChIP_peaks_401bp.bed',sep="\t",header=FALSE)
+znf143CountsDF = get.counts.interval(y, "/scratch/jdong/ZNF143dTAG/ChIP/FASTQ', file.prefix="*HA*seqOut",file.prefix="*HA*")
+sample.conditions = factor(sapply(strsplit(colnames(znf143CountsDF), '_rep'), '[', 1))
+deseqCounts = DESeqDataSetFromMatrix(countData = znf143CountsDF,
+                colData = as.data.frame(sample.conditions),
+                design = ~ sample.conditions)
+ZNF.SF <- read.table("antiZNF143_reads.txt", sep = '\t', header = TRUE)[,-1]
+ZNF.size.factors = estimateSizeFactorsForMatrix(ZNF.SF)
+sizeFactors(deseqCounts) <- ZNF.size.factors
+znf143dds2 = DESeq(deseqCounts)
+norm.counts.znf143_2 = counts(znf143dds2, normalized=TRUE)
+# Take final peak intensities from averages of the control ChIP counts
+peak.intensities2 = rowMeans(norm.counts.znf143_2[,1:2]) 
+peak.intens2.NoZero = peak.intensities2[which(peak.intensities2 != 0)]
+```
+
+
 ## Defining a functional threshold for peak intensity
 
-Getting down to 4682: SF_ZNF143summits_overQuant0.7.bed how did I make this file???????? See ZNF143_15_ChIP2_size_factors_20240108.qmd line 388 and above thank you past me for writing this!!!!!!! 
+Make quantile of peaks by normalized control intensity: 
 
-cumulativeQuantileChIP2_SF_abline400_CDF_Repressed.pdf <-- we picked intensity from this plot. 
+```{r engine='R', eval=F, echo=TRUE}
+znf143quants2 = quantile(peak.intens2.NoZero, probs = seq(.05, 1.00, by = .05))
+chr = sapply(strsplit(names(peak.intens2.NoZero), ":"), "[", 1)
+rnge = sapply(strsplit(names(peak.intens2.NoZero), ":"), "[", 2)
+start = as.numeric(sapply(strsplit(rnge, "-"), "[", 1)) + 200
+end = as.numeric(sapply(strsplit(rnge, "-"), "[", 2)) - 200
+
+j=0 
+q=seq(0, 1.00, by = .05)
+count=1
+
+for (i in quantile(peak.intens2.NoZero, probs = seq(.05, 1.00, by = .05))) {
+    prev=as.character(q[count])
+    count = count +1
+
+    write.table(file = paste0('SFquantile',prev,"_to_",as.character(q[count]), '_summits.bed'), data.frame(chr[peak.intens2.NoZero > j & peak.intens2.NoZero <= i], start[peak.intens2.NoZero > j & peak.intens2.NoZero <= i], end[peak.intens2.NoZero > j & peak.intens2.NoZero <= i], peak.intens2.NoZero[peak.intens2.NoZero > j & peak.intens2.NoZero <= i]), sep = '\t', quote=FALSE, col.names=FALSE, row.names=FALSE )
+    j = i
+}
+
+```
+
+Create cumulative quantile files:
+
+```{r engine='bash', eval=F, echo=TRUE}
+cat SFquantile0.95_to_1_summits.bed SFquantile0.9_to_0.95_summits.bed > SFqmerge1.bed
+echo "Manually merged SFquantile0.95_to_1_summits.bed and SFquantile0.9_to_0.95_summits.bed to create SFqmerge1.bed" > merging_scheme_ChIP2_SFadjust.txt
+echo $(wc -l SFqmerge1.bed) >> merging_scheme_ChIP2_SFadjust.txt
+quants=($(seq 0.9 -0.05 0.05))
+for i in {1..18}
+do
+    k=${quants[$((i-1))]} #bash arrays are 0-indexed
+    prev=${quants[$((i))]}
+    # echo $i
+    # echo $k
+    # echo $prev
+    if [[ "$i" == "18" ]]; then 
+        echo "Now merging" SFqmerge${i}.bed "with" SFquantile0_to_${k}_summits.bed "to create" SFqmerge$((i+1)).bed
+        cat SFqmerge${i}.bed SFquantile0_to_${k}_summits.bed > SFqmerge$((i+1)).bed
+        wc -l SFqmerge$((i+1)).bed
+    elif [[ "$i" != "18" ]]; then
+        echo "Now merging" SFqmerge${i}.bed "with" SFquantile${prev}_to_${k}_summits.bed "to create" SFqmerge$((i+1)).bed
+        cat SFqmerge${i}.bed SFquantile${prev}_to_${k}_summits.bed > SFqmerge$((i+1)).bed
+        wc -l SFqmerge$((i+1)).bed
+    fi
+done 2>&1 | tee -a merging_scheme_ChIP2_SFadjust.txt
+```
+
+Plot a cumulative quantile CDF showing ZNF143 peak distance to nearest TSS of a gene that decreased expression after ZNF143 degradtion (down genes). Generally, closer distances to down genes will indicate a higher chance that a particular ZNF143 peak is actually impacting the regulation of that gene's expression. We will pick a quantile threshold from the quantile where the traces start overlapping each other, indicating that most of the peaks are already represented by these quantiles.
+
+```{r engine='R', eval=F, echo=TRUE}
+geneFile = read.table(file="ZNF143dTAG_act_rep_matches.bed",header=FALSE,sep="\t")
+
+cat="Repressed"
+
+cdf.deseq.df <- function(genes = gene.file, chip.peaks = chip.peaks, cat = "Repressed", opt.str="") {
+  bed.tss.activated = get.tss(genes[genes$treatment == cat,])
+  bed.tss.unchanged = get.tss(genes[genes$treatment == paste0("Matched to ", cat),])
+  
+  # note 'functionstring' in bedTools.closest
+  act.distance = bedTools.closest(bed1 = bed.tss.activated, bed2 = chip.peaks, opt.string = '-D a')
+  unreg.distance = bedTools.closest(bed1 = bed.tss.unchanged, bed2 = chip.peaks, opt.string = '-D a')
+
+  df.up.can = cbind(act.distance, paste0(opt.str,cat))
+  df.un.can = cbind(unreg.distance, paste0(opt.str,"Matched to ", cat))
+
+  colnames(df.up.can) = c(colnames(df.up.can)[seq(1,ncol(df.up.can)-1)], 'status')
+  colnames(df.un.can) = c(colnames(df.up.can)[seq(1,ncol(df.un.can)-1)], 'status')
+
+  df.all = rbind(df.up.can, df.un.can)
+  df.all$status = factor(df.all$status, levels = c(paste0(opt.str,cat), paste0(opt.str,"Matched to ", cat)))
+  return(df.all)
+}
+
+dfCDF2 = data.frame(matrix(nrow = 0, ncol = 12))
+for (chip.peak in Sys.glob(file.path("/scratch/jdong/ZNF143dTAG/ChIP/FASTQ/SFqmerge*bed"))) {
+    print(chip.peak)
+    quantile.name = strsplit(strsplit(chip.peak, "/")[[1]][length(strsplit(chip.peak, "/")[[1]])], '.bed')[[1]][1]
+    print(quantile.name)
+    df.all = cdf.deseq.df(genes = gene.file,
+        chip.peaks=read.table(chip.peak, header=FALSE),
+        cat = cat)
+    x = paste(as.character(df.all$status), quantile.name)
+    df.all$status = x
+    dfCDF2 = rbind(dfCDF2, df.all) # check variable names here!
+    }
+
+plot_cdf <- function(df.all, tf="quantile", cat = "Repressed", col.lines = c("#ce228e", "grey60", "#2290cf","grey90"), line.type = c(1), line.width = 1, cex = 1, abline=1) {
+pdf(paste0(tf, "_CDF_", cat, ".pdf"), width=6.2, height=3.83) 
+         print(ecdfplot(~log(abs(dis), base = 10), groups = status, data = df.all,
+         auto.key = list(lines=TRUE, points=FALSE, cex = cex,space="right"),
+         col = col.lines,
+         aspect = 1,
+                                        #xlim = c(0, 50000),
+         scales=list(relation="free",alternating=c(1,1,1,1)),
+         ylab = 'Cumulative Distribution Function',
+         xlab = expression('log'[10]~'ZNF143 initial peak distance to down gene TSS'),
+                                        #index.cond = list(c(2,1)),
+         between=list(y=1.0),
+         type = 'a',
+         xlim = c(0,8),
+         lwd=line.width,
+         lty=line.type,
+         par.settings = list(superpose.line = list(col = col.lines, lwd=3), strip.background=list(col="grey85")),
+         panel = function(...) {
+             panel.abline(v= log(abline, base=10), lty =2) # variable line location
+             panel.ecdfplot(...)
+         }))
+    dev.off()
+}
+
+colnames(dfCDF2) = c("chrTSS","startTSS","endTSS","gene","treatment","strand","chrSumm","startSumm","endSumm","peakIntens","dis","status")
+
+mlvls2 = gsub("qmerge","SFqmerge",mlvls)
+rlvls2 = gsub("qmerge","SFqmerge",rlvls)
+lvlslvls2 = c(mlvls2,rlvls2)
+dfCDF2$status = factor(dfCDF2$status,levels=lvlslvls2)
+
+# Empirically determine where the traces begin to increase at the same rate:
+matched = ecdf(abs(dfCDF2$dis)[dfCDF2$status == 'Matched to Repressed SFqmerge13'])
+repr = ecdf(abs(dfCDF2$dis)[dfCDF2$status == 'Repressed SFqmerge13'])
+match.y = seq(0, 20000, by=20) # like indices
+rep.y = seq(0, 20000, by=20)
+spl = smooth.spline(rep.y, repr(rep.y) - matched(match.y))
+pred = predict(spl)
+pred1 = predict(spl, deriv=1)
+ablineVal = rep.y[min(which(pred1$y<=0)) - 1]
+ablineVal
+# [1] 200
+
+matched = ecdf(abs(dfCDF2$dis)[dfCDF2$status == 'Matched to Repressed SFqmerge5'])
+repr = ecdf(abs(dfCDF2$dis)[dfCDF2$status == 'Repressed SFqmerge5'])
+match.y = seq(0, 20000, by=20) # like indices
+rep.y = seq(0, 20000, by=20)
+spl = smooth.spline(rep.y, repr(rep.y) - matched(match.y))
+pred = predict(spl)
+pred1 = predict(spl, deriv=1)
+ablineVal = rep.y[min(which(pred1$y<=0)) - 1]
+ablineVal
+# [1] 400
+
+colorQ6 = c(colorRampPalette(c("grey10","grey40"))(19),turbo(19))
+
+plot_cdf(dfCDF,tf="cumulativeQuantileChIP2_SF_abline400",cat = "Repressed",col.lines = colorQ6, line.type = c(rep(2, 19), rep(1,19)), line.width = 0.4, cex = 0.35,abline=400)
+# plot file name: cumulativeQuantileChIP2_SF_abline400_CDF_Repressed.pdf
+```
+
+```{r  out.width = "800px", echo=F, fig.align = "center", fig.cap="Cumulative Quantile CDF"}
+library(knitr)
+knitr::include_graphics("cumulativeQuantileChIP2_SF_abline400_CDF_Repressed.png") 
+```
+
+We chose to include everything in quantile 0.7 and above (qmerge5) as "functional" ZNF143 binding sites. 
+
+```{r engine='bash', eval=F, echo=TRUE}
+# clean up bed file
+cp SFqmerge5.bed SF_ZNF143peaks_overQuant0.7.bed
+grep -v "random" SF_ZNF143peaks_overQuant0.7.bed | grep -v "chrUn" | grep -v "chrEBV" | grep -v "chrM" | grep -v "alt" > SF_ZNF143summits_overQuant0.7.bed
+
+```
+
+
+## rigorous de novo motif analysis  
+
+We conducted several rounds of de novo motif analysis on the "functional" ZNF143 ChIP peaks defined above. After each round, peaks containing the top ZNF143 motif (as determined by MAST) are removed. De novo motif analyis is repeated with the remaining peaks, and this continues until all peaks are accounted for.
+
+
 
 (ZNF143_16.5_strict_r1...20240816.qmd)
 
 
 Final file of ZNF143 functional binding sites: (see ZNF143_17_CDF...20240209.qmd)ZNF143strict_comp29_inferredSites_peakIntensities_unique.bed
-
-## rigorous de novo motif analysis  
 
 ## heatmaps
 

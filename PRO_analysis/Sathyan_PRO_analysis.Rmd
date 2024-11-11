@@ -716,7 +716,7 @@ size.factors = t(t(dds$sizeFactor))
 write.table(size.factors, "sizefactorsFile.txt", sep="\t", quote=F, col.names=F)
 ```
 
-Next, run PRO_normalization_sizefactor from Nascent RNA Methods:
+Next, run PRO_normalization_sizefactor from Nascent RNA Methods in the directory containing only unnormalized bigWigs:
 
 ```{r engine='bash', eval=F, echo=TRUE}
 PRO_normalization_sizefactor -c hg38.chrom.sizes -z sizefactorsFile.txt
@@ -1306,6 +1306,14 @@ xyplot(deseqAll$log2FoldChangeRS ~ log(deseqAll$baseMeanRS, base=10),
     par.settings=list(par.xlab.text=list(cex=1.1,font=2), 
                         par.ylab.text=list(cex=1.1,font=2)))
 dev.off()
+
+```
+
+
+Merge the activated/repressed/matched files together (duplicates okay):
+
+```{r engine='bash', eval=F, echo=TRUE}
+cat ZNF143dTAG_*genes* > ZNF143dTAG_act_rep_matches.bed
 
 ```
 
