@@ -1788,11 +1788,10 @@ write.table(znf143pswm, file = "znf143_denovo_pswm_ACGT.txt", sep="\t", quote = 
 
 ceqlogo -i ZNF143.txt -m ZNF143 -o ZNF143_combined.eps
 ```
-
-```{r  out.width = "50%", out.height = "50%", echo=F, fig.align = "center", fig.cap="combined ZNF143 seqLogo"}
+<!-- ```{r  out.width = "50%", out.height = "50%", echo=F, fig.align = "center", fig.cap="combined ZNF143 seqLogo"}
 library(knitr)
 knitr::include_graphics("ZNF143_combined_final.png") 
-```
+``` -->
 
 ZNF143_combined_final.png
 
