@@ -162,7 +162,6 @@ module load sratoolkit/3.0.5 # latest version on Xanadu
 fasterq-dump SRR288795XXX 
 
 echo "Script finished:" $(date '+%a %Y-%m-%d %H:%M:%S %Z')
-
 ```
 
 "get_SRA_template_ATAC_SRR302751.sh":
