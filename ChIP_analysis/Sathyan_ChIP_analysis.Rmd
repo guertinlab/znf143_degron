@@ -417,7 +417,7 @@ Template script "chIP_seqOB_template.sh":
 ```{r engine='bash', eval=F, echo=TRUE}
 #! /usr/bin/bash
 
-#SBATCH --job-name=chIP_seqOB2_XXXXXXX     # name for job
+#SBATCH --job-name=chIP_seqOB_XXXXXXX     # name for job
 #SBATCH -N 1                  
 #SBATCH -n 1                 
 #SBATCH -c 1                  
@@ -454,18 +454,18 @@ echo "End seqOutBias"
 Make individual scripts and submit:
 
 ```{r engine='bash', eval=F, echo=TRUE}
-file=SP1chIP_seqOB_template.sh
+file=chIP_seqOB_template.sh
 
 for i in *_PE1.fastq 
 do
     nm=$(echo $i | awk -F"/" '{print $NF}' | awk -F"_PE1.fastq" '{print $1}')
     echo $nm
-    sed -e "s/XXXXXXX/${nm}/g" "$file" > SP1chIP_seqOB_${nm}.sh
+    sed -e "s/XXXXXXX/${nm}/g" "$file" > chIP_seqOB_${nm}.sh
     sleep 1
 done
 
 # manually check if substitutions worked, then submit all
-for i in SP1chIP_seqOB_*rep*.sh
+for i in chIP_seqOB_*rep*.sh
 do
     echo $i
     sbatch $i
@@ -493,7 +493,7 @@ module load macs3
 
 mkdir temp_macs
 
-# Control ZNF143 ChIP only
+# Call peaks on control ZNF143 ChIP only
 macs3 callpeak --call-summits -t *HA_control*sorted.bam -c mock*hg38.bam -n ZNF143_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
 
 macs3 callpeak --call-summits -t *SP1*hg38.bam -c mock*hg38.bam -n antiSP1_ChIP -g hs -q 0.01 --keep-dup all -f BAMPE --nomodel --tempdir temp_macs
@@ -517,7 +517,7 @@ do
     echo $name
     grep -v "random" ${name}_summits.bed | grep -v "chrUn" | grep -v "chrEBV" | grep -v "chrM" | grep -v "alt" | intersectBed -v -a - -b $blacklist > ${name}_summits_final.bed
     slopBed -b 50 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_summit_100window.bed
-    slopBed -b 200 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_summit_400window.bed
+    slopBed -b 200 -i ${name}_summits_final.bed -g $sizes  | sort -k1,1 -k2,2n > ${name}_peaks_401bp.bed
 done
 
 ```
@@ -677,6 +677,139 @@ The normalized bigWigs are available in our trackhub which is available by linki
 After peak calling, we use DESeq2 to calculate normalized peak intensities. For ZNF143-ChIP, we use the manually calculated size factors based on read depth of the control samples, since the +dTAGV-1 ChIP samples have so little signal. For the other ChIPs, we use DESeq2-generated size factors. 
 
 ```{r engine='R', eval=F, echo=TRUE}
+library(bigWig)
+library(lattice)
+library(DESeq2)
+library(MatchIt)
+library(data.table)
+
+source('https://raw.githubusercontent.com/guertinlab/seqOutBias/master/docs/R/seqOutBias_functions.R')
+source('https://raw.githubusercontent.com/mjg54/znf143_pro_seq_analysis/master/docs/ZNF143_functions.R')
+
+# Required functions in addition to sourced functions from above:
+
+# Overwrite get.raw.counts.interval in ZNF143_functions.R (just changes the hard-coded file suffixes)
+
+get.raw.counts.interval <- function(df, path.to.bigWig, file.prefix = 'M') {
+    vec.names = c()
+    inten.df=data.frame(matrix(ncol = 0, nrow = nrow(df)))
+    
+    for (mod.bigWig in Sys.glob(file.path(path.to.bigWig, paste(file.prefix, "*plus_PE1.bigWig", sep ='')))) {
+        factor.name = strsplit(strsplit(mod.bigWig, "/")[[1]][length(strsplit(mod.bigWig, "/")[[1]])], '_plus')[[1]][1]
+        print(factor.name)
+        vec.names = c(vec.names, factor.name)
+        loaded.bw.plus = load.bigWig(mod.bigWig)
+        print(mod.bigWig)
+        print(paste(path.to.bigWig,'/',factor.name, '_minus.bigWig', sep=''))
+        loaded.bw.minus = load.bigWig(paste(path.to.bigWig,'/',factor.name, '_minus_PE1.bigWig', sep=''))
+        mod.inten = bed6.region.bpQuery.bigWig(loaded.bw.plus, loaded.bw.minus, df)
+        inten.df = cbind(inten.df, mod.inten)
+    }
+    colnames(inten.df) = vec.names
+    r.names = paste(df[,1], ':', df[,2], '-', df[,3],'_', df[,4], sep='')
+    row.names(inten.df) = r.names
+    return(inten.df)
+}
+
+# run.deseq.list.dds: new function
+run.deseq.list.dds <- function(mat) {
+  sample.conditions = factor(c("untreated","untreated","untreated","untreated","treated","treated","treated","treated"), levels=c("untreated","treated"))        
+  deseq.counts.table = DESeqDataSetFromMatrix(mat, DataFrame(sample.conditions), ~ sample.conditions);
+  colData(deseq.counts.table)$condition<-factor(colData(deseq.counts.table)$sample.conditions, levels=c('untreated','treated'));
+  dds = DESeq(deseq.counts.table);
+  #res = results(dds);
+  #res = res[order(res$padj),];
+  return(dds)
+}
+
+# tighten_summit_window: new function. Needed for categorizing genes
+tighten_summit_window <- function(res.deseq) {
+  chr = sapply(strsplit(rownames(res.deseq), ':'), '[', 1)
+  start = as.numeric(sapply(strsplit(sapply(strsplit(rownames(res.deseq), ':'), '[', 2), "-"), "[", 1))
+  x=sapply(strsplit(sapply(strsplit(rownames(res.deseq), ':'), '[', 2), "-"), "[", 2)
+  end = as.numeric(sapply(strsplit(x, "_"), "[", 1))
+  gene = sapply(strsplit(rownames(res.deseq), "_"), "[", 2)
+  df = cbind.data.frame(chr, start, end, gene)
+  return(df)
+}
+
+plotPCAlattice <- function(df, file = 'PCA_lattice.pdf') {  
+  perVar = round(100 * attr(df, "percentVar"))
+  df = data.frame(cbind(df, sapply(strsplit(as.character(df$name), '_rep'), '[', 1)))
+  colnames(df) = c(colnames(df)[1:(ncol(df)-1)], 'unique_condition')
+  print(df)
+  #get colors and take away the hex transparency
+  color.x = substring(rainbow(length(unique(df$unique_condition))), 1,7) 
+  
+  df$color = NA
+  df$alpha.x = NA
+  df$alpha.y = NA
+  df$colpal = NA
+  
+  for (i in 1:length(unique(df$unique_condition))) {
+    
+    df[df$unique_condition == unique(df$unique_condition)[[i]],]$color = color.x[i]   
+    #gives replicates for unique condition
+    reps_col<- df[df$unique_condition == unique(df$unique_condition)[[i]],]
+    #gives number of replicates in unique condition
+    replicates.x = nrow(reps_col)
+    alx <- rev(seq(0.2, 1, length.out = replicates.x))
+    
+    #count transparency(alx), convert alx to hex(aly), combain color and transparency(cp)
+    for(rep in 1:replicates.x) {
+    
+      na <- reps_col[rep, ]$name
+      df[df$name == na, ]$alpha.x = alx[rep]
+      aly = as.hexmode(round(alx * 255))
+      df[df$name == na, ]$alpha.y = aly[rep]
+      cp = paste0(color.x[i], aly)
+      df[df$name == na, ]$colpal = cp[rep]
+      #print(df)
+    }
+  }
+  colpal = df$colpal
+  df$name = gsub('_', ' ', df$name)
+  pdf(file, width=6, height=6, useDingbats=FALSE)
+  print(xyplot(PC2 ~ PC1, groups = name, data=df,
+               xlab = paste('PC1: ', perVar[1], '% variance', sep = ''),
+               ylab = paste('PC2: ', perVar[2], '% variance', sep = ''),
+               par.settings = list(superpose.symbol = list(pch = c(20), col=colpal)),
+               pch = 20, cex = 1.7,
+               auto.key = TRUE,
+               col = colpal))
+  dev.off()
+}
+
+bedTools.closest <- function(functionstring="/usr/local/bin/bedtools2-2.31.0/bin/closestBed",bed1,bed2,opt.string="",distLabel = "dis") {
+  
+  options(scipen =99) # not to use scientific notation when writing out
+  
+  #write bed formatted dataframes to tempfile
+  write.table(bed1,file= 'a.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
+  write.table(bed2,file= 'b.file.bed', quote=F,sep="\t",col.names=F,row.names=F)
+  
+  # create the command string and call the command using system()
+  command1=paste('sort -k1,1 -k2,2n', 'a.file.bed', '> a.file.sorted.bed')
+  cat(command1,"\n")
+  try(system(command1))
+  command2=paste('sort -k1,1 -k2,2n', 'b.file.bed', '> b.file.sorted.bed')
+  cat(command2,"\n")
+  try(system(command2))
+  
+  # use opt.string argument to add options for closestBed
+  command=paste(functionstring,opt.string,"-a",'a.file.sorted.bed',"-b",'b.file.sorted.bed',">",'out.file.bed',sep=" ")
+  cat(command,"\n")
+  try(system(command))
+  
+  res=read.table('out.file.bed',sep ="\t", header=F, comment.char='')
+  
+  command3=paste('rm', 'a.file.bed', 'b.file.bed', 'a.file.sorted.bed', 'b.file.sorted.bed', 'out.file.bed')
+  cat(command3,"\n")
+  try(system(command3))
+  
+  colnames(res) = c(colnames(bed1), colnames(bed2), distLabel )
+  return(res)
+}
 
 
 # ZNF143
@@ -688,9 +821,30 @@ After peak calling, we use DESeq2 to calculate normalized peak intensities. For 
 
 
 # Nrf1
+nrf1peaks401 = read.table('antiNrf1_ChIP_peaks_401bp.bed', sep = "\t", header=FALSE)
+nrf1.counts.df = get.counts.interval(nrf1peaks401, '/scratch/jdong/ZNF143dTAG/ChIP/FASTQ', file.prefix="*Nrf1*seqOut")
+sample.conditions = factor(sapply(strsplit(colnames(nrf1.counts.df), '-rep'), '[', 1))
+sample.conditions = factor(gsub("-","_",sample.conditions))
+deseq.counts.table = DESeqDataSetFromMatrix(countData = nrf1.counts.df,
+                colData = as.data.frame(sample.conditions),
+                design = ~ sample.conditions)
+nrf1.dds <- DESeq(deseq.counts.table)
+normCountsNrf1 = counts(nrf1.dds, normalized=TRUE)
+nrf1Peaks = tighten_summit_window(normCountsNrf1)
+normCountsNrf1 = cbind(nrf1Peaks,normCountsNrf1)
 
-# all that other deseq stuff
 
+nrf1peakIntensSort = sort(nrf1peakIntens, decreasing=TRUE)
+
+chr = sapply(strsplit(names(nrf1peakIntensSort), ":"), "[", 1)
+rnge = sapply(strsplit(names(nrf1peakIntensSort), ":"), "[", 2)
+start = as.numeric(sapply(strsplit(rnge, "-"), "[", 1)) + 200
+end = as.numeric(sapply(strsplit(rnge, "-"), "[", 2)) - 200
+
+normCountsNrf1df = as.data.frame(cbind(chr,start,end,nrf1peakIntensSort))
+write.table(normCountsNrf1df, file = 'nrf1_normCounts_summits.bed', sep = '\t', quote=FALSE, col.names=FALSE, row.names=FALSE)
+
+# take peak intensities from average of control intensities
 normCountsNrf1$nrf1ContPeakIntens = rowMeans(normCountsNrf1[,4:7])
 normCountsNrf1sorted = normCountsNrf1[order(as.numeric(normCountsNrf1$nrf1ContPeakIntens), decreasing = FALSE),]
 write.table(normCountsNrf1sorted[,c("chr","start","end","peakCoords","nrf1ContPeakIntens")], sep="\t", quote=FALSE, row.names=FALSE,col.names=FALSE,file="nrf1_peaks_intensities_decreasing_401bp.bed")
@@ -701,12 +855,18 @@ write.table(normCountsNrf1sorted[,c("chr","start","end","peakCoords","nrf1ContPe
 We do de novo motif analysis after peak calling to verify if our target antibodies pulled down our expected targets. Generally we expect that the top motif to come out of the most intense peaks to be that of our expected transcription factor. This was only done for non-ZNF143 samples since ZNF143 went through a more rigorous de novo motif analysis process (see below). 
 
 ```{r engine='bash', eval=F, echo=TRUE}
-cat antiSP1_ChIP_summits.bed | sort -rn -k5 | head -1000 > antiSP1_top1kPeaks.bed
 # search for motif in 100bp window (101 total)
 sizes=/home/FCAM/jdong/human38/hg38.chrom.sizes
+
+cat antiSP1_ChIP_summits.bed | sort -rn -k5 | head -1000 > antiSP1_top1kPeaks.bed
 slopBed -b 50 -i antiSP1_top1kPeaks.bed -g $sizes  | sort -k1,1 -k2,2n > antiSP1_top1kPeaks_101window.bed
 genome=/home/FCAM/jdong/human38/hg38.fa
 fastaFromBed -fi $genome -bed antiSP1_top1kPeaks_101window.bed -fo antiSP1_top1kPeaks_101window.fasta
+
+slopBed -b 50 -i nrf1_normCounts_summits.bed -g $sizes > nrf1_normCounts_summits_101bp.bed
+# take top 1k peaks 
+head -1000 nrf1_normCounts_summits_101bp.bed > nrf1_normCounts_summits_top1k.bed
+fastaFromBed -fi $genome -bed nrf1_normCounts_summits_top1k.bed -fo nrf1_normCounts_summits_top1k_101bp.fasta
 
 module load meme/5.4.1
 
@@ -716,10 +876,15 @@ meme -oc Nrf1_motif_analysis_top1k_normCounts.meme_output -nmotifs 3 -p 160 -obj
 
 ```
 
-[add figure of sp motif]
+```{r  out.width = "500px", echo=F, fig.align = "center", fig.cap="SP1 logo from top 1000 ChIP peaks"}
+library(knitr)
+knitr::include_graphics("SP1logo_rc1.png") 
+```
 
-[add figure of Nrf1 motif]
-
+```{r  out.width = "500px", echo=F, fig.align = "center", fig.cap="Nrf1 logo from top 1000 ChIP peaks"}
+library(knitr)
+knitr::include_graphics("Nrf1logo_rc1.png") 
+```
 
 
 # ZNF143 ChIP-seq analysis 
