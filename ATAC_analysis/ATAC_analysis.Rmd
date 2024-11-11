@@ -39,7 +39,7 @@ pre[class] {
 
 This vignette contains the ATAC-seq analysis for the manuscript "ZNF143 binds DNA and stimulates transcription initiation to activate and repress direct target genes" (doi: https://doi.org/10.1101/2024.05.13.594008). 
 
-The analysis follows the published figures, which may differ from the preprint figures in labeling and content. This vignette is copied largely from the ATAC-seq vignette for the GeneX course (https://github.com/guertinlab/genex/tree/main).
+The analysis follows the published figures, which may differ from the preprint figures in labeling and content. This vignette is copied largely from the ATAC-seq vignette for the CSHL Gene Expression course (https://github.com/guertinlab/genex/tree/main).
 
 # ATAC-seq experiments
 
