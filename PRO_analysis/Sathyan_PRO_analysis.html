@@ -1153,15 +1153,15 @@ done 2&gt; Z143_UMI_test_clipped_stderr.txt</code></pre>
 <p>Interpreting results:</p>
 <pre class="bash"><code>grep -i &quot;alignment rate&quot; Z143_UMI_test_clipped_stderr.txt 
 65.72% overall alignment rate # 0 bases trimmed
-74.20% overall alignment rate # 1
-78.63% overall alignment rate # 2
-82.87% overall alignment rate # 3
-84.89% overall alignment rate # 4
-86.72% overall alignment rate # 5
-89.22% overall alignment rate # 6
-74.36% overall alignment rate # 7
-95.84% overall alignment rate # 8 -- spike
-96.61% overall alignment rate # 9 </code></pre>
+74.17% overall alignment rate # 1
+78.61% overall alignment rate # 2
+82.83% overall alignment rate # 3
+84.85% overall alignment rate # 4
+86.66% overall alignment rate # 5
+89.18% overall alignment rate # 6
+74.31% overall alignment rate # 7
+95.83% overall alignment rate # 8 -- spike
+96.61% overall alignment rate # 9</code></pre>
 <p>Note the large spike in alignment rate when 8 bases are trimmed–this is another point in favor of the UMI length = 8.</p>
 </div>
 </div>
@@ -1362,8 +1362,8 @@ rm ${name}.notCombined_1.fastq.gz
 rm ${name}.notCombined_2.fastq.gz</code></pre>
 <p>Re-zip raw sequencing files:</p>
 <pre class="bash"><code># check wildcards first
-gzip *_PE1_final.fastq
-gzip *_PE2_final.fastq</code></pre>
+gzip *_PE1.fastq
+gzip *_PE2.fastq</code></pre>
 <p>Combine all QC metrics and plot:</p>
 <pre class="bash"><code>cat *_QC_metrics.txt | awk &#39;!x[$0]++&#39; &gt; project_QC_metrics.txt 
 
