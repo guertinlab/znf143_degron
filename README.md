@@ -7,3 +7,7 @@ https://guertinlab.github.io/znf143_degron/ChIP_analysis/Sathyan_ChIP_analysis.h
 ZNF143 dTAG13 degradation PRO-seq analysis
 
 https://guertinlab.github.io/znf143_degron/PRO_analysis/Sathyan_PRO_analysis.html
+
+ZNF143 dTAG degradation ATAC-sec analysis
+
+https://guertinlab.github.io/znf143_degron/ATAC_analysis/ATAC_analysis.html
