@@ -942,7 +942,7 @@ Use manual size factors to get normalized counts in peaks:
 
 ```{r engine='R', eval=F, echo=TRUE}
 y = read.table('ZNF143_ChIP_peaks_401bp.bed',sep="\t",header=FALSE)
-znf143CountsDF = get.counts.interval(y, "/scratch/jdong/ZNF143dTAG/ChIP/FASTQ', file.prefix="*HA*seqOut",file.prefix="*HA*")
+znf143CountsDF = get.counts.interval(y, '/scratch/jdong/ZNF143dTAG/ChIP/FASTQ', file.prefix="*HA*seqOut",file.prefix="*HA*")
 sample.conditions = factor(sapply(strsplit(colnames(znf143CountsDF), '_rep'), '[', 1))
 deseqCounts = DESeqDataSetFromMatrix(countData = znf143CountsDF,
                 colData = as.data.frame(sample.conditions),
@@ -1136,7 +1136,9 @@ Final file of ZNF143 functional binding sites: (see ZNF143_17_CDF...20240209.qmd
 
 ## heatmaps
 
+# Finding overlaps of promoter-enriched motifs with ZNF143
 
+## Fig. S9A Motif overlap dot plot
 
 # SP1 ChIP-seq analysis
 
